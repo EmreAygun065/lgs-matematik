@@ -145,5 +145,14 @@ table.grid.small td.x { width: auto; padding: 0 .3rem; color: var(--muted); }
   .panel { border: none; page-break-inside: avoid; }
 }
 
+/* Marka */
+.marka { font-weight: 700; color: var(--accent); white-space: nowrap; }
+.marka::before { content: "✎ "; font-weight: 400; }
+.imza { text-align: center; color: var(--muted); font-size: .85rem; margin: 2rem 0 0; }
+.imza-sabit { display: none; }
+@media print {
+  .imza-sabit { display: block; position: fixed; bottom: 0; right: 0; font-size: 9pt; color: #888; }
+}
+
 /* Öğrenci sitesi: kaynak PDF atıfları gizli */
 .kaynak { display: none; }

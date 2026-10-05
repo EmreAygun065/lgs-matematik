@@ -7,12 +7,13 @@
   const LETTERS = ['A', 'B', 'C', 'D'];
   const konular = [...new Set(QUESTIONS.map(q => q.konu).filter(Boolean))];
 
-  document.title = SET.baslik + ' ' + SET.vurgu;
+  document.title = SET.baslik + ' ' + SET.vurgu + ' · Emre Hoca';
   document.body.innerHTML = `
 <header>
   <a class="home" href="../index.html" title="Ana sayfa">⌂</a>
   <h1>${SET.baslik} · <span>${SET.vurgu}</span></h1>
   ${konular.length > 1 ? `<select id="konu" aria-label="Konu seç"><option value="">Tüm konular (${QUESTIONS.length})</option>${konular.map(k => `<option>${k}</option>`).join('')}</select>` : ''}
+  <span class="marka">Emre Hoca</span>
   <button class="theme-btn" id="themeBtn" title="Açık / koyu tema">◐ Tema</button>
   <nav id="nav"></nav>
 </header>

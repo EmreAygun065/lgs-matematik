@@ -55,16 +55,17 @@
   const L = 'ABCD';
   const cozumAcik = params.get('cozum') === '1';
 
-  document.title = 'Çalışma Kâğıdı · ' + set.ad;
+  document.title = 'Çalışma Kâğıdı · ' + set.ad + ' · Emre Hoca';
   document.body.innerHTML = `
   <div class="bar">
     <a class="home" href="../index.html" title="Ana sayfa">⌂</a>
-    <h1>Çalışma Kâğıdı</h1>
+    <h1>Çalışma Kâğıdı · <span class="marka">Emre Hoca</span></h1>
     <select id="set">${Object.entries(SETLER).map(([k, v]) => `<option value="${k}" ${k === SET_ADI ? 'selected' : ''}>${v.ad}</option>`).join('')}</select>
     ${konular.length > 1 ? `<select id="konu"><option value="">Tüm konular</option>${konular.map(k => `<option ${k === konu ? 'selected' : ''}>${k}</option>`).join('')}</select>` : ''}
     <label><input type="checkbox" id="coz" ${cozumAcik ? 'checked' : ''}> Çözümleri de ekle</label>
     <button class="primary" onclick="print()">🖨 Yazdır / PDF</button>
   </div>
+  <div class="imza-sabit">Emre Hoca · LGS Matematik</div>
   <div class="kagit">
     <h2>Üslü İfadeler · ${set.ad}${konu ? ' · ' + konu : ''}</h2>
     <p class="bilgi"><span>Ad Soyad: ……………………………</span><span>Sınıf: ……</span><span>Tarih: ……………</span><span>${sorular.length} soru</span></p>
