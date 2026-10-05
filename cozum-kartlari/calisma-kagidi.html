@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Çalışma Kâğıdı</title>
+<link rel="stylesheet" href="ortak/stil.css">
+<style>
+  body { background: var(--bg); }
+  .bar { position: sticky; top: 0; z-index: 5; display: flex; flex-wrap: wrap; gap: .6rem 1rem; align-items: center; padding: .7rem 1.25rem; background: var(--card); border-bottom: 1px solid var(--line); }
+  .bar h1 { font-size: 1.1rem; margin: 0; flex: 1; }
+  .bar select, .bar button, .bar label { font: inherit; font-size: .9rem; }
+  .bar select, .bar button { border: 1px solid var(--line); border-radius: 8px; padding: .3rem .6rem; background: var(--bg); color: var(--ink); cursor: pointer; }
+  .bar button.primary { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 600; }
+  .kagit { max-width: 900px; margin: 1.25rem auto; background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 1.5rem 2rem; }
+  .kagit > h2 { margin: 0 0 .2rem; font-size: 1.3rem; }
+  .bilgi { color: var(--muted); font-size: .9rem; margin: 0 0 1rem; display: flex; gap: 1.5rem; flex-wrap: wrap; }
+  .soru { border-top: 1px solid var(--line); padding: 1rem 0; break-inside: avoid; page-break-inside: avoid; }
+  .soru-bas { display: flex; gap: .5rem; align-items: center; margin-bottom: .3rem; }
+  .soru .opts { margin-top: .6rem; }
+  .soru .opt { cursor: default; border-width: 1px; padding: .3rem .6rem; }
+  .anahtar { break-before: page; page-break-before: always; }
+  .anahtar table { border-collapse: collapse; width: 100%; font-size: .95rem; }
+  .anahtar td, .anahtar th { border: 1px solid var(--line); padding: .3rem .5rem; text-align: center; }
+  .cozumler li { margin-bottom: .6rem; }
+  .cozumler .c-adim { color: var(--muted); }
+  @media print {
+    .bar { display: none; }
+    body { background: #fff; }
+    .kagit { border: none; margin: 0; padding: 0; max-width: none; }
+    .soru .opt { background: #fff; }
+  }
+</style>
+</head>
+<body>
+<script>
+  // ?set=cikmis | ornek | benzer-cikmis | benzer-ornek   ve isteğe bağlı &konu=...
+  const SETLER = {
+    'cikmis': { ad: 'LGS Çıkmış Sorular (2018–2026)', js: ['veri/uslu-cikmis.js'], al: () => KART_SETI.sorular },
+    'ornek': { ad: 'MEB Örnek Sorular', js: ['ortak/yardimci.js', 'veri/ornek-0.js', 'veri/ornek-1.js', 'veri/ornek-2.js', 'veri/ornek-3.js', 'veri/ornek-4.js'], al: () => ORNEK },
+    'benzer-cikmis': { ad: 'Çıkmış Sorulara Benzer Yeni Sorular', js: ['ortak/yardimci.js', 'veri/benzer-cikmis.js'], al: () => BENZER_CIKMIS },
+    'benzer-ornek': { ad: 'MEB Sorularına Benzer Yeni Sorular', js: ['ortak/yardimci.js', 'veri/benzer-ornek-1.js', 'veri/benzer-ornek-2.js', 'veri/benzer-ornek-3.js', 'veri/benzer-ornek-4.js'], al: () => BENZER_ORNEK }
+  };
+  const params = new URLSearchParams(location.search);
+  const SET_ADI = SETLER[params.get('set')] ? params.get('set') : 'benzer-cikmis';
+  SETLER[SET_ADI].js.forEach(src => document.write(`<script src="${src}"><\/script>`));
+</script>
+<script>
+(function () {
+  const set = SETLER[SET_ADI];
+  const tum = set.al();
+  const konu = params.get('konu') || '';
+  const sorular = tum.filter(q => !konu || q.konu === konu);
+  const konular = [...new Set(tum.map(q => q.konu).filter(Boolean))];
+  const L = 'ABCD';
+  const cozumAcik = params.get('cozum') === '1';
+
+  document.title = 'Çalışma Kâğıdı · ' + set.ad;
+  document.body.innerHTML = `
+  <div class="bar">
+    <a class="home" href="../index.html" title="Ana sayfa">⌂</a>
+    <h1>Çalışma Kâğıdı</h1>
+    <select id="set">${Object.entries(SETLER).map(([k, v]) => `<option value="${k}" ${k === SET_ADI ? 'selected' : ''}>${v.ad}</option>`).join('')}</select>
+    ${konular.length > 1 ? `<select id="konu"><option value="">Tüm konular</option>${konular.map(k => `<option ${k === konu ? 'selected' : ''}>${k}</option>`).join('')}</select>` : ''}
+    <label><input type="checkbox" id="coz" ${cozumAcik ? 'checked' : ''}> Çözümleri de ekle</label>
+    <button class="primary" onclick="print()">🖨 Yazdır / PDF</button>
+  </div>
+  <div class="kagit">
+    <h2>Üslü İfadeler · ${set.ad}${konu ? ' · ' + konu : ''}</h2>
+    <p class="bilgi"><span>Ad Soyad: ……………………………</span><span>Sınıf: ……</span><span>Tarih: ……………</span><span>${sorular.length} soru</span></p>
+    ${sorular.map((q, i) => `
+      <div class="soru">
+        <div class="soru-bas"><span class="qno">${i + 1}</span>${q.yil ? `<span class="tag">${q.yil} LGS</span>` : ''}${q.etiket ? `<span class="tag">${q.etiket}</span>` : ''}</div>
+        <div class="qtext">${q.q}</div>
+        <div class="opts ${q.long ? 'long' : ''}">${q.opts.map((o, j) => `<div class="opt"><b>${L[j]})</b>${o}</div>`).join('')}</div>
+      </div>`).join('')}
+    <div class="anahtar">
+      <h2>Cevap Anahtarı</h2>
+      <table>${chunk(sorular.map((q, i) => [i + 1, L[q.ans]]), 10).map(r => `<tr>${r.map(([n]) => `<th>${n}</th>`).join('')}</tr><tr>${r.map(([, a]) => `<td><b>${a}</b></td>`).join('')}</tr>`).join('')}</table>
+      ${cozumAcik ? `<h2 style="margin-top:1.5rem">Kısa Çözümler</h2><ol class="cozumler">${sorular.map(q => `<li><span class="c-adim">${q.steps.join(' → ')}</span><br><b>${q.answer}</b></li>`).join('')}</ol>` : ''}
+    </div>
+  </div>`;
+
+  function chunk(arr, n) { const out = []; for (let i = 0; i < arr.length; i += n) out.push(arr.slice(i, i + n)); return out; }
+  const git = (s, k, c) => { const p = new URLSearchParams({ set: s }); if (k) p.set('konu', k); if (c) p.set('cozum', '1'); location.search = p.toString(); };
+  document.getElementById('set').onchange = e => git(e.target.value, '', document.getElementById('coz').checked);
+  if (document.getElementById('konu')) document.getElementById('konu').onchange = e => git(SET_ADI, e.target.value, document.getElementById('coz').checked);
+  document.getElementById('coz').onchange = e => git(SET_ADI, konu, e.target.checked);
+})();
+</script>
+</body>
+</html>

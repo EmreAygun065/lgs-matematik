@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Matematik Ders Materyalleri</title>
+<link rel="stylesheet" href="cozum-kartlari/ortak/stil.css">
+<style>
+  .sayfa { max-width: 1100px; margin: 0 auto; padding: 1.5rem 1.25rem 3rem; }
+  .sayfa > h1 { font-size: 1.6rem; margin: .5rem 0 .2rem; }
+  .sayfa > h1 span { color: var(--accent); }
+  .alt { color: var(--muted); margin: 0 0 1.5rem; }
+  h2 { font-size: 1.1rem; margin: 2rem 0 .8rem; }
+  .izgara { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 1rem; }
+  a.kart { display: block; text-decoration: none; color: var(--ink); background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 1.1rem 1.2rem; transition: border-color .15s, transform .15s; }
+  a.kart:hover { border-color: var(--accent); transform: translateY(-2px); }
+  a.kart b { display: block; font-size: 1.05rem; margin-bottom: .3rem; }
+  a.kart span { color: var(--muted); font-size: .9rem; }
+  a.kart .sayi { float: right; background: var(--accent-soft); color: var(--accent); font-weight: 700; border-radius: 999px; padding: 0 .6rem; font-size: .85rem; }
+  .ipucu { margin-top: 2rem; color: var(--muted); font-size: .9rem; border-left: 3px solid var(--line); padding-left: .8rem; }
+</style>
+</head>
+<body>
+<div class="sayfa">
+  <h1>8. Sınıf Matematik · <span>Üslü İfadeler</span></h1>
+  <p class="alt">LGS hazırlığı için etkileşimli çözüm kartları, benzer sorular ve yazdırılabilir çalışma kâğıtları.</p>
+
+  <h2>📘 Çözüm kartları (akıllı tahta için)</h2>
+  <div class="izgara">
+    <a class="kart" href="cozum-kartlari/uslu-cikmis.html"><em class="sayi">21</em><b>LGS çıkmış sorular</b><span>2018–2026 arası çıkan tüm üslü ifadeler soruları, adım adım çözüm ve tuzaklar</span></a>
+    <a class="kart" href="cozum-kartlari/uslu-ornek.html"><em class="sayi">80</em><b>MEB örnek sorular</b><span>Konulara göre filtrelenebilir, her soru için ipucu ve çözüm</span></a>
+  </div>
+
+  <h2>✏️ Benzer yeni sorular</h2>
+  <div class="izgara">
+    <a class="kart" href="cozum-kartlari/benzer-cikmis.html"><em class="sayi">21</em><b>Çıkmış sorulara benzer</b><span>Her çıkmış sorunun mantığıyla yazılmış yeni soru</span></a>
+    <a class="kart" href="cozum-kartlari/benzer-ornek.html"><em class="sayi">80</em><b>MEB sorularına benzer</b><span>Her örnek sorunun mantığıyla yazılmış yeni soru</span></a>
+  </div>
+
+  <h2>🖨 Yazdırılabilir çalışma kâğıtları</h2>
+  <div class="izgara">
+    <a class="kart" href="cozum-kartlari/calisma-kagidi.html?set=benzer-cikmis"><b>Benzer sorular (çıkmış)</b><span>21 soru + cevap anahtarı</span></a>
+    <a class="kart" href="cozum-kartlari/calisma-kagidi.html?set=benzer-ornek"><b>Benzer sorular (MEB)</b><span>80 soru, konuya göre seçilebilir + cevap anahtarı</span></a>
+    <a class="kart" href="cozum-kartlari/calisma-kagidi.html?set=cikmis"><b>Çıkmış sorular</b><span>21 soru + cevap anahtarı</span></a>
+    <a class="kart" href="cozum-kartlari/calisma-kagidi.html?set=ornek"><b>MEB örnek sorular</b><span>80 soru, konuya göre seçilebilir + cevap anahtarı</span></a>
+  </div>
+
+  <p class="ipucu">Çözüm kartlarında: <kbd>→</kbd> sonraki adım, <kbd>←</kbd> geri, <kbd>İ</kbd> ipucu, <kbd>Page Down</kbd> sonraki soru. Çalışma kâğıdında “Yazdır / PDF” düğmesiyle kâğıda ya da PDF'e alabilirsiniz; cevap anahtarı ayrı sayfaya düşer.</p>
+</div>
+<script>
+  try { const t = localStorage.getItem('tema'); if (t) document.documentElement.dataset.theme = t; } catch (e) {}
+</script>
+</body>
+</html>
