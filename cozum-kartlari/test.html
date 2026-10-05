@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Online Test · Emre Hoca</title>
+<link rel="stylesheet" href="ortak/stil.css">
+<style>
+  .sayfa { max-width: 860px; margin: 0 auto; padding: 1rem 1rem 4rem; }
+  .ust { display: flex; align-items: center; gap: .8rem; flex-wrap: wrap; margin-bottom: 1rem; }
+  .ust h1 { font-size: 1.25rem; margin: 0; flex: 1; }
+  .kutu { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 1.2rem 1.4rem; margin-bottom: 1rem; }
+  label.alan { display: block; font-weight: 600; margin: .8rem 0 .3rem; }
+  input[type=text], select.test-sec { font: inherit; width: 100%; padding: .55rem .7rem; border: 1px solid var(--line); border-radius: 10px; background: var(--bg); color: var(--ink); }
+  .dugme { font: inherit; font-weight: 700; border: none; border-radius: 10px; padding: .7rem 1.4rem; background: var(--accent); color: #fff; cursor: pointer; margin-top: 1.2rem; }
+  .dugme.ikincil { background: var(--bg); color: var(--ink); border: 1px solid var(--line); font-weight: 500; }
+  .hata { color: var(--red); font-weight: 600; margin-top: .6rem; min-height: 1.4rem; }
+  .soru .opt.secili { border-color: var(--blue); background: var(--blue-soft); }
+  .soru .opt.dogru { border-color: var(--green); background: var(--green-soft); }
+  .soru .opt.yanlis { border-color: var(--red); background: var(--red-soft); }
+  .ilerleme { position: sticky; bottom: 0; background: var(--card); border-top: 1px solid var(--line); padding: .7rem 1rem; display: flex; align-items: center; gap: 1rem; justify-content: space-between; margin: 0 -1rem; }
+  .ilerleme .dugme { margin: 0; }
+  .puan { display: grid; grid-template-columns: repeat(4, 1fr); gap: .6rem; text-align: center; margin: 1rem 0; }
+  .puan div { border-radius: 12px; padding: .7rem .3rem; background: var(--bg); }
+  .puan b { display: block; font-size: 1.8rem; }
+  .puan .d b { color: var(--green); } .puan .y b { color: var(--red); } .puan .p b { color: var(--accent); }
+  .durum { font-size: .95rem; padding: .6rem .8rem; border-radius: 10px; background: var(--bg); }
+  .durum.ok { background: var(--green-soft); color: var(--green); } .durum.no { background: var(--red-soft); color: var(--red); }
+  details.cozum { margin-top: .6rem; } details.cozum summary { cursor: pointer; color: var(--blue); font-weight: 600; }
+  details.cozum ol { margin: .5rem 0 0; padding-left: 1.3rem; }
+  .sonuc-etiket { font-weight: 700; margin-left: .3rem; }
+  .sonuc-etiket.d { color: var(--green); } .sonuc-etiket.y { color: var(--red); } .sonuc-etiket.b { color: var(--muted); }
+</style>
+</head>
+<body>
+<script src="ortak/ayarlar.js"></script>
+<script src="ortak/yardimci.js"></script>
+<script src="veri/benzer-cikmis.js"></script>
+<script src="veri/benzer-ornek-1.js"></script>
+<script src="veri/benzer-ornek-2.js"></script>
+<script src="veri/benzer-ornek-3.js"></script>
+<script src="veri/benzer-ornek-4.js"></script>
+<script>
+(function () {
+  const araliktan = (a, b) => BENZER_ORNEK.filter(q => q.no >= a && q.no <= b);
+  const TESTLER = [
+    { id: 'cikmis', ad: 'LGS tarzı karma test', sorular: () => BENZER_CIKMIS },
+    { id: 'tam-sayi', ad: 'Tam sayıların kuvvetleri', sorular: () => araliktan(1, 15) },
+    { id: 'kurallar-1', ad: 'Temel kurallar – 1', sorular: () => araliktan(16, 34) },
+    { id: 'kurallar-2', ad: 'Temel kurallar – 2', sorular: () => araliktan(35, 53) },
+    { id: 'ondalik', ad: "Ondalık çözümleme ve 10'un kuvvetleri", sorular: () => araliktan(54, 75) },
+    { id: 'bilimsel', ad: 'Bilimsel gösterim', sorular: () => araliktan(76, 80) }
+  ];
+  const L = 'ABCD';
+  const $ = id => document.getElementById(id);
+  const params = new URLSearchParams(location.search);
+  let test = TESTLER.find(t => t.id === params.get('test'));
+  let ogrenci = null, sorular = [], cevaplar = [];
+
+  try { const t = localStorage.getItem('tema'); if (t) document.documentElement.dataset.theme = t; } catch (e) {}
+
+  const ust = baslik => `<div class="ust"><a class="home" href="../index.html" title="Ana sayfa">⌂</a><h1>${baslik}</h1><span class="marka">Emre Hoca</span></div>`;
+
+  // 1) Giriş ekranı
+  function giris() {
+    let kayitli = {};
+    try { kayitli = JSON.parse(localStorage.getItem('ogrenci') || '{}'); } catch (e) {}
+    document.body.innerHTML = `<div class="sayfa">${ust('Online Test')}
+      <div class="kutu">
+        <p>Testi çözmeye başlamadan önce bilgilerini yaz. Sonucun öğretmenine gönderilecek.</p>
+        <label class="alan" for="ad">Ad Soyad</label>
+        <input type="text" id="ad" autocomplete="name" maxlength="60" value="${kacis(kayitli.ad || '')}">
+        <label class="alan" for="sinif">Sınıf / Şube</label>
+        <input type="text" id="sinif" maxlength="20" placeholder="Örn. 8-A" value="${kacis(kayitli.sinif || '')}">
+        <label class="alan" for="test">Test</label>
+        <select class="test-sec" id="test">${TESTLER.map(t => `<option value="${t.id}" ${test && test.id === t.id ? 'selected' : ''}>${t.ad} (${t.sorular().length} soru)</option>`).join('')}</select>
+        <button class="dugme" id="basla">Teste başla →</button>
+        <div class="hata" id="hata"></div>
+      </div></div>`;
+    $('basla').onclick = () => {
+      const ad = $('ad').value.trim().replace(/\s+/g, ' '), sinif = $('sinif').value.trim();
+      if (ad.split(' ').length < 2) { $('hata').textContent = 'Lütfen adını ve soyadını yaz.'; return; }
+      if (!sinif) { $('hata').textContent = 'Lütfen sınıfını yaz.'; return; }
+      ogrenci = { ad, sinif };
+      try { localStorage.setItem('ogrenci', JSON.stringify(ogrenci)); } catch (e) {}
+      test = TESTLER.find(t => t.id === $('test').value);
+      sorular = test.sorular();
+      cevaplar = sorular.map(() => null);
+      coz();
+    };
+  }
+
+  // 2) Soru çözme ekranı
+  function coz() {
+    document.body.innerHTML = `<div class="sayfa">${ust(test.ad)}
+      <p class="durum">${kacis(ogrenci.ad)} · ${kacis(ogrenci.sinif)} — İşaretlediğin şıkkı değiştirebilirsin. Bitince en alttaki “Testi bitir” düğmesine bas.</p>
+      ${sorular.map((q, i) => `<div class="kutu soru" id="s${i}">
+        <div class="qhead"><span class="qno">${i + 1}</span></div>
+        <div class="qtext">${q.q}</div>
+        <div class="opts ${q.long ? 'long' : ''}">${q.opts.map((o, j) => `<button class="opt" data-i="${i}" data-j="${j}"><b>${L[j]})</b>${o}</button>`).join('')}</div>
+      </div>`).join('')}
+      <div class="ilerleme"><span id="sayac"></span><button class="dugme" id="bitir">Testi bitir</button></div>
+    </div>`;
+    document.querySelectorAll('.soru .opt').forEach(b => b.onclick = () => {
+      const i = +b.dataset.i, j = +b.dataset.j;
+      cevaplar[i] = cevaplar[i] === j ? null : j;   // aynı şıkka tekrar basınca işaret kalkar
+      document.querySelectorAll(`#s${i} .opt`).forEach(x => x.classList.toggle('secili', +x.dataset.j === cevaplar[i]));
+      sayac();
+    });
+    $('bitir').onclick = () => {
+      const bos = cevaplar.filter(c => c === null).length;
+      if (bos && !confirm(`${bos} soruyu boş bıraktın. Yine de testi bitirmek istiyor musun?`)) return;
+      sonuc();
+    };
+    sayac();
+    window.scrollTo(0, 0);
+  }
+
+  function sayac() {
+    const n = cevaplar.filter(c => c !== null).length;
+    $('sayac').textContent = `${n} / ${sorular.length} soru işaretlendi`;
+  }
+
+  // 3) Sonuç ekranı + gönderim
+  function sonuc() {
+    const dogru = cevaplar.filter((c, i) => c === sorular[i].ans).length;
+    const bos = cevaplar.filter(c => c === null).length;
+    const yanlis = sorular.length - dogru - bos;
+    const puan = Math.round(dogru / sorular.length * 100);
+    const kayit = {
+      ad: ogrenci.ad, sinif: ogrenci.sinif, test: test.ad, testId: test.id,
+      dogru, yanlis, bos, puan, soruSayisi: sorular.length,
+      cevaplar: cevaplar.map((c, i) => `${i + 1}:${c === null ? '-' : L[c]}${c === null ? '' : c === sorular[i].ans ? '✓' : '✗(' + L[sorular[i].ans] + ')'}`).join(' ')
+    };
+
+    document.body.innerHTML = `<div class="sayfa">${ust(test.ad + ' · Sonuç')}
+      <div class="kutu">
+        <p><b>${kacis(ogrenci.ad)}</b> · ${kacis(ogrenci.sinif)}</p>
+        <div class="puan"><div class="d"><b>${dogru}</b>Doğru</div><div class="y"><b>${yanlis}</b>Yanlış</div><div><b>${bos}</b>Boş</div><div class="p"><b>${puan}</b>Puan</div></div>
+        <p class="durum" id="gonderim">Sonucun öğretmenine gönderiliyor…</p>
+        <button class="dugme ikincil" id="tekrar" hidden>Tekrar göndermeyi dene</button>
+      </div>
+      <h2 style="font-size:1.1rem">Cevapların</h2>
+      ${sorular.map((q, i) => {
+        const c = cevaplar[i], d = c === q.ans;
+        const etiket = c === null ? '<span class="sonuc-etiket b">Boş</span>' : d ? '<span class="sonuc-etiket d">✓ Doğru</span>' : '<span class="sonuc-etiket y">✗ Yanlış</span>';
+        return `<div class="kutu soru">
+          <div class="qhead"><span class="qno">${i + 1}</span>${etiket}</div>
+          <div class="qtext">${q.q}</div>
+          <div class="opts ${q.long ? 'long' : ''}">${q.opts.map((o, j) => `<div class="opt ${j === q.ans ? 'dogru' : j === c ? 'yanlis' : ''}"><b>${L[j]})</b>${o}</div>`).join('')}</div>
+          <details class="cozum"><summary>Çözümü göster</summary><ol>${q.steps.map(s => `<li>${s}</li>`).join('')}</ol><p class="answer">${q.answer}</p></details>
+        </div>`;
+      }).join('')}
+      <button class="dugme" onclick="location.reload()">Başka bir test çöz</button>
+    </div>`;
+    window.scrollTo(0, 0);
+    gonder(kayit);
+    $('tekrar').onclick = () => gonder(kayit);
+  }
+
+  function gonder(kayit) {
+    const durum = $('gonderim');
+    if (!window.SONUC_ADRESI) {
+      durum.className = 'durum'; durum.textContent = 'Not: Sonuç gönderme henüz ayarlanmadı; puanını öğretmenine kendin söyleyebilirsin.';
+      return;
+    }
+    durum.className = 'durum'; durum.textContent = 'Sonucun öğretmenine gönderiliyor…';
+    $('tekrar').hidden = true;
+    // text/plain + no-cors: Google Apps Script'e ön kontrol (CORS) olmadan gönderir.
+    fetch(window.SONUC_ADRESI, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(kayit) })
+      .then(() => { durum.className = 'durum ok'; durum.textContent = '✓ Sonucun öğretmenine gönderildi.'; })
+      .catch(() => { durum.className = 'durum no'; durum.textContent = 'Sonuç gönderilemedi. İnternet bağlantını kontrol edip tekrar dene.'; $('tekrar').hidden = false; });
+  }
+
+  function kacis(s) { return String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
+
+  giris();
+})();
+</script>
+</body>
+</html>
