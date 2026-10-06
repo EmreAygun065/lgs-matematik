@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Çalışma Kâğıdı</title>
-<link rel="stylesheet" href="ortak/stil.css">
+<link rel="stylesheet" href="ortak/stil.css?v=20261006b">
 <style>
   body { background: var(--bg); }
   .bar { position: sticky; top: 0; z-index: 5; display: flex; flex-wrap: wrap; gap: .6rem 1rem; align-items: center; padding: .7rem 1.25rem; background: var(--card); border-bottom: 1px solid var(--line); }
@@ -34,10 +34,15 @@
 </head>
 <body>
 <script>
-  // ?set=cikmis | ornek | benzer-cikmis | benzer-ornek (Üslü) · kk-cikmis | kk-ornek | kk-benzer-cikmis | kk-benzer-ornek (Karekök)   ve isteğe bağlı &konu=...
-  const USLU = 'Üslü İfadeler', KAREKOK = 'Kareköklü İfadeler';
+  // ?set=ck-cikmis | ck-ornek | ck-benzer-cikmis | ck-benzer-ornek (Çarpanlar) · cikmis | ornek | benzer-cikmis | benzer-ornek (Üslü) · kk-cikmis | kk-ornek | kk-benzer-cikmis | kk-benzer-ornek (Karekök)   ve isteğe bağlı &konu=...
+  const CARPAN = 'Çarpanlar ve Katlar', USLU = 'Üslü İfadeler', KAREKOK = 'Kareköklü İfadeler';
+  const ck = n => [1, 2, 3, 4].map(i => `veri/carpan-${n}-${i}.js`);
   const kk = n => [1, 2, 3, 4].map(i => `veri/karekok-${n}-${i}.js`);
   const SETLER = {
+    'ck-cikmis': { unite: CARPAN, ad: 'LGS Çıkmış Sorular (2018–2026)', js: ['ortak/yardimci.js', 'veri/carpan-cikmis.js'], al: () => CK_CIKMIS },
+    'ck-ornek': { unite: CARPAN, ad: 'MEB Örnek Sorular', js: ['ortak/yardimci.js', ...ck('ornek')], al: () => CK_ORNEK },
+    'ck-benzer-cikmis': { unite: CARPAN, ad: 'Çıkmış Sorulara Benzer Yeni Sorular', js: ['ortak/yardimci.js', 'veri/carpan-benzer-cikmis.js'], al: () => CK_BENZER_CIKMIS },
+    'ck-benzer-ornek': { unite: CARPAN, ad: 'MEB Sorularına Benzer Yeni Sorular', js: ['ortak/yardimci.js', ...ck('benzer-ornek')], al: () => CK_BENZER_ORNEK },
     'cikmis': { unite: USLU, ad: 'LGS Çıkmış Sorular (2018–2026)', js: ['veri/uslu-cikmis.js'], al: () => KART_SETI.sorular },
     'ornek': { unite: USLU, ad: 'MEB Örnek Sorular', js: ['ortak/yardimci.js', 'veri/ornek-0.js', 'veri/ornek-1.js', 'veri/ornek-2.js', 'veri/ornek-3.js', 'veri/ornek-4.js'], al: () => ORNEK },
     'benzer-cikmis': { unite: USLU, ad: 'Çıkmış Sorulara Benzer Yeni Sorular', js: ['ortak/yardimci.js', 'veri/benzer-cikmis.js'], al: () => BENZER_CIKMIS },
@@ -49,7 +54,7 @@
   };
   const params = new URLSearchParams(location.search);
   const SET_ADI = SETLER[params.get('set')] ? params.get('set') : 'benzer-cikmis';
-  SETLER[SET_ADI].js.forEach(src => document.write(`<script src="${src}"><\/script>`));
+  SETLER[SET_ADI].js.forEach(src => document.write(`<script src="${src}?v=20261006b"><\/script>`));
 </script>
 <script>
 (function () {
@@ -66,7 +71,7 @@
   <div class="bar">
     <a class="home" href="../index.html" title="Ana sayfa">⌂</a>
     <h1>Çalışma Kâğıdı · <span class="marka">Emre Hoca</span></h1>
-    <select id="set">${[USLU, KAREKOK].map(u => `<optgroup label="${u}">${Object.entries(SETLER).filter(([, v]) => v.unite === u).map(([k, v]) => `<option value="${k}" ${k === SET_ADI ? 'selected' : ''}>${v.ad}</option>`).join('')}</optgroup>`).join('')}</select>
+    <select id="set">${[CARPAN, USLU, KAREKOK].map(u => `<optgroup label="${u}">${Object.entries(SETLER).filter(([, v]) => v.unite === u).map(([k, v]) => `<option value="${k}" ${k === SET_ADI ? 'selected' : ''}>${v.ad}</option>`).join('')}</optgroup>`).join('')}</select>
     ${konular.length > 1 ? `<select id="konu"><option value="">Tüm konular</option>${konular.map(k => `<option ${k === konu ? 'selected' : ''}>${k}</option>`).join('')}</select>` : ''}
     <label><input type="checkbox" id="coz" ${cozumAcik ? 'checked' : ''}> Çözümleri de ekle</label>
     <button class="primary" onclick="print()">🖨 Yazdır / PDF</button>

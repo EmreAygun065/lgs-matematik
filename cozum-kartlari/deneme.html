@@ -1,0 +1,289 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Deneme Sınavı · Emre Hoca</title>
+<link rel="stylesheet" href="ortak/stil.css?v=20261006b">
+<style>
+  .sayfa { max-width: 900px; margin: 0 auto; padding: 1rem 1rem 5rem; }
+  .ust { display: flex; align-items: center; gap: .8rem; flex-wrap: wrap; margin-bottom: 1rem; }
+  .ust h1 { font-size: 1.25rem; margin: 0; flex: 1; }
+  .kutu { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 1.2rem 1.4rem; margin-bottom: 1rem; }
+  label.alan { display: block; font-weight: 600; margin: .8rem 0 .3rem; }
+  input[type=text], select.sec { font: inherit; width: 100%; padding: .55rem .7rem; border: 1px solid var(--line); border-radius: 10px; background: var(--bg); color: var(--ink); }
+  .dugme { font: inherit; font-weight: 700; border: none; border-radius: 10px; padding: .7rem 1.4rem; background: var(--accent); color: #fff; cursor: pointer; }
+  .dugme.ikincil { background: var(--bg); color: var(--ink); border: 1px solid var(--line); font-weight: 500; }
+  .dugme:disabled { opacity: .45; cursor: default; }
+  .hata { color: var(--red); font-weight: 600; margin-top: .6rem; min-height: 1.4rem; }
+  .bilgi { color: var(--muted); font-size: .95rem; }
+  .bilgi li { margin: .25rem 0; }
+
+  /* Sınav ekranı */
+  .serit { position: sticky; top: 0; z-index: 5; background: var(--card); border-bottom: 1px solid var(--line); padding: .6rem 1rem; display: flex; align-items: center; gap: .8rem; flex-wrap: wrap; margin: -1rem -1rem 1rem; }
+  .serit .ad { flex: 1; font-weight: 600; min-width: 0; }
+  .sure { font-weight: 700; font-variant-numeric: tabular-nums; font-size: 1.2rem; padding: .2rem .7rem; border-radius: 8px; background: var(--bg); }
+  .sure.az { color: var(--red); background: var(--red-soft); }
+  .harita { display: grid; grid-template-columns: repeat(10, minmax(0, 1fr)); gap: .35rem; margin-bottom: 1rem; }
+  .harita button { font: inherit; font-size: .9rem; font-variant-numeric: tabular-nums; border: 1px solid var(--line); border-radius: 8px; background: var(--card); color: var(--ink); padding: .35rem 0; cursor: pointer; position: relative; }
+  .harita button.dolu { background: var(--blue-soft); border-color: var(--blue); }
+  .harita button.aktif { outline: 2px solid var(--accent); outline-offset: 1px; font-weight: 700; }
+  .harita button.bayrak::after { content: ""; position: absolute; top: 3px; right: 4px; width: 7px; height: 7px; border-radius: 50%; background: var(--yellow-line); }
+  .harita-not { display: flex; gap: 1rem; flex-wrap: wrap; font-size: .8rem; color: var(--muted); margin: -.4rem 0 1rem; }
+  .harita-not span:not(#sayac)::before { content: ""; display: inline-block; width: .8rem; height: .8rem; border-radius: 3px; margin-right: .3rem; vertical-align: -1px; border: 1px solid var(--line); }
+  .harita-not .n-dolu::before { background: var(--blue-soft); border-color: var(--blue); }
+  .harita-not .n-bayrak::before { background: var(--yellow-line); border-radius: 50%; border: none; }
+  .soru-ust { display: flex; align-items: center; gap: .6rem; margin-bottom: .6rem; flex-wrap: wrap; }
+  .soru-ust .tag { margin-left: auto; }
+  .soru .opt.secili { border-color: var(--blue); background: var(--blue-soft); }
+  .gezinme { display: flex; gap: .6rem; justify-content: space-between; flex-wrap: wrap; margin-top: 1rem; }
+  .bayrak-btn.aktif { background: var(--yellow-soft); border-color: var(--yellow-line); }
+  .onay { border: 2px solid var(--accent); }
+  .onay p { margin: .2rem 0 .8rem; }
+  .onay .dugmeler { display: flex; gap: .6rem; flex-wrap: wrap; }
+
+  /* Sonuç ekranı */
+  .ozet { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: .6rem; text-align: center; margin: 1rem 0; }
+  .ozet div { border-radius: 12px; padding: .7rem .3rem; background: var(--bg); }
+  .ozet b { display: block; font-size: 1.8rem; font-variant-numeric: tabular-nums; }
+  .ozet .d b { color: var(--green); } .ozet .y b { color: var(--red); } .ozet .n b { color: var(--accent); }
+  table.unite { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; margin: .5rem 0 1rem; }
+  table.unite th, table.unite td { border-bottom: 1px solid var(--line); padding: .45rem .5rem; text-align: center; }
+  table.unite th:first-child, table.unite td:first-child { text-align: left; }
+  .durum { font-size: .95rem; padding: .6rem .8rem; border-radius: 10px; background: var(--bg); }
+  .durum.ok { background: var(--green-soft); color: var(--green); } .durum.no { background: var(--red-soft); color: var(--red); }
+  .zaman { display: grid; grid-template-columns: repeat(auto-fill, minmax(4.4rem, 1fr)); gap: .4rem; font-variant-numeric: tabular-nums; }
+  .zaman div { border-radius: 8px; padding: .35rem .2rem; text-align: center; font-size: .85rem; background: var(--bg); border: 1px solid var(--line); }
+  .zaman div b { display: block; font-size: .95rem; }
+  .zaman .d { border-color: var(--green); } .zaman .y { border-color: var(--red); }
+  .zaman .uzun { background: var(--yellow-soft); }
+  .soru .opt.dogru { border-color: var(--green); background: var(--green-soft); }
+  .soru .opt.yanlis { border-color: var(--red); background: var(--red-soft); }
+  .sonuc-etiket { font-weight: 700; } .sonuc-etiket.d { color: var(--green); } .sonuc-etiket.y { color: var(--red); } .sonuc-etiket.b { color: var(--muted); }
+  details.cozum { margin-top: .6rem; } details.cozum summary { cursor: pointer; color: var(--blue); font-weight: 600; }
+  details.cozum ol { margin: .5rem 0 0; padding-left: 1.3rem; }
+  @media (max-width: 560px) { .harita { grid-template-columns: repeat(5, minmax(0, 1fr)); } .ozet { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+</style>
+</head>
+<body>
+<script src="ortak/ayarlar.js?v=20261006b"></script>
+<script src="ortak/yardimci.js?v=20261006b"></script>
+<script src="veri/carpan-benzer-cikmis.js?v=20261006b"></script>
+<script src="veri/carpan-benzer-ornek-1.js?v=20261006b"></script>
+<script src="veri/carpan-benzer-ornek-2.js?v=20261006b"></script>
+<script src="veri/carpan-benzer-ornek-3.js?v=20261006b"></script>
+<script src="veri/carpan-benzer-ornek-4.js?v=20261006b"></script>
+<script src="veri/benzer-cikmis.js?v=20261006b"></script>
+<script src="veri/benzer-ornek-1.js?v=20261006b"></script>
+<script src="veri/benzer-ornek-2.js?v=20261006b"></script>
+<script src="veri/benzer-ornek-3.js?v=20261006b"></script>
+<script src="veri/benzer-ornek-4.js?v=20261006b"></script>
+<script>
+(function () {
+  const SURE_DK = 40;           // LGS matematik: 20 soru, 40 dakika
+  const CARPAN = 'Çarpanlar ve Katlar', USLU = 'Üslü İfadeler';
+  const L = 'ABCD';
+  const $ = id => document.getElementById(id);
+
+  // Denemeler birbirinden farklı sorulardan oluşur: her ünitede 7 + 3 (Üslü) ya da 5 + 5 (Çarpanlar) soru.
+  const sec = (dizi, adet, baslangic, adim) => Array.from({ length: adet }, (_, i) => dizi[(baslangic + i * adim) % dizi.length]);
+  const etiketle = (q, unite) => ({ ...q, unite });
+  const DENEMELER = [1, 2, 3].map(n => {
+    const k = n - 1;
+    const carpan = [...CK_BENZER_CIKMIS.slice(k * 5, k * 5 + 5), ...sec(CK_BENZER_ORNEK, 5, k * 5 + 2, 15)].map(q => etiketle(q, CARPAN));
+    const uslu = [...BENZER_CIKMIS.slice(k * 7, k * 7 + 7), ...sec(BENZER_ORNEK, 3, k * 9 + 4, 27)].map(q => etiketle(q, USLU));
+    return { id: 'deneme-' + n, ad: `Deneme ${n}`, kapsam: `${CARPAN} + ${USLU}`, sorular: [...carpan, ...uslu] };
+  });
+
+  const dakika = sn => `${Math.floor(sn / 60)}:${String(Math.max(0, sn) % 60).padStart(2, '0')}`;
+  const kacis = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const ust = baslik => `<div class="ust"><a class="home" href="../index.html" title="Ana sayfa">⌂</a><h1>${baslik}</h1><span class="marka">Emre Hoca</span></div>`;
+  try { const t = localStorage.getItem('tema'); if (t) document.documentElement.dataset.theme = t; } catch (e) {}
+
+  // Durum: sayfa yenilenirse kaldığı yerden devam eder
+  let D = null;   // { denemeId, ogrenci, bitis, cevaplar[], bayrak[], sureler[], aktif }
+  let deneme = null, zamanlayici = null, sonTik = 0;
+  const kaydet = () => { try { localStorage.setItem('aktifDeneme', JSON.stringify(D)); } catch (e) {} };
+  const temizle = () => { try { localStorage.removeItem('aktifDeneme'); } catch (e) {} };
+
+  // 1) Giriş
+  function giris() {
+    let kayitli = {};
+    try { kayitli = JSON.parse(localStorage.getItem('ogrenci') || '{}'); } catch (e) {}
+    const istenen = new URLSearchParams(location.search).get('deneme');
+    document.body.innerHTML = `<div class="sayfa">${ust('Deneme Sınavı')}
+      <div class="kutu">
+        <ul class="bilgi">
+          <li><b>20 soru, 40 dakika</b>: LGS matematik bölümüyle aynı süre.</li>
+          <li>Sorular arasında serbestçe gezebilir, emin olmadığın soruyu işaretleyip sonra dönebilirsin.</li>
+          <li>Süre bitince deneme kendiliğinden biter ve cevapların öğretmenine gönderilir.</li>
+          <li>Net = doğru − yanlış ÷ 3. Emin olmadığın soruyu boş bırakmak da bir stratejidir.</li>
+        </ul>
+        <label class="alan" for="ad">Ad Soyad</label>
+        <input type="text" id="ad" autocomplete="name" maxlength="60" value="${kacis(kayitli.ad || '')}">
+        <label class="alan" for="sinif">Sınıf / Şube</label>
+        <input type="text" id="sinif" maxlength="20" placeholder="Örn. 8-A" value="${kacis(kayitli.sinif || '')}">
+        <label class="alan" for="deneme">Deneme</label>
+        <select class="sec" id="deneme">${DENEMELER.map(d => `<option value="${d.id}" ${d.id === istenen ? 'selected' : ''}>${d.ad}: ${d.kapsam} (20 soru · 40 dk)</option>`).join('')}</select>
+        <p style="margin-top:1.2rem"><button class="dugme" id="basla">Denemeye başla →</button></p>
+        <div class="hata" id="hata"></div>
+      </div></div>`;
+    $('basla').onclick = () => {
+      const ad = $('ad').value.trim().replace(/\s+/g, ' '), sinif = $('sinif').value.trim();
+      if (ad.split(' ').length < 2) { $('hata').textContent = 'Lütfen adını ve soyadını yaz.'; return; }
+      if (!sinif) { $('hata').textContent = 'Lütfen sınıfını yaz.'; return; }
+      try { localStorage.setItem('ogrenci', JSON.stringify({ ad, sinif })); } catch (e) {}
+      deneme = DENEMELER.find(d => d.id === $('deneme').value);
+      const n = deneme.sorular.length;
+      D = { denemeId: deneme.id, ogrenci: { ad, sinif }, bitis: Date.now() + SURE_DK * 60000, cevaplar: Array(n).fill(null), bayrak: Array(n).fill(false), sureler: Array(n).fill(0), aktif: 0 };
+      kaydet();
+      sinav();
+    };
+  }
+
+  // 2) Sınav ekranı: tek soru görünür, harita ile gezinilir
+  function sinav() {
+    document.body.innerHTML = `<div class="sayfa">
+      <div class="serit"><a class="home" href="../index.html" title="Ana sayfa">⌂</a><span class="ad">${kacis(deneme.ad)} · ${kacis(D.ogrenci.ad)}</span><span class="sure" id="sure"></span><button class="dugme" id="bitir">Bitir</button></div>
+      <div class="harita" id="harita"></div>
+      <div class="harita-not"><span class="n-dolu">Cevaplandı</span><span class="n-bayrak">Sonra dönülecek</span><span id="sayac"></span></div>
+      <div id="onay"></div>
+      <div class="kutu soru" id="soru"></div>
+    </div>`;
+    $('bitir').onclick = onayGoster;
+    sonTik = Date.now();
+    zamanlayici = setInterval(tik, 1000);
+    goster(D.aktif);
+    tik();
+  }
+
+  function harita() {
+    $('harita').innerHTML = deneme.sorular.map((q, i) => `<button class="${D.cevaplar[i] !== null ? 'dolu' : ''} ${D.bayrak[i] ? 'bayrak' : ''} ${i === D.aktif ? 'aktif' : ''}" data-i="${i}" title="${q.unite}">${i + 1}</button>`).join('');
+    $('harita').querySelectorAll('button').forEach(b => b.onclick = () => goster(+b.dataset.i));
+    const n = D.cevaplar.filter(c => c !== null).length;
+    $('sayac').textContent = `${n} / ${deneme.sorular.length} cevaplandı`;
+  }
+
+  function sureyiYaz() {
+    const simdi = Date.now();
+    D.sureler[D.aktif] += Math.round((simdi - sonTik) / 1000);
+    sonTik = simdi;
+  }
+
+  function goster(i) {
+    sureyiYaz();
+    D.aktif = i;
+    const q = deneme.sorular[i];
+    $('soru').innerHTML = `<div class="soru-ust"><span class="qno">${i + 1}</span><span class="tag">${q.unite}</span></div>
+      <div class="qtext">${q.q}</div>
+      <div class="opts ${q.long ? 'long' : ''}">${q.opts.map((o, j) => `<button class="opt ${D.cevaplar[i] === j ? 'secili' : ''}" data-j="${j}"><b>${L[j]})</b>${o}</button>`).join('')}</div>
+      <div class="gezinme">
+        <button class="dugme ikincil" id="onceki" ${i === 0 ? 'disabled' : ''}>← Önceki</button>
+        <button class="dugme ikincil bayrak-btn ${D.bayrak[i] ? 'aktif' : ''}" id="bayrakBtn">${D.bayrak[i] ? '● Sonra dönülecek' : '○ Sonra dönmek için işaretle'}</button>
+        <button class="dugme ikincil" id="sonraki" ${i === deneme.sorular.length - 1 ? 'disabled' : ''}>Sonraki →</button>
+      </div>`;
+    $('soru').querySelectorAll('.opt').forEach(b => b.onclick = () => {
+      const j = +b.dataset.j;
+      D.cevaplar[i] = D.cevaplar[i] === j ? null : j;   // aynı şıkka tekrar basınca işaret kalkar
+      $('soru').querySelectorAll('.opt').forEach(x => x.classList.toggle('secili', +x.dataset.j === D.cevaplar[i]));
+      harita(); kaydet();
+    });
+    $('onceki').onclick = () => goster(i - 1);
+    $('sonraki').onclick = () => goster(i + 1);
+    $('bayrakBtn').onclick = () => { D.bayrak[i] = !D.bayrak[i]; goster(i); };
+    harita(); kaydet();
+    window.scrollTo(0, 0);
+  }
+
+  function tik() {
+    sureyiYaz(); kaydet();   // açık sorunun süresi her saniye işlenir; yenilemede kaybolmaz
+    const kalan = Math.max(0, Math.ceil((D.bitis - Date.now()) / 1000));
+    $('sure').textContent = '⏱ ' + dakika(kalan);
+    $('sure').classList.toggle('az', kalan <= 300);
+    if (kalan === 0) sonuc(true);
+  }
+
+  // Bitirmeden önce sayfa içinde onay (tarayıcı penceresi açılmaz)
+  function onayGoster() {
+    const bos = D.cevaplar.filter(c => c === null).length, bayrakli = D.bayrak.filter(Boolean).length;
+    $('onay').innerHTML = `<div class="kutu onay"><p><b>Denemeyi bitirmek istiyor musun?</b></p>
+      <p>${bos ? `${bos} soru boş.` : 'Bütün soruları cevapladın.'} ${bayrakli ? `${bayrakli} soruyu sonra dönmek için işaretlemiştin.` : ''}</p>
+      <div class="dugmeler"><button class="dugme" id="evet">Evet, bitir</button><button class="dugme ikincil" id="hayir">Sınava dön</button></div></div>`;
+    $('evet').onclick = () => sonuc(false);
+    $('hayir').onclick = () => { $('onay').innerHTML = ''; };
+    window.scrollTo(0, 0);
+  }
+
+  // 3) Sonuç
+  function sonuc(sureDoldu) {
+    clearInterval(zamanlayici);
+    sureyiYaz();
+    temizle();
+    const S = deneme.sorular;
+    const harcanan = Math.min(SURE_DK * 60, SURE_DK * 60 - Math.max(0, Math.ceil((D.bitis - Date.now()) / 1000)));
+    const say = filtre => {
+      const idx = S.map((_, i) => i).filter(filtre);
+      const d = idx.filter(i => D.cevaplar[i] === S[i].ans).length, b = idx.filter(i => D.cevaplar[i] === null).length;
+      return { d, y: idx.length - d - b, b, n: d - (idx.length - d - b) / 3, toplam: idx.length };
+    };
+    const tum = say(() => true), ck = say(i => S[i].unite === CARPAN), us = say(i => S[i].unite === USLU);
+    const netYaz = n => (Math.round(n * 100) / 100).toLocaleString('tr-TR');
+    const ort = harcanan / S.length;
+    const kayit = {
+      ad: D.ogrenci.ad, sinif: D.ogrenci.sinif, test: `${deneme.ad} · ${deneme.kapsam}`, testId: deneme.id,
+      dogru: tum.d, yanlis: tum.y, bos: tum.b, puan: Math.round(tum.d / S.length * 100), soruSayisi: S.length,
+      net: netYaz(tum.n), carpanNet: netYaz(ck.n), usluNet: netYaz(us.n),
+      sure: dakika(harcanan) + ' / ' + dakika(SURE_DK * 60), sureDoldu: sureDoldu ? 'Evet' : 'Hayır',
+      cevaplar: D.cevaplar.map((c, i) => `${i + 1}:${c === null ? '-' : L[c]}${c === null ? '' : c === S[i].ans ? '✓' : '✗(' + L[S[i].ans] + ')'}`).join(' '),
+      soruSureleri: D.sureler.map((s, i) => `${i + 1}:${dakika(s)}`).join(' ')
+    };
+    const satir = (ad, r) => `<tr><td>${ad}</td><td>${r.d}</td><td>${r.y}</td><td>${r.b}</td><td><b>${netYaz(r.n)}</b></td></tr>`;
+    document.body.innerHTML = `<div class="sayfa">${ust(deneme.ad + ' · Sonuç')}
+      <div class="kutu">
+        <p><b>${kacis(D.ogrenci.ad)}</b> · ${kacis(D.ogrenci.sinif)} · ⏱ ${dakika(harcanan)} / ${SURE_DK}:00</p>
+        ${sureDoldu ? '<p class="durum no">Süre doldu, deneme kendiliğinden bitirildi.</p>' : ''}
+        <div class="ozet"><div class="d"><b>${tum.d}</b>Doğru</div><div class="y"><b>${tum.y}</b>Yanlış</div><div><b>${tum.b}</b>Boş</div><div class="n"><b>${netYaz(tum.n)}</b>Net</div></div>
+        <table class="unite"><tr><th>Ünite</th><th>D</th><th>Y</th><th>B</th><th>Net</th></tr>${satir(CARPAN, ck)}${satir(USLU, us)}</table>
+        <p class="durum" id="gonderim">Sonucun öğretmenine gönderiliyor…</p>
+        <button class="dugme ikincil" id="tekrar" hidden>Tekrar göndermeyi dene</button>
+      </div>
+      <div class="kutu">
+        <h2 style="font-size:1.05rem;margin:0 0 .3rem">Soru başına harcadığın süre</h2>
+        <p class="bilgi" style="margin:0 0 .7rem">Ortalama ${dakika(Math.round(ort))}. Sarı kutular ortalamanın iki katından uzun sürenler: bu tür sorularda takılmak yerine işaretleyip geçmeyi dene.</p>
+        <div class="zaman">${D.sureler.map((s, i) => { const c = D.cevaplar[i]; const sinif = c === null ? '' : c === S[i].ans ? 'd' : 'y'; return `<div class="${sinif} ${s > 2 * ort && s > 60 ? 'uzun' : ''}"><b>${i + 1}</b>${dakika(s)}</div>`; }).join('')}</div>
+      </div>
+      <h2 style="font-size:1.1rem">Cevapların ve çözümler</h2>
+      ${S.map((q, i) => {
+        const c = D.cevaplar[i], d = c === q.ans;
+        const et = c === null ? '<span class="sonuc-etiket b">Boş</span>' : d ? '<span class="sonuc-etiket d">✓ Doğru</span>' : '<span class="sonuc-etiket y">✗ Yanlış</span>';
+        return `<div class="kutu soru"><div class="soru-ust"><span class="qno">${i + 1}</span>${et}<span class="tag">${q.unite}</span></div>
+          <div class="qtext">${q.q}</div>
+          <div class="opts ${q.long ? 'long' : ''}">${q.opts.map((o, j) => `<div class="opt ${j === q.ans ? 'dogru' : j === c ? 'yanlis' : ''}"><b>${L[j]})</b>${o}</div>`).join('')}</div>
+          <details class="cozum"><summary>Çözümü göster</summary><ol>${q.steps.map(s => `<li>${s}</li>`).join('')}</ol><p class="answer">${q.answer}</p></details></div>`;
+      }).join('')}
+      <p><button class="dugme" onclick="location.href=location.pathname">Başka bir deneme çöz</button></p>
+    </div>`;
+    window.scrollTo(0, 0);
+    gonder(kayit);
+    $('tekrar').onclick = () => gonder(kayit);
+  }
+
+  function gonder(kayit) {
+    const durum = $('gonderim');
+    if (!window.SONUC_ADRESI) { durum.className = 'durum'; durum.textContent = 'Not: Sonuç gönderme henüz ayarlanmadı; netini öğretmenine kendin söyleyebilirsin.'; return; }
+    durum.className = 'durum'; durum.textContent = 'Sonucun öğretmenine gönderiliyor…';
+    $('tekrar').hidden = true;
+    fetch(window.SONUC_ADRESI, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(kayit) })
+      .then(() => { durum.className = 'durum ok'; durum.textContent = '✓ Sonucun öğretmenine gönderildi.'; })
+      .catch(() => { durum.className = 'durum no'; durum.textContent = 'Sonuç gönderilemedi. İnternet bağlantını kontrol edip tekrar dene.'; $('tekrar').hidden = false; });
+  }
+
+  // Başlangıç: yarım kalmış deneme varsa devam
+  try { D = JSON.parse(localStorage.getItem('aktifDeneme') || 'null'); } catch (e) { D = null; }
+  deneme = D && DENEMELER.find(d => d.id === D.denemeId);
+  if (deneme && D.cevaplar && D.cevaplar.length === deneme.sorular.length) sinav();
+  else { D = null; temizle(); giris(); }
+})();
+</script>
+</body>
+</html>

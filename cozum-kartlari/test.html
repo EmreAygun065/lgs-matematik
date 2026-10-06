@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Online Test · Emre Hoca</title>
-<link rel="stylesheet" href="ortak/stil.css">
+<link rel="stylesheet" href="ortak/stil.css?v=20261006b">
 <style>
   .sayfa { max-width: 860px; margin: 0 auto; padding: 1rem 1rem 4rem; }
   .ust { display: flex; align-items: center; gap: .8rem; flex-wrap: wrap; margin-bottom: 1rem; }
@@ -37,25 +37,38 @@
 </style>
 </head>
 <body>
-<script src="ortak/ayarlar.js"></script>
-<script src="ortak/yardimci.js"></script>
-<script src="veri/benzer-cikmis.js"></script>
-<script src="veri/benzer-ornek-1.js"></script>
-<script src="veri/benzer-ornek-2.js"></script>
-<script src="veri/benzer-ornek-3.js"></script>
-<script src="veri/benzer-ornek-4.js"></script>
-<script src="veri/karekok-benzer-cikmis.js"></script>
-<script src="veri/karekok-benzer-ornek-1.js"></script>
-<script src="veri/karekok-benzer-ornek-2.js"></script>
-<script src="veri/karekok-benzer-ornek-3.js"></script>
-<script src="veri/karekok-benzer-ornek-4.js"></script>
+<script src="ortak/ayarlar.js?v=20261006b"></script>
+<script src="ortak/yardimci.js?v=20261006b"></script>
+<script src="veri/benzer-cikmis.js?v=20261006b"></script>
+<script src="veri/benzer-ornek-1.js?v=20261006b"></script>
+<script src="veri/benzer-ornek-2.js?v=20261006b"></script>
+<script src="veri/benzer-ornek-3.js?v=20261006b"></script>
+<script src="veri/benzer-ornek-4.js?v=20261006b"></script>
+<script src="veri/carpan-benzer-cikmis.js?v=20261006b"></script>
+<script src="veri/carpan-benzer-ornek-1.js?v=20261006b"></script>
+<script src="veri/carpan-benzer-ornek-2.js?v=20261006b"></script>
+<script src="veri/carpan-benzer-ornek-3.js?v=20261006b"></script>
+<script src="veri/carpan-benzer-ornek-4.js?v=20261006b"></script>
+<script src="veri/karekok-benzer-cikmis.js?v=20261006b"></script>
+<script src="veri/karekok-benzer-ornek-1.js?v=20261006b"></script>
+<script src="veri/karekok-benzer-ornek-2.js?v=20261006b"></script>
+<script src="veri/karekok-benzer-ornek-3.js?v=20261006b"></script>
+<script src="veri/karekok-benzer-ornek-4.js?v=20261006b"></script>
 <script>
 (function () {
   const araliktan = (a, b) => BENZER_ORNEK.filter(q => q.no >= a && q.no <= b);
   const kkKonu = (...konular) => KK_BENZER_ORNEK.filter(q => konular.includes(q.konu));
   const kkYaklasik = KK_BENZER_ORNEK.filter(q => q.konu === 'Karekökün yaklaşık değeri');
-  const USLU = 'Üslü İfadeler', KAREKOK = 'Kareköklü İfadeler';
+  const ckKonu = (...konular) => CK_BENZER_ORNEK.filter(q => konular.includes(q.konu));
+  const ckEbob = ckKonu('EBOB ve EKOK');
+  const CARPAN = 'Çarpanlar ve Katlar', USLU = 'Üslü İfadeler', KAREKOK = 'Kareköklü İfadeler';
   const TESTLER = [
+    { id: 'ck-karma', unite: CARPAN, ad: 'LGS tarzı karma test', sorular: () => CK_BENZER_CIKMIS },
+    { id: 'ck-carpan', unite: CARPAN, ad: 'Bir doğal sayının çarpanları', sorular: () => ckKonu('Bir doğal sayının çarpanları') },
+    { id: 'ck-ebob-1', unite: CARPAN, ad: 'EBOB ve EKOK – 1', sorular: () => ckEbob.slice(0, 18) },
+    { id: 'ck-ebob-2', unite: CARPAN, ad: 'EBOB ve EKOK – 2', sorular: () => ckEbob.slice(18, 36) },
+    { id: 'ck-ebob-3', unite: CARPAN, ad: 'EBOB ve EKOK – 3', sorular: () => ckEbob.slice(36) },
+    { id: 'ck-asal', unite: CARPAN, ad: 'Aralarında asal sayılar', sorular: () => ckKonu('Aralarında asal sayılar') },
     { id: 'cikmis', unite: USLU, ad: 'LGS tarzı karma test', sorular: () => BENZER_CIKMIS },
     { id: 'tam-sayi', unite: USLU, ad: 'Tam sayıların kuvvetleri', sorular: () => araliktan(1, 15) },
     { id: 'kurallar-1', unite: USLU, ad: 'Temel kurallar – 1', sorular: () => araliktan(16, 34) },
