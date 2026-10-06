@@ -85,14 +85,22 @@
   const L = 'ABCD';
   const $ = id => document.getElementById(id);
 
-  // Denemeler birbirinden farklı sorulardan oluşur: her ünitede 7 + 3 (Üslü) ya da 5 + 5 (Çarpanlar) soru.
+  // Her deneme: her üniteden 5 çıkmış-benzeri + 5 MEB-benzeri soru. Denemeler birbirinden farklı sorulardan oluşur.
+  // Sorular karışık sıradadır; sıra her deneme için sabittir (bütün öğrenciler aynı sırayı görür).
   const sec = (dizi, adet, baslangic, adim) => Array.from({ length: adet }, (_, i) => dizi[(baslangic + i * adim) % dizi.length]);
   const etiketle = (q, unite) => ({ ...q, unite });
+  const karistir = (dizi, tohum) => {
+    let t = tohum;
+    const rastgele = () => { t = (t * 1103515245 + 12345) % 2147483648; return t / 2147483648; };
+    const a = [...dizi];
+    for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(rastgele() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; }
+    return a;
+  };
   const DENEMELER = [1, 2, 3].map(n => {
     const k = n - 1;
     const carpan = [...CK_BENZER_CIKMIS.slice(k * 5, k * 5 + 5), ...sec(CK_BENZER_ORNEK, 5, k * 5 + 2, 15)].map(q => etiketle(q, CARPAN));
-    const uslu = [...BENZER_CIKMIS.slice(k * 7, k * 7 + 7), ...sec(BENZER_ORNEK, 3, k * 9 + 4, 27)].map(q => etiketle(q, USLU));
-    return { id: 'deneme-' + n, ad: `Deneme ${n}`, kapsam: `${CARPAN} + ${USLU}`, sorular: [...carpan, ...uslu] };
+    const uslu = [...BENZER_CIKMIS.slice(k * 5, k * 5 + 5), ...sec(BENZER_ORNEK, 5, k * 5 + 3, 16)].map(q => etiketle(q, USLU));
+    return { id: 'deneme-' + n, ad: `Deneme ${n}`, kapsam: `${CARPAN} + ${USLU}`, sorular: karistir([...carpan, ...uslu], 2026 + n * 97) };
   });
 
   const dakika = sn => `${Math.floor(sn / 60)}:${String(Math.max(0, sn) % 60).padStart(2, '0')}`;
