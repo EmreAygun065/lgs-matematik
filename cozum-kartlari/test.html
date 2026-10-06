@@ -54,35 +54,10 @@
 <script src="veri/karekok-benzer-ornek-2.js?v=20261006b"></script>
 <script src="veri/karekok-benzer-ornek-3.js?v=20261006b"></script>
 <script src="veri/karekok-benzer-ornek-4.js?v=20261006b"></script>
+<script src="ortak/sinavlar.js?v=20261006b"></script>
 <script>
 (function () {
-  const araliktan = (a, b) => BENZER_ORNEK.filter(q => q.no >= a && q.no <= b);
-  const kkKonu = (...konular) => KK_BENZER_ORNEK.filter(q => konular.includes(q.konu));
-  const kkYaklasik = KK_BENZER_ORNEK.filter(q => q.konu === 'Karekökün yaklaşık değeri');
-  const ckKonu = (...konular) => CK_BENZER_ORNEK.filter(q => konular.includes(q.konu));
-  const ckEbob = ckKonu('EBOB ve EKOK');
-  const CARPAN = 'Çarpanlar ve Katlar', USLU = 'Üslü İfadeler', KAREKOK = 'Kareköklü İfadeler';
-  const TESTLER = [
-    { id: 'ck-karma', unite: CARPAN, ad: 'LGS tarzı karma test', sorular: () => CK_BENZER_CIKMIS },
-    { id: 'ck-carpan', unite: CARPAN, ad: 'Bir doğal sayının çarpanları', sorular: () => ckKonu('Bir doğal sayının çarpanları') },
-    { id: 'ck-ebob-1', unite: CARPAN, ad: 'EBOB ve EKOK – 1', sorular: () => ckEbob.slice(0, 18) },
-    { id: 'ck-ebob-2', unite: CARPAN, ad: 'EBOB ve EKOK – 2', sorular: () => ckEbob.slice(18, 36) },
-    { id: 'ck-ebob-3', unite: CARPAN, ad: 'EBOB ve EKOK – 3', sorular: () => ckEbob.slice(36) },
-    { id: 'ck-asal', unite: CARPAN, ad: 'Aralarında asal sayılar', sorular: () => ckKonu('Aralarında asal sayılar') },
-    { id: 'cikmis', unite: USLU, ad: 'LGS tarzı karma test', sorular: () => BENZER_CIKMIS },
-    { id: 'tam-sayi', unite: USLU, ad: 'Tam sayıların kuvvetleri', sorular: () => araliktan(1, 15) },
-    { id: 'kurallar-1', unite: USLU, ad: 'Temel kurallar – 1', sorular: () => araliktan(16, 34) },
-    { id: 'kurallar-2', unite: USLU, ad: 'Temel kurallar – 2', sorular: () => araliktan(35, 53) },
-    { id: 'ondalik', unite: USLU, ad: "Ondalık çözümleme ve 10'un kuvvetleri", sorular: () => araliktan(54, 75) },
-    { id: 'bilimsel', unite: USLU, ad: 'Bilimsel gösterim', sorular: () => araliktan(76, 80) },
-    { id: 'kk-karma-1', unite: KAREKOK, ad: 'LGS tarzı karma test – 1', sorular: () => KK_BENZER_CIKMIS.slice(0, 16) },
-    { id: 'kk-karma-2', unite: KAREKOK, ad: 'LGS tarzı karma test – 2', sorular: () => KK_BENZER_CIKMIS.slice(16) },
-    { id: 'kk-temel', unite: KAREKOK, ad: 'Tam kareler, ondalık sayılar, gerçek sayılar', sorular: () => kkKonu('Tam kare sayılar', 'Ondalık sayıların karekökü', 'Gerçek sayılar') },
-    { id: 'kk-yaklasik-1', unite: KAREKOK, ad: 'Karekökün yaklaşık değeri – 1', sorular: () => kkYaklasik.slice(0, 20) },
-    { id: 'kk-yaklasik-2', unite: KAREKOK, ad: 'Karekökün yaklaşık değeri – 2', sorular: () => kkYaklasik.slice(20) },
-    { id: 'kk-carpma', unite: KAREKOK, ad: 'Çarpma ve bölme', sorular: () => kkKonu('Çarpma ve bölme') },
-    { id: 'kk-toplama', unite: KAREKOK, ad: 'Toplama ve çıkarma', sorular: () => kkKonu('Toplama ve çıkarma') }
-  ];
+  const TESTLER = window.TESTLER;
   const SORU_SURESI = 150;   // soru başına saniye (2,5 dakika)
   const L = 'ABCD';
   const $ = id => document.getElementById(id);

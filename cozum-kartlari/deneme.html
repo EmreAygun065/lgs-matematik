@@ -78,30 +78,14 @@
 <script src="veri/benzer-ornek-2.js?v=20261006b"></script>
 <script src="veri/benzer-ornek-3.js?v=20261006b"></script>
 <script src="veri/benzer-ornek-4.js?v=20261006b"></script>
+<script src="ortak/sinavlar.js?v=20261006b"></script>
 <script>
 (function () {
   const SURE_DK = 40;           // LGS matematik: 20 soru, 40 dakika
-  const CARPAN = 'Çarpanlar ve Katlar', USLU = 'Üslü İfadeler';
   const L = 'ABCD';
   const $ = id => document.getElementById(id);
 
-  // Her deneme: her üniteden 5 çıkmış-benzeri + 5 MEB-benzeri soru. Denemeler birbirinden farklı sorulardan oluşur.
-  // Sorular karışık sıradadır; sıra her deneme için sabittir (bütün öğrenciler aynı sırayı görür).
-  const sec = (dizi, adet, baslangic, adim) => Array.from({ length: adet }, (_, i) => dizi[(baslangic + i * adim) % dizi.length]);
-  const etiketle = (q, unite) => ({ ...q, unite });
-  const karistir = (dizi, tohum) => {
-    let t = tohum;
-    const rastgele = () => { t = (t * 1103515245 + 12345) % 2147483648; return t / 2147483648; };
-    const a = [...dizi];
-    for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(rastgele() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; }
-    return a;
-  };
-  const DENEMELER = [1, 2, 3].map(n => {
-    const k = n - 1;
-    const carpan = [...CK_BENZER_CIKMIS.slice(k * 5, k * 5 + 5), ...sec(CK_BENZER_ORNEK, 5, k * 5 + 2, 15)].map(q => etiketle(q, CARPAN));
-    const uslu = [...BENZER_CIKMIS.slice(k * 5, k * 5 + 5), ...sec(BENZER_ORNEK, 5, k * 5 + 3, 16)].map(q => etiketle(q, USLU));
-    return { id: 'deneme-' + n, ad: `Deneme ${n}`, kapsam: `${CARPAN} + ${USLU}`, sorular: karistir([...carpan, ...uslu], 2026 + n * 97) };
-  });
+  const DENEMELER = window.DENEMELER;
 
   const dakika = sn => `${Math.floor(sn / 60)}:${String(Math.max(0, sn) % 60).padStart(2, '0')}`;
   const kacis = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -234,13 +218,15 @@
       const d = idx.filter(i => D.cevaplar[i] === S[i].ans).length, b = idx.filter(i => D.cevaplar[i] === null).length;
       return { d, y: idx.length - d - b, b, n: d - (idx.length - d - b) / 3, toplam: idx.length };
     };
-    const tum = say(() => true), ck = say(i => S[i].unite === CARPAN), us = say(i => S[i].unite === USLU);
-    const netYaz = n => (Math.round(n * 100) / 100).toLocaleString('tr-TR');
+    const tum = say(() => true);
+    const uniteler = [...new Set(S.map(q => q.unite))].map(u => ({ ad: u, r: say(i => S[i].unite === u) }));
+    const yuvarla = n => Math.round(n * 100) / 100;
+    const netYaz = n => yuvarla(n).toLocaleString('tr-TR');
     const ort = harcanan / S.length;
     const kayit = {
       ad: D.ogrenci.ad, sinif: D.ogrenci.sinif, test: `${deneme.ad} · ${deneme.kapsam}`, testId: deneme.id,
       dogru: tum.d, yanlis: tum.y, bos: tum.b, puan: Math.round(tum.d / S.length * 100), soruSayisi: S.length,
-      net: netYaz(tum.n), carpanNet: netYaz(ck.n), usluNet: netYaz(us.n),
+      net: yuvarla(tum.n), uniteNetleri: Object.fromEntries(uniteler.map(u => [u.ad, yuvarla(u.r.n)])),
       sure: dakika(harcanan) + ' / ' + dakika(SURE_DK * 60), sureDoldu: sureDoldu ? 'Evet' : 'Hayır',
       cevaplar: D.cevaplar.map((c, i) => `${i + 1}:${c === null ? '-' : L[c]}${c === null ? '' : c === S[i].ans ? '✓' : '✗(' + L[S[i].ans] + ')'}`).join(' '),
       soruSureleri: D.sureler.map((s, i) => `${i + 1}:${dakika(s)}`).join(' ')
@@ -251,7 +237,7 @@
         <p><b>${kacis(D.ogrenci.ad)}</b> · ${kacis(D.ogrenci.sinif)} · ⏱ ${dakika(harcanan)} / ${SURE_DK}:00</p>
         ${sureDoldu ? '<p class="durum no">Süre doldu, deneme kendiliğinden bitirildi.</p>' : ''}
         <div class="ozet"><div class="d"><b>${tum.d}</b>Doğru</div><div class="y"><b>${tum.y}</b>Yanlış</div><div><b>${tum.b}</b>Boş</div><div class="n"><b>${netYaz(tum.n)}</b>Net</div></div>
-        <table class="unite"><tr><th>Ünite</th><th>D</th><th>Y</th><th>B</th><th>Net</th></tr>${satir(CARPAN, ck)}${satir(USLU, us)}</table>
+        <table class="unite"><tr><th>Ünite</th><th>D</th><th>Y</th><th>B</th><th>Net</th></tr>${uniteler.map(u => satir(u.ad, u.r)).join('')}</table>
         <p class="durum" id="gonderim">Sonucun öğretmenine gönderiliyor…</p>
         <button class="dugme ikincil" id="tekrar" hidden>Tekrar göndermeyi dene</button>
       </div>

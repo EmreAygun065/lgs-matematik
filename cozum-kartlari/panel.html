@@ -1,0 +1,473 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Öğretmen Paneli · Emre Hoca</title>
+<link rel="stylesheet" href="ortak/stil.css?v=20261006b">
+<style>
+  .sayfa { max-width: 1100px; margin: 0 auto; padding: 1rem 1rem 4rem; }
+  .ust { display: flex; align-items: center; gap: .8rem; flex-wrap: wrap; margin-bottom: 1rem; }
+  .ust h1 { font-size: 1.25rem; margin: 0; flex: 1; }
+  .kutu { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 1.1rem 1.3rem; margin-bottom: 1rem; min-width: 0; }
+  .kutu > h2 { font-size: 1.05rem; margin: 0 0 .2rem; }
+  .bilgi { color: var(--muted); font-size: .9rem; margin: 0 0 .8rem; }
+  label.alan { display: block; font-weight: 600; margin: .8rem 0 .3rem; }
+  input[type=password], input[type=search], select { font: inherit; padding: .5rem .7rem; border: 1px solid var(--line); border-radius: 10px; background: var(--bg); color: var(--ink); max-width: 100%; }
+  input[type=password] { width: 100%; }
+  .dugme { font: inherit; font-weight: 700; border: none; border-radius: 10px; padding: .6rem 1.2rem; background: var(--accent); color: #fff; cursor: pointer; }
+  .dugme.ikincil { background: var(--bg); color: var(--ink); border: 1px solid var(--line); font-weight: 500; }
+  .dugme.kucuk { padding: .35rem .8rem; font-size: .9rem; }
+  .hata { color: var(--red); font-weight: 600; margin-top: .6rem; min-height: 1.4rem; }
+  .bag { color: var(--blue); background: none; border: none; font: inherit; cursor: pointer; padding: 0; text-decoration: underline; }
+
+  .arac { display: flex; flex-wrap: wrap; gap: .6rem; align-items: center; margin-bottom: 1rem; }
+  .sekmeler { display: flex; gap: .3rem; background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: .25rem; }
+  .sekmeler button { font: inherit; border: none; background: none; color: var(--muted); padding: .4rem .9rem; border-radius: 9px; cursor: pointer; font-weight: 600; }
+  .sekmeler button.secili { background: var(--accent); color: #fff; }
+  .arac .bosluk { flex: 1; }
+  .zaman-notu { color: var(--muted); font-size: .85rem; }
+  .ornek-uyari { background: var(--yellow-soft); border: 1px solid var(--yellow-line); border-radius: 10px; padding: .5rem .8rem; margin-bottom: 1rem; font-size: .92rem; }
+
+  .ozet { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: .6rem; margin: .4rem 0 .2rem; }
+  .ozet div { background: var(--bg); border-radius: 12px; padding: .7rem .8rem; }
+  .ozet b { display: block; font-size: 1.6rem; font-variant-numeric: tabular-nums; }
+  .ozet span { color: var(--muted); font-size: .85rem; }
+
+  .tablo-kap { overflow-x: auto; }
+  table.liste { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; font-size: .93rem; }
+  table.liste th, table.liste td { border-bottom: 1px solid var(--line); padding: .45rem .5rem; text-align: center; white-space: nowrap; }
+  table.liste th { color: var(--muted); font-weight: 600; font-size: .85rem; }
+  table.liste th.sol, table.liste td.sol { text-align: left; }
+  table.liste tr.tik { cursor: pointer; }
+  table.liste tr.tik:hover td { background: var(--bg); }
+  .net { font-weight: 700; }
+  .rozet { display: inline-block; font-size: .75rem; border-radius: 6px; padding: 0 .4rem; background: var(--red-soft); color: var(--red); margin-left: .3rem; font-weight: 600; }
+  .rozet.gri { background: var(--bg); color: var(--muted); }
+
+  .sorular { display: grid; grid-template-columns: repeat(auto-fill, minmax(78px, 1fr)); gap: .45rem; }
+  .sorular button { font: inherit; border: 2px solid var(--line); background: var(--bg); color: var(--ink); border-radius: 10px; padding: .4rem .2rem .45rem; cursor: pointer; text-align: center; font-variant-numeric: tabular-nums; }
+  .sorular button b { display: block; font-size: .8rem; color: var(--muted); }
+  .sorular button span { font-size: 1.15rem; font-weight: 700; }
+  .sorular button.iyi { border-color: var(--green); background: var(--green-soft); }
+  .sorular button.orta { border-color: var(--yellow-line); background: var(--yellow-soft); }
+  .sorular button.zor { border-color: var(--red); background: var(--red-soft); }
+  .sorular button.secili { outline: 3px solid var(--blue); outline-offset: 1px; }
+  .lejant { display: flex; gap: 1rem; flex-wrap: wrap; font-size: .85rem; color: var(--muted); margin-top: .6rem; }
+  .lejant i { display: inline-block; width: .8rem; height: .8rem; border-radius: 3px; margin-right: .3rem; vertical-align: -1px; border: 2px solid; }
+
+  .soru-detay { margin-top: 1rem; border-top: 1px dashed var(--line); padding-top: 1rem; }
+  .soru-detay .qtext { margin: .4rem 0 .8rem; }
+  .dagilim { display: grid; gap: .35rem; margin: .6rem 0; }
+  .dagilim div { display: grid; grid-template-columns: 4.5rem 1fr 5.5rem; gap: .6rem; align-items: center; font-size: .92rem; font-variant-numeric: tabular-nums; }
+  .cubuk { height: .8rem; border-radius: 999px; background: var(--bg); overflow: hidden; }
+  .cubuk i { display: block; height: 100%; background: var(--muted); border-radius: 999px; }
+  .cubuk i.d { background: var(--green); } .cubuk i.y { background: var(--red); }
+  .isimler { font-size: .9rem; color: var(--muted); }
+  details.cozum { margin-top: .6rem; } details.cozum summary { cursor: pointer; color: var(--blue); font-weight: 600; }
+  details.cozum ol { margin: .5rem 0 0; padding-left: 1.3rem; }
+
+  .iki { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  .iki > * { min-width: 0; }
+  @media (max-width: 760px) { .iki { grid-template-columns: 1fr; } }
+  .yuzde { display: grid; grid-template-columns: minmax(0, 1fr) 7rem 3.2rem; gap: .6rem; align-items: center; padding: .35rem 0; border-bottom: 1px solid var(--line); font-size: .93rem; font-variant-numeric: tabular-nums; }
+  .yuzde:last-child { border-bottom: none; }
+  .yuzde small { color: var(--muted); display: block; }
+  .yuzde .cubuk i { background: var(--green); }
+  .yuzde .cubuk i.orta { background: var(--yellow-line); } .yuzde .cubuk i.zor { background: var(--red); }
+  .yuzde b { text-align: right; }
+  .yanlis-soru { border: 1px solid var(--line); border-radius: 12px; padding: .8rem 1rem; margin-top: .6rem; }
+  .yanlis-soru .opt.dogru { border-color: var(--green); background: var(--green-soft); }
+  .yanlis-soru .opt.yanlis { border-color: var(--red); background: var(--red-soft); }
+  .bos-durum { color: var(--muted); text-align: center; padding: 2rem 1rem; }
+</style>
+</head>
+<body>
+<script src="ortak/ayarlar.js?v=20261006b"></script>
+<script src="ortak/yardimci.js?v=20261006b"></script>
+<script src="veri/benzer-cikmis.js?v=20261006b"></script>
+<script src="veri/benzer-ornek-1.js?v=20261006b"></script>
+<script src="veri/benzer-ornek-2.js?v=20261006b"></script>
+<script src="veri/benzer-ornek-3.js?v=20261006b"></script>
+<script src="veri/benzer-ornek-4.js?v=20261006b"></script>
+<script src="veri/carpan-benzer-cikmis.js?v=20261006b"></script>
+<script src="veri/carpan-benzer-ornek-1.js?v=20261006b"></script>
+<script src="veri/carpan-benzer-ornek-2.js?v=20261006b"></script>
+<script src="veri/carpan-benzer-ornek-3.js?v=20261006b"></script>
+<script src="veri/carpan-benzer-ornek-4.js?v=20261006b"></script>
+<script src="veri/karekok-benzer-cikmis.js?v=20261006b"></script>
+<script src="veri/karekok-benzer-ornek-1.js?v=20261006b"></script>
+<script src="veri/karekok-benzer-ornek-2.js?v=20261006b"></script>
+<script src="veri/karekok-benzer-ornek-3.js?v=20261006b"></script>
+<script src="veri/karekok-benzer-ornek-4.js?v=20261006b"></script>
+<script src="ortak/sinavlar.js?v=20261006b"></script>
+<script>
+(function () {
+  const L = 'ABCD';
+  const $ = id => document.getElementById(id);
+  const kacis = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const sayiYaz = (n, basamak = 2) => n == null || isNaN(n) ? '–' : (Math.round(n * 10 ** basamak) / 10 ** basamak).toLocaleString('tr-TR');
+  const dakika = sn => sn == null || isNaN(sn) ? '–' : `${Math.floor(sn / 60)}:${String(Math.round(sn) % 60).padStart(2, '0')}`;
+  const ort = a => a.length ? a.reduce((x, y) => x + y, 0) / a.length : null;
+  const tarihYaz = t => isNaN(t) ? '' : t.toLocaleDateString('tr-TR', { day: 'numeric', month: 'short' }) + ' ' + t.toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' });
+  const ust = `<div class="ust"><a class="home" href="../index.html" title="Ana sayfa">⌂</a><h1>Öğretmen Paneli</h1><span class="marka">Emre Hoca</span></div>`;
+  try { const t = localStorage.getItem('tema'); if (t) document.documentElement.dataset.theme = t; } catch (e) {}
+
+  // Bütün sınavlar (online testler + denemeler) tek listede: kod → { tur, ad, sorular }
+  const SINAVLAR = new Map();
+  window.DENEMELER.forEach(d => SINAVLAR.set(d.id, { tur: 'deneme', ad: d.ad, alt: d.kapsam, sorular: d.sorular }));
+  window.TESTLER.forEach(t => SINAVLAR.set(t.id, { tur: 'test', ad: t.ad, alt: t.unite, sorular: t.sorular() }));
+
+  let durum = { sekme: 'deneme', sinif: '', sinav: { deneme: '', test: '' }, ogrenci: '', soru: null, ornek: false };
+  let KAYITLAR = [], alinma = null;
+
+  // ---------- Veriyi okuma ----------
+  const sinifDuzelt = s => String(s == null ? '' : s).trim().toLocaleUpperCase('tr').replace(/\s+/g, '').replace(/[/._]/g, '-').replace(/^(\d+)([A-ZÇĞİÖŞÜ])$/, '$1-$2');
+  const adDuzelt = s => String(s == null ? '' : s).trim().replace(/\s+/g, ' ');
+  const sureSn = s => { const m = /^(\d+):(\d{2})/.exec(String(s || '')); return m ? +m[1] * 60 + +m[2] : null; };
+  const cevapCoz = s => {
+    const dizi = [];
+    String(s || '').split(/\s+/).forEach(p => {
+      const m = /^(\d+):([A-D]|-)(✓|✗\(([A-D])\))?$/.exec(p);
+      if (m) dizi[+m[1] - 1] = m[2] === '-' ? { sec: null, durum: 'b' } : { sec: L.indexOf(m[2]), durum: m[3] === '✓' ? 'd' : 'y' };
+    });
+    return dizi;
+  };
+  const sureleriCoz = s => {
+    const dizi = [];
+    String(s || '').split(/\s+/).forEach(p => { const m = /^(\d+):(\d+):(\d{2})$/.exec(p); if (m) dizi[+m[1] - 1] = +m[2] * 60 + +m[3]; });
+    return dizi;
+  };
+  function kayitYap(r, tur) {
+    const baslik = String(r[tur === 'deneme' ? 'Deneme' : 'Test'] || '');
+    let kod = String(r[tur === 'deneme' ? 'Deneme Kodu' : 'Test Kodu'] || '');
+    if (!kod && tur === 'test') { const t = window.TESTLER.find(t => `${t.unite} · ${t.ad}` === baslik); if (t) kod = t.id; }
+    const uniteNet = {};
+    Object.keys(r).forEach(k => { if (/ Neti$/.test(k) && r[k] !== '' && r[k] != null) uniteNet[k.replace(/ Neti$/, '')] = +String(r[k]).replace(',', '.'); });
+    const d = +r['Doğru'] || 0, y = +r['Yanlış'] || 0, b = +r['Boş'] || 0;
+    const net = r['Net'] !== '' && r['Net'] != null ? +String(r['Net']).replace(',', '.') : d - y / 3;
+    const ad = adDuzelt(r['Ad Soyad']), sinif = sinifDuzelt(r['Sınıf']);
+    return {
+      tur, kod, baslik: SINAVLAR.has(kod) ? SINAVLAR.get(kod).ad : baslik, tarih: new Date(r['Tarih']),
+      ad, sinif, anahtar: ad.toLocaleUpperCase('tr') + '|' + sinif,
+      d, y, b, net, puan: +r['Puan'] || 0, soruSayisi: +r['Soru Sayısı'] || d + y + b,
+      sure: sureSn(r['Süre']), sureDoldu: r['Süre Doldu'] === 'Evet',
+      cevaplar: cevapCoz(r['Cevaplar']), sureler: sureleriCoz(r['Soru Süreleri']), uniteNet
+    };
+  }
+  function veriYukle(v) {
+    KAYITLAR = [...(v.denemeler || []).map(r => kayitYap(r, 'deneme')), ...(v.testler || []).map(r => kayitYap(r, 'test'))]
+      .filter(k => k.ad).sort((a, b) => a.tarih - b.tarih);
+    // Aynı öğrencinin aynı sınavı tekrar çözdüğü kayıtlar işaretlenir; sınıf istatistiklerine ilk deneme girer.
+    const gorulen = new Map();
+    KAYITLAR.forEach(k => { const a = k.anahtar + '#' + k.kod; k.tekrar = gorulen.get(a) || 0; gorulen.set(a, k.tekrar + 1); });
+    alinma = v.zaman ? new Date(v.zaman) : new Date();
+  }
+
+  // ---------- Giriş ----------
+  function giris(mesaj) {
+    let kayitli = '';
+    try { kayitli = localStorage.getItem('panelSifre') || ''; } catch (e) {}
+    document.body.innerHTML = `<div class="sayfa" style="max-width:520px">${ust}
+      <div class="kutu">
+        <p>Öğrencilerin gönderdiği test ve deneme sonuçlarını görmek için Apps Script'e yazdığın panel şifresini gir.</p>
+        <label class="alan" for="sifre">Panel şifresi</label>
+        <input type="password" id="sifre" autocomplete="current-password" value="${kacis(kayitli)}">
+        <label style="display:flex;gap:.5rem;align-items:center;margin-top:.7rem;font-size:.92rem"><input type="checkbox" id="hatirla" ${kayitli ? 'checked' : ''}> Bu cihazda hatırla (sadece kendi bilgisayarında işaretle)</label>
+        <div style="display:flex;gap:.8rem;align-items:center;flex-wrap:wrap;margin-top:1rem"><button class="dugme" id="gir">Sonuçları getir</button><button class="bag" id="ornek">Örnek verilerle göz at</button></div>
+        <div class="hata" id="hata">${kacis(mesaj || '')}</div>
+      </div></div>`;
+    $('sifre').onkeydown = e => { if (e.key === 'Enter') $('gir').click(); };
+    $('gir').onclick = () => getir($('sifre').value.trim(), $('hatirla').checked);
+    $('ornek').onclick = () => { durum.ornek = true; veriYukle(ornekVeri()); ciz(); };
+    if (!mesaj) $('sifre').focus();
+  }
+
+  async function getir(sifre, hatirla) {
+    if (!sifre) { $('hata').textContent = 'Şifreyi yaz.'; return; }
+    if (!window.SONUC_ADRESI) { $('hata').textContent = 'Sonuç adresi (ortak/ayarlar.js) ayarlanmamış.'; return; }
+    $('hata').textContent = ''; $('gir').disabled = true; $('gir').textContent = 'Getiriliyor…';
+    try {
+      const yanit = await fetch(window.SONUC_ADRESI + '?sifre=' + encodeURIComponent(sifre));
+      const v = await yanit.json();
+      if (v.hata) throw new Error(v.hata);
+      try { if (hatirla) localStorage.setItem('panelSifre', sifre); else localStorage.removeItem('panelSifre'); } catch (e) {}
+      oturum = sifre; durum.ornek = false;
+      veriYukle(v); ciz();
+    } catch (e) {
+      const m = e instanceof SyntaxError || e instanceof TypeError
+        ? 'Sonuçlar alınamadı. Apps Script kodunu güncelleyip "Yeni sürüm" olarak dağıttığından emin ol; internet bağlantını da kontrol et.'
+        : e.message;
+      if ($('gir')) { $('gir').disabled = false; $('gir').textContent = 'Sonuçları getir'; $('hata').textContent = m; } else giris(m);
+    }
+  }
+  let oturum = '';
+
+  // ---------- Ana ekran ----------
+  function ciz() {
+    const siniflar = [...new Set(KAYITLAR.map(k => k.sinif))].filter(Boolean).sort((a, b) => a.localeCompare(b, 'tr', { numeric: true }));
+    if (durum.sinif && !siniflar.includes(durum.sinif)) durum.sinif = '';
+    document.body.innerHTML = `<div class="sayfa">${ust}
+      ${durum.ornek ? '<div class="ornek-uyari">Bunlar <b>uydurma örnek verilerdir</b>, panelin nasıl görüneceğini göstermek için. Gerçek sonuçlar için <button class="bag" id="cik">şifreyle giriş yap</button>.</div>' : ''}
+      <div class="arac">
+        <div class="sekmeler">${[['deneme', '⏱ Denemeler'], ['test', '📝 Testler'], ['ogrenci', '👤 Öğrenciler']].map(([k, a]) => `<button data-sekme="${k}" class="${durum.sekme === k ? 'secili' : ''}">${a}</button>`).join('')}</div>
+        <select id="sinif"><option value="">Bütün sınıflar</option>${siniflar.map(s => `<option ${s === durum.sinif ? 'selected' : ''}>${kacis(s)}</option>`).join('')}</select>
+        <span class="bosluk"></span>
+        ${durum.ornek ? '' : `<span class="zaman-notu">${KAYITLAR.length} sonuç · ${alinma.toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })} itibarıyla</span>
+        <button class="dugme ikincil kucuk" id="yenile">↻ Yenile</button><button class="dugme ikincil kucuk" id="cik">Çıkış</button>`}
+      </div>
+      <div id="icerik"></div>
+    </div>`;
+    document.querySelectorAll('[data-sekme]').forEach(b => b.onclick = () => { durum.sekme = b.dataset.sekme; durum.soru = null; ciz(); });
+    $('sinif').onchange = e => { durum.sinif = e.target.value; durum.soru = null; ciz(); };
+    if ($('yenile')) $('yenile').onclick = () => { document.body.innerHTML = `<div class="sayfa">${ust}<p class="bos-durum">Sonuçlar yenileniyor…</p></div>`; getirSessiz(); };
+    if ($('cik')) $('cik').onclick = () => { try { if (!durum.ornek) localStorage.removeItem('panelSifre'); } catch (e) {} oturum = ''; durum.ornek = false; KAYITLAR = []; giris(); };
+    const ic = $('icerik');
+    if (durum.sekme === 'ogrenci') ogrenciEkrani(ic); else sinavEkrani(ic, durum.sekme);
+    window.scrollTo(0, 0);
+  }
+  async function getirSessiz() {
+    try {
+      const v = await (await fetch(window.SONUC_ADRESI + '?sifre=' + encodeURIComponent(oturum))).json();
+      if (v.hata) throw new Error(v.hata);
+      veriYukle(v); ciz();
+    } catch (e) { giris(e.message && !(e instanceof TypeError) ? e.message : 'Sonuçlar yenilenemedi, tekrar dene.'); }
+  }
+
+  const sinifFiltre = k => !durum.sinif || k.sinif === durum.sinif;
+
+  // ---------- Deneme / test ekranı ----------
+  function sinavEkrani(ic, tur) {
+    const kayitlar = KAYITLAR.filter(k => k.tur === tur && sinifFiltre(k));
+    const kodlar = [...new Set(kayitlar.map(k => k.kod))];
+    // Seçim listesi: sonucu olan sınavlar önce (en yeni sonuca göre), sonra henüz kimsenin çözmediği sınavlar.
+    const sonTarih = kod => Math.max(...kayitlar.filter(k => k.kod === kod).map(k => +k.tarih));
+    kodlar.sort((a, b) => sonTarih(b) - sonTarih(a));
+    if (!durum.sinav[tur] || !kodlar.includes(durum.sinav[tur])) durum.sinav[tur] = kodlar[0] || '';
+    const kod = durum.sinav[tur];
+    const secenekler = kodlar.map(k => { const s = SINAVLAR.get(k); const n = kayitlar.filter(x => x.kod === k && !x.tekrar).length; return `<option value="${kacis(k)}" ${k === kod ? 'selected' : ''}>${kacis(s ? (tur === 'test' ? s.alt + ' · ' : '') + s.ad : k || 'Bilinmeyen')} (${n} öğrenci)</option>`; }).join('');
+    if (!kodlar.length) {
+      ic.innerHTML = `<div class="kutu bos-durum">${durum.sinif ? kacis(durum.sinif) + ' sınıfından ' : ''}henüz ${tur === 'deneme' ? 'deneme' : 'online test'} sonucu gelmedi.<br>Öğrenciler ${tur === 'deneme' ? 'denemeyi' : 'testi'} bitirdikçe sonuçlar burada görünür.</div>`;
+      return;
+    }
+    const sinav = SINAVLAR.get(kod);
+    const hepsi = kayitlar.filter(k => k.kod === kod);
+    const ilkler = hepsi.filter(k => !k.tekrar);
+    const deneme = tur === 'deneme';
+    const puanAl = k => deneme ? k.net : k.puan;
+    const puanlar = ilkler.map(puanAl);
+    const sureler = ilkler.map(k => k.sure).filter(s => s != null);
+    const uniteler = deneme ? [...new Set(ilkler.flatMap(k => Object.keys(k.uniteNet)))] : [];
+    const sirali = [...ilkler].sort((a, b) => puanAl(b) - puanAl(a) || (a.sure || 0) - (b.sure || 0));
+
+    ic.innerHTML = `
+      <div class="arac"><select id="sinav" style="flex:1;min-width:0">${secenekler}</select></div>
+      <div class="kutu">
+        <h2>${kacis(sinav ? sinav.ad : kod)} <span class="tag">${kacis(sinav ? sinav.alt : '')}</span></h2>
+        <div class="ozet">
+          <div><b>${ilkler.length}</b><span>öğrenci katıldı</span></div>
+          <div><b>${sayiYaz(ort(puanlar))}</b><span>ortalama ${deneme ? 'net' : 'puan'}</span></div>
+          <div><b>${sayiYaz(Math.max(...puanlar))}</b><span>en yüksek ${deneme ? 'net' : 'puan'}</span></div>
+          <div><b>${dakika(ort(sureler))}</b><span>ortalama süre</span></div>
+          ${uniteler.map(u => `<div><b>${sayiYaz(ort(ilkler.map(k => k.uniteNet[u]).filter(n => n != null)))}</b><span>${kacis(u)} ort. net</span></div>`).join('')}
+        </div>
+      </div>
+      <div class="kutu">
+        <h2>Soru analizi</h2>
+        <p class="bilgi">Kutudaki sayı soruyu doğru yapanların oranı. Bir soruya dokununca hangi şıkkın kaç kişi tarafından işaretlendiğini ve sorunun çözümünü görürsün.</p>
+        <div class="sorular" id="sorular"></div>
+        <div class="lejant"><span><i style="border-color:var(--green);background:var(--green-soft)"></i>%70 ve üstü</span><span><i style="border-color:var(--yellow-line);background:var(--yellow-soft)"></i>%40–69</span><span><i style="border-color:var(--red);background:var(--red-soft)"></i>%40'ın altı</span></div>
+        <div id="soruDetay"></div>
+      </div>
+      <div class="iki">
+        <div class="kutu"><h2>En çok zorlanılan sorular</h2><p class="bilgi">Doğru oranı en düşük 5 soru.</p><div id="zorlar"></div></div>
+        <div class="kutu"><h2>Konulara göre başarı</h2><p class="bilgi">Bu ${deneme ? 'denemede' : 'testte'} her konunun sorularında doğru oranı.</p><div id="konular"></div></div>
+      </div>
+      <div class="kutu">
+        <h2>Sıralama</h2>
+        <p class="bilgi">Bir öğrenciye dokununca bütün sonuçlarını görürsün.${hepsi.length > ilkler.length ? ' Aynı sınavı ikinci kez çözenlerin yalnızca ilk sonucu istatistiklere katıldı.' : ''}</p>
+        <div class="tablo-kap"><table class="liste">
+          <tr><th>#</th><th class="sol">Ad Soyad</th><th>Sınıf</th><th>D</th><th>Y</th><th>B</th><th>${deneme ? 'Net' : 'Puan'}</th>${uniteler.map(u => `<th>${kacis(u.split(' ')[0])}</th>`).join('')}<th>Süre</th><th class="sol">Tarih</th></tr>
+          ${sirali.map((k, i) => `<tr class="tik" data-ogr="${kacis(k.anahtar)}"><td>${i + 1}</td><td class="sol">${kacis(k.ad)}${hepsi.some(x => x.anahtar === k.anahtar && x.tekrar) ? '<span class="rozet gri">tekrar çözdü</span>' : ''}</td><td>${kacis(k.sinif)}</td><td>${k.d}</td><td>${k.y}</td><td>${k.b}</td><td class="net">${sayiYaz(puanAl(k))}</td>${uniteler.map(u => `<td>${sayiYaz(k.uniteNet[u])}</td>`).join('')}<td>${dakika(k.sure)}${k.sureDoldu ? '<span class="rozet">süre bitti</span>' : ''}</td><td class="sol">${tarihYaz(k.tarih)}</td></tr>`).join('')}
+        </table></div>
+      </div>`;
+
+    $('sinav').onchange = e => { durum.sinav[tur] = e.target.value; durum.soru = null; ciz(); };
+    ic.querySelectorAll('tr[data-ogr]').forEach(tr => tr.onclick = () => { durum.ogrenci = tr.dataset.ogr; durum.sekme = 'ogrenci'; ciz(); });
+
+    // Soru istatistikleri
+    const soruSayisi = sinav ? sinav.sorular.length : Math.max(...ilkler.map(k => k.cevaplar.length));
+    const ist = Array.from({ length: soruSayisi }, (_, i) => {
+      const s = { secim: [0, 0, 0, 0], bos: 0, d: 0, toplam: 0, yanlislar: [], bosBirakan: [], sureler: [] };
+      ilkler.forEach(k => {
+        const c = k.cevaplar[i]; if (!c) return;
+        s.toplam++;
+        if (c.durum === 'b') { s.bos++; s.bosBirakan.push(k.ad); } else { s.secim[c.sec]++; if (c.durum === 'd') s.d++; else s.yanlislar.push(`${k.ad} (${L[c.sec]})`); }
+        if (k.sureler[i] != null) s.sureler.push(k.sureler[i]);
+      });
+      s.oran = s.toplam ? s.d / s.toplam : null;
+      return s;
+    });
+    const renk = o => o == null ? '' : o >= .7 ? 'iyi' : o >= .4 ? 'orta' : 'zor';
+    const yuzde = o => o == null ? '–' : '%' + Math.round(o * 100);
+    $('sorular').innerHTML = ist.map((s, i) => `<button data-i="${i}" class="${renk(s.oran)} ${durum.soru === i ? 'secili' : ''}" title="${sinav && sinav.sorular[i] ? kacis(sinav.sorular[i].konu || '') : ''}"><b>${i + 1}. soru</b><span>${yuzde(s.oran)}</span></button>`).join('');
+    const soruAc = i => {
+      durum.soru = durum.soru === i ? null : i;
+      $('sorular').querySelectorAll('button').forEach(b => b.classList.toggle('secili', +b.dataset.i === durum.soru));
+      $('soruDetay').innerHTML = durum.soru == null ? '' : soruDetay(sinav, ist[i], i);
+      if (durum.soru != null) $('soruDetay').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    };
+    $('sorular').querySelectorAll('button').forEach(b => b.onclick = () => soruAc(+b.dataset.i));
+    if (durum.soru != null && durum.soru < soruSayisi) { const i = durum.soru; durum.soru = null; soruAc(i); }
+
+    const zorlar = ist.map((s, i) => ({ s, i })).filter(x => x.s.oran != null).sort((a, b) => a.s.oran - b.s.oran || b.s.bos - a.s.bos).slice(0, 5);
+    $('zorlar').innerHTML = zorlar.map(({ s, i }) => {
+      const q = sinav && sinav.sorular[i];
+      const enCok = s.secim.map((n, j) => ({ n, j })).filter(x => q && x.j !== q.ans).sort((a, b) => b.n - a.n)[0];
+      return `<div class="yuzde" style="cursor:pointer" data-i="${i}"><span><b>${i + 1}. soru</b> ${q ? '· ' + kacis(q.konu || '') : ''}<small>${s.bos} boş${enCok && enCok.n ? ` · en çok seçilen yanlış: ${L[enCok.j]} (${enCok.n} kişi)` : ''}</small></span><span class="cubuk"><i class="${renk(s.oran)}" style="width:${Math.round(s.oran * 100)}%"></i></span><b>${yuzde(s.oran)}</b></div>`;
+    }).join('') || '<p class="bilgi">Veri yok.</p>';
+    $('zorlar').querySelectorAll('[data-i]').forEach(el => el.onclick = () => { if (durum.soru !== +el.dataset.i) soruAc(+el.dataset.i); else $('soruDetay').scrollIntoView({ behavior: 'smooth' }); });
+
+    $('konular').innerHTML = konuListesi(sinav ? ilkler.flatMap(k => k.cevaplar.map((c, i) => ({ c, q: sinav.sorular[i] }))) : []);
+  }
+
+  function soruDetay(sinav, s, i) {
+    const q = sinav && sinav.sorular[i];
+    const satir = (etiket, n, sinif) => `<div><span>${etiket}</span><span class="cubuk"><i class="${sinif}" style="width:${s.toplam ? Math.round(n / s.toplam * 100) : 0}%"></i></span><span>${n} kişi · %${s.toplam ? Math.round(n / s.toplam * 100) : 0}</span></div>`;
+    return `<div class="soru-detay">
+      <div class="qhead"><span class="qno">${i + 1}</span>${q ? `<span class="tag">${kacis(q.unite || '')}</span><span class="tag">${kacis(q.konu || '')}</span>` : ''}<span class="tag">ort. süre ${dakika(ort(s.sureler))}</span></div>
+      ${q ? `<div class="qtext">${q.q}</div><div class="opts ${q.long ? 'long' : ''}">${q.opts.map((o, j) => `<div class="opt ${j === q.ans ? 'dogru' : ''}" style="${j === q.ans ? 'border-color:var(--green);background:var(--green-soft)' : ''}"><b>${L[j]})</b>${o}</div>`).join('')}</div>` : ''}
+      <div class="dagilim">${[0, 1, 2, 3].map(j => satir(L[j] + (q && j === q.ans ? ' ✓' : ''), s.secim[j], q ? (j === q.ans ? 'd' : 'y') : '')).join('')}${satir('Boş', s.bos, '')}</div>
+      ${s.yanlislar.length ? `<p class="isimler"><b>Yanlış yapanlar:</b> ${s.yanlislar.map(kacis).join(', ')}</p>` : ''}
+      ${s.bosBirakan.length ? `<p class="isimler"><b>Boş bırakanlar:</b> ${s.bosBirakan.map(kacis).join(', ')}</p>` : ''}
+      ${q ? `<details class="cozum"><summary>Çözümü göster</summary><ol>${q.steps.map(x => `<li>${x}</li>`).join('')}</ol><p class="answer">${q.answer}</p>${q.trap ? `<p class="bilgi">⚠ ${q.trap}</p>` : ''}</details>` : ''}
+    </div>`;
+  }
+
+  // Cevap listesinden konu başarısını çıkarır: [{ c: {durum}, q: soru }]
+  function konuListesi(ogeler, enFazla) {
+    const konular = new Map();
+    ogeler.forEach(({ c, q }) => {
+      if (!c || !q) return;
+      const ad = q.konu || 'Diğer', anahtar = (q.unite || '') + '|' + ad;
+      const k = konular.get(anahtar) || { ad, unite: q.unite || '', d: 0, y: 0, b: 0 };
+      k[c.durum]++; konular.set(anahtar, k);
+    });
+    const liste = [...konular.values()].map(k => ({ ...k, toplam: k.d + k.y + k.b, oran: k.d / (k.d + k.y + k.b) })).sort((a, b) => a.oran - b.oran);
+    if (!liste.length) return '<p class="bilgi">Veri yok.</p>';
+    const renk = o => o >= .7 ? '' : o >= .4 ? 'orta' : 'zor';
+    return liste.slice(0, enFazla || liste.length).map(k => `<div class="yuzde"><span>${kacis(k.ad)}<small>${kacis(k.unite)} · ${k.toplam} soru: ${k.d} D, ${k.y} Y, ${k.b} B</small></span><span class="cubuk"><i class="${renk(k.oran)}" style="width:${Math.round(k.oran * 100)}%"></i></span><b>%${Math.round(k.oran * 100)}</b></div>`).join('');
+  }
+
+  // ---------- Öğrenci ekranı ----------
+  function ogrenciEkrani(ic) {
+    const kayitlar = KAYITLAR.filter(sinifFiltre);
+    const ogrenciler = new Map();
+    kayitlar.forEach(k => { const o = ogrenciler.get(k.anahtar) || { anahtar: k.anahtar, ad: k.ad, sinif: k.sinif, kayitlar: [] }; o.kayitlar.push(k); ogrenciler.set(k.anahtar, o); });
+    const liste = [...ogrenciler.values()].sort((a, b) => a.sinif.localeCompare(b.sinif, 'tr', { numeric: true }) || a.ad.localeCompare(b.ad, 'tr'));
+    if (!liste.length) { ic.innerHTML = `<div class="kutu bos-durum">Henüz sonuç gelmedi.</div>`; return; }
+    if (!ogrenciler.has(durum.ogrenci)) durum.ogrenci = '';
+
+    if (!durum.ogrenci) {
+      // Öğrenci listesi: her öğrencinin genel durumu
+      const satirlar = liste.map(o => {
+        const den = o.kayitlar.filter(k => k.tur === 'deneme' && !k.tekrar), tst = o.kayitlar.filter(k => k.tur === 'test' && !k.tekrar);
+        const oge = o.kayitlar.filter(k => !k.tekrar).flatMap(k => { const s = SINAVLAR.get(k.kod); return s ? k.cevaplar.map((c, i) => ({ c, q: s.sorular[i] })) : []; });
+        const zayif = enZayifKonu(oge);
+        return `<tr class="tik" data-ogr="${kacis(o.anahtar)}"><td class="sol">${kacis(o.ad)}</td><td>${kacis(o.sinif)}</td><td>${den.length}</td><td>${sayiYaz(ort(den.map(k => k.net)))}</td><td>${tst.length}</td><td>${tst.length ? sayiYaz(ort(tst.map(k => k.puan)), 0) : '–'}</td><td class="sol">${zayif ? kacis(zayif.ad) + ` <span class="rozet">%${Math.round(zayif.oran * 100)}</span>` : '–'}</td></tr>`;
+      }).join('');
+      ic.innerHTML = `<div class="arac"><input type="search" id="ara" placeholder="Öğrenci ara…" style="flex:1;min-width:0"></div>
+        <div class="kutu"><h2>Öğrenciler</h2><p class="bilgi">Bir öğrenciye dokununca bütün sonuçlarını ve zorlandığı konuları görürsün. "En zayıf konu" en az 3 sorusunu çözdüğü konular arasından seçilir.</p>
+        <div class="tablo-kap"><table class="liste" id="ogrTablo"><tr><th class="sol">Ad Soyad</th><th>Sınıf</th><th>Deneme</th><th>Ort. net</th><th>Test</th><th>Ort. puan</th><th class="sol">En zayıf konu</th></tr>${satirlar}</table></div></div>`;
+      ic.querySelectorAll('tr[data-ogr]').forEach(tr => tr.onclick = () => { durum.ogrenci = tr.dataset.ogr; ciz(); });
+      $('ara').oninput = e => { const a = e.target.value.trim().toLocaleUpperCase('tr'); ic.querySelectorAll('tr[data-ogr]').forEach(tr => { tr.hidden = a && !tr.dataset.ogr.includes(a); }); };
+      return;
+    }
+
+    const o = ogrenciler.get(durum.ogrenci);
+    const kayitSirali = [...o.kayitlar].sort((a, b) => b.tarih - a.tarih);
+    const oge = o.kayitlar.filter(k => !k.tekrar).flatMap(k => { const s = SINAVLAR.get(k.kod); return s ? k.cevaplar.map((c, i) => ({ c, q: s.sorular[i], k, i })) : []; });
+    const denemeler = o.kayitlar.filter(k => k.tur === 'deneme').sort((a, b) => a.tarih - b.tarih);
+    const uniteler = [...new Set(denemeler.flatMap(k => Object.keys(k.uniteNet)))];
+    const yanlislar = oge.filter(x => x.c && x.c.durum === 'y' && x.q).reverse().slice(0, 30);
+
+    ic.innerHTML = `<div class="arac"><button class="dugme ikincil kucuk" id="geri">← Bütün öğrenciler</button></div>
+      <div class="kutu"><h2>${kacis(o.ad)} <span class="tag">${kacis(o.sinif)}</span></h2>
+        <div class="ozet">
+          <div><b>${denemeler.length}</b><span>deneme</span></div>
+          <div><b>${sayiYaz(ort(denemeler.filter(k => !k.tekrar).map(k => k.net)))}</b><span>ortalama net</span></div>
+          ${uniteler.map(u => `<div><b>${sayiYaz(ort(denemeler.filter(k => !k.tekrar).map(k => k.uniteNet[u]).filter(n => n != null)))}</b><span>${kacis(u)} ort. net</span></div>`).join('')}
+          <div><b>${o.kayitlar.filter(k => k.tur === 'test').length}</b><span>online test</span></div>
+        </div>
+      </div>
+      <div class="iki">
+        <div class="kutu"><h2>Konulara göre başarı</h2><p class="bilgi">Çözdüğü bütün test ve denemelerdeki sorular; en zayıftan en iyiye.</p>${konuListesi(oge)}</div>
+        <div class="kutu"><h2>Bütün sonuçları</h2><div class="tablo-kap"><table class="liste">
+          <tr><th class="sol">Tarih</th><th class="sol">Sınav</th><th>D</th><th>Y</th><th>B</th><th>Net / Puan</th><th>Süre</th></tr>
+          ${kayitSirali.map(k => `<tr><td class="sol">${tarihYaz(k.tarih)}</td><td class="sol">${kacis(k.baslik)}${k.tekrar ? '<span class="rozet gri">' + (k.tekrar + 1) + '. kez</span>' : ''}</td><td>${k.d}</td><td>${k.y}</td><td>${k.b}</td><td class="net">${k.tur === 'deneme' ? sayiYaz(k.net) + ' net' : k.puan + ' puan'}</td><td>${dakika(k.sure)}${k.sureDoldu ? '<span class="rozet">süre bitti</span>' : ''}</td></tr>`).join('')}
+        </table></div></div>
+      </div>
+      <div class="kutu"><h2>Yanlış yaptığı sorular</h2><p class="bilgi">En yeniden eskiye ${yanlislar.length} soru. Kırmızı öğrencinin işaretlediği, yeşil doğru şık.</p>
+        ${yanlislar.map(({ c, q, k, i }) => `<details class="yanlis-soru"><summary><b>${kacis(k.baslik)} · ${i + 1}. soru</b> <span class="tag">${kacis(q.konu || '')}</span> — işaretlediği ${L[c.sec]}, doğrusu ${L[q.ans]}</summary>
+          <div class="qtext" style="margin-top:.6rem">${q.q}</div>
+          <div class="opts ${q.long ? 'long' : ''}">${q.opts.map((op, j) => `<div class="opt ${j === q.ans ? 'dogru' : j === c.sec ? 'yanlis' : ''}"><b>${L[j]})</b>${op}</div>`).join('')}</div>
+          <details class="cozum"><summary>Çözümü göster</summary><ol>${q.steps.map(x => `<li>${x}</li>`).join('')}</ol><p class="answer">${q.answer}</p></details>
+        </details>`).join('') || '<p class="bilgi">Yanlış yaptığı soru yok. 👏</p>'}
+      </div>`;
+    $('geri').onclick = () => { durum.ogrenci = ''; ciz(); };
+  }
+
+  function enZayifKonu(oge) {
+    const m = new Map();
+    oge.forEach(({ c, q }) => { if (!c || !q) return; const k = m.get(q.konu) || { ad: q.konu || 'Diğer', d: 0, t: 0 }; k.t++; if (c.durum === 'd') k.d++; m.set(q.konu, k); });
+    return [...m.values()].filter(k => k.t >= 3).map(k => ({ ...k, oran: k.d / k.t })).sort((a, b) => a.oran - b.oran)[0] || null;
+  }
+
+  // ---------- Örnek veri (öğretmen paneli tanıtımı için uydurma sonuçlar) ----------
+  function ornekVeri() {
+    let t = 7;
+    const r = () => { t = (t * 1103515245 + 12345) % 2147483648; return t / 2147483648; };
+    const adlar = ['Ali Yılmaz', 'Ayşe Demir', 'Mehmet Kaya', 'Zeynep Çelik', 'Mustafa Şahin', 'Elif Yıldız', 'Ahmet Öztürk', 'Fatma Aydın', 'Emir Arslan', 'Defne Doğan',
+      'Yusuf Kılıç', 'Ecrin Aslan', 'Ömer Çetin', 'Nehir Kara', 'Kerem Koç', 'Azra Kurt', 'Eymen Özdemir', 'Asel Şimşek', 'Miraç Polat', 'Duru Erdoğan', 'Aras Güneş', 'Lina Aksoy'];
+    const ogr = adlar.map((ad, i) => ({ ad, sinif: i % 2 ? '8-B' : '8-A', guc: .35 + r() * .55 }));
+    const tarih = (gun, dk) => new Date(2026, 9, gun, 10, dk).toISOString();
+    const satir = (o, kod, sorular, gun) => {
+      const cev = [], sure = []; let d = 0, y = 0, b = 0; const net = {};
+      sorular.forEach((q, i) => {
+        const zor = (q.no * 37 % 10) / 25, p = o.guc - zor;
+        const s = r() < p ? q.ans : r() < .25 ? null : (q.ans + 1 + Math.floor(r() * 3)) % 4;
+        if (s === null) b++; else if (s === q.ans) d++; else y++;
+        cev.push(`${i + 1}:${s === null ? '-' : L[s]}${s === null ? '' : s === q.ans ? '✓' : '✗(' + L[q.ans] + ')'}`);
+        sure.push(30 + Math.floor(r() * 150));
+        if (q.unite) { net[q.unite] = net[q.unite] || 0; net[q.unite] += s === null ? 0 : s === q.ans ? 1 : -1 / 3; }
+      });
+      const top = sure.reduce((a, x) => a + x, 0);
+      const ortak = { 'Tarih': tarih(gun, Math.floor(r() * 50)), 'Ad Soyad': o.ad, 'Sınıf': o.sinif, 'Doğru': d, 'Yanlış': y, 'Boş': b, 'Puan': Math.round(d / sorular.length * 100), 'Soru Sayısı': sorular.length,
+        'Süre': dakika(top) + ' / ' + dakika(sorular.length * (kod.startsWith('deneme') ? 120 : 150)), 'Süre Doldu': 'Hayır', 'Cevaplar': cev.join(' ') };
+      if (!kod.startsWith('deneme')) return { ...ortak, 'Test Kodu': kod, 'Test': kod };
+      const s = { ...ortak, 'Deneme Kodu': kod, 'Deneme': kod, 'Net': Math.round((d - y / 3) * 100) / 100, 'Soru Süreleri': sure.map((x, i) => `${i + 1}:${dakika(x)}`).join(' ') };
+      Object.keys(net).forEach(u => { s[u + ' Neti'] = Math.round(net[u] * 100) / 100; });
+      return s;
+    };
+    const d1 = window.DENEMELER[0], d2 = window.DENEMELER[1];
+    const testler = [], denemeler = [];
+    ogr.forEach((o, i) => {
+      denemeler.push(satir(o, d1.id, d1.sorular, 5));
+      if (i % 5 !== 3) denemeler.push(satir(o, d2.id, d2.sorular, 12));
+      if (i % 3 === 0) { const tt = window.TESTLER[2]; testler.push(satir(o, tt.id, tt.sorular(), 8)); }
+      if (i % 4 === 1) { const tt = window.TESTLER[6]; testler.push(satir(o, tt.id, tt.sorular(), 9)); }
+    });
+    denemeler.push(satir(ogr[4], d1.id, d1.sorular, 6));
+    return { testler, denemeler, zaman: new Date().toISOString() };
+  }
+
+  // Açılış: hatırlanan şifre varsa doğrudan getir.
+  let kayitli = '';
+  try { kayitli = localStorage.getItem('panelSifre') || ''; } catch (e) {}
+  if (new URLSearchParams(location.search).has('ornek')) { durum.ornek = true; veriYukle(ornekVeri()); ciz(); }
+  else { giris(); if (kayitli) getir(kayitli, true); }
+})();
+</script>
+</body>
+</html>
