@@ -122,6 +122,8 @@ kbd { border: 1px solid var(--line); border-bottom-width: 2px; border-radius: 4p
 @keyframes in { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
 
 .frac { display: inline-flex; flex-direction: column; vertical-align: middle; text-align: center; font-size: .9em; line-height: 1.1; margin: 0 .1em; }
+.kok { white-space: nowrap; }
+.kok > span { border-top: 1.5px solid currentColor; padding: 0 .12em 0 .05em; margin-left: .02em; }
 .frac > span:first-child { border-bottom: 1.5px solid currentColor; padding: 0 .15em; }
 table.t { border-collapse: collapse; margin: .6rem auto; font-size: .95rem; }
 table.t th, table.t td { border: 1px solid var(--blue); padding: .3rem .8rem; text-align: center; }

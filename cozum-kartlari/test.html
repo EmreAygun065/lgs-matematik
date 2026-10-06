@@ -30,6 +30,10 @@
   details.cozum ol { margin: .5rem 0 0; padding-left: 1.3rem; }
   .sonuc-etiket { font-weight: 700; margin-left: .3rem; }
   .sonuc-etiket.d { color: var(--green); } .sonuc-etiket.y { color: var(--red); } .sonuc-etiket.b { color: var(--muted); }
+  .sure { font-weight: 700; font-variant-numeric: tabular-nums; font-size: 1.15rem; padding: .2rem .7rem; border-radius: 8px; background: var(--bg); }
+  .sure.az { color: var(--red); background: var(--red-soft); }
+  .ilerleme .sol { display: flex; flex-direction: column; gap: .15rem; }
+  .ilerleme .sol #sayac { font-size: .9rem; color: var(--muted); }
 </style>
 </head>
 <body>
@@ -40,22 +44,43 @@
 <script src="veri/benzer-ornek-2.js"></script>
 <script src="veri/benzer-ornek-3.js"></script>
 <script src="veri/benzer-ornek-4.js"></script>
+<script src="veri/karekok-benzer-cikmis.js"></script>
+<script src="veri/karekok-benzer-ornek-1.js"></script>
+<script src="veri/karekok-benzer-ornek-2.js"></script>
+<script src="veri/karekok-benzer-ornek-3.js"></script>
+<script src="veri/karekok-benzer-ornek-4.js"></script>
 <script>
 (function () {
   const araliktan = (a, b) => BENZER_ORNEK.filter(q => q.no >= a && q.no <= b);
+  const kkKonu = (...konular) => KK_BENZER_ORNEK.filter(q => konular.includes(q.konu));
+  const kkYaklasik = KK_BENZER_ORNEK.filter(q => q.konu === 'Karekökün yaklaşık değeri');
+  const USLU = 'Üslü İfadeler', KAREKOK = 'Kareköklü İfadeler';
   const TESTLER = [
-    { id: 'cikmis', ad: 'LGS tarzı karma test', sorular: () => BENZER_CIKMIS },
-    { id: 'tam-sayi', ad: 'Tam sayıların kuvvetleri', sorular: () => araliktan(1, 15) },
-    { id: 'kurallar-1', ad: 'Temel kurallar – 1', sorular: () => araliktan(16, 34) },
-    { id: 'kurallar-2', ad: 'Temel kurallar – 2', sorular: () => araliktan(35, 53) },
-    { id: 'ondalik', ad: "Ondalık çözümleme ve 10'un kuvvetleri", sorular: () => araliktan(54, 75) },
-    { id: 'bilimsel', ad: 'Bilimsel gösterim', sorular: () => araliktan(76, 80) }
+    { id: 'cikmis', unite: USLU, ad: 'LGS tarzı karma test', sorular: () => BENZER_CIKMIS },
+    { id: 'tam-sayi', unite: USLU, ad: 'Tam sayıların kuvvetleri', sorular: () => araliktan(1, 15) },
+    { id: 'kurallar-1', unite: USLU, ad: 'Temel kurallar – 1', sorular: () => araliktan(16, 34) },
+    { id: 'kurallar-2', unite: USLU, ad: 'Temel kurallar – 2', sorular: () => araliktan(35, 53) },
+    { id: 'ondalik', unite: USLU, ad: "Ondalık çözümleme ve 10'un kuvvetleri", sorular: () => araliktan(54, 75) },
+    { id: 'bilimsel', unite: USLU, ad: 'Bilimsel gösterim', sorular: () => araliktan(76, 80) },
+    { id: 'kk-karma-1', unite: KAREKOK, ad: 'LGS tarzı karma test – 1', sorular: () => KK_BENZER_CIKMIS.slice(0, 16) },
+    { id: 'kk-karma-2', unite: KAREKOK, ad: 'LGS tarzı karma test – 2', sorular: () => KK_BENZER_CIKMIS.slice(16) },
+    { id: 'kk-temel', unite: KAREKOK, ad: 'Tam kareler, ondalık sayılar, gerçek sayılar', sorular: () => kkKonu('Tam kare sayılar', 'Ondalık sayıların karekökü', 'Gerçek sayılar') },
+    { id: 'kk-yaklasik-1', unite: KAREKOK, ad: 'Karekökün yaklaşık değeri – 1', sorular: () => kkYaklasik.slice(0, 20) },
+    { id: 'kk-yaklasik-2', unite: KAREKOK, ad: 'Karekökün yaklaşık değeri – 2', sorular: () => kkYaklasik.slice(20) },
+    { id: 'kk-carpma', unite: KAREKOK, ad: 'Çarpma ve bölme', sorular: () => kkKonu('Çarpma ve bölme') },
+    { id: 'kk-toplama', unite: KAREKOK, ad: 'Toplama ve çıkarma', sorular: () => kkKonu('Toplama ve çıkarma') }
   ];
+  const SORU_SURESI = 150;   // soru başına saniye (2,5 dakika)
   const L = 'ABCD';
   const $ = id => document.getElementById(id);
   const params = new URLSearchParams(location.search);
   let test = TESTLER.find(t => t.id === params.get('test'));
-  let ogrenci = null, sorular = [], cevaplar = [];
+  let ogrenci = null, sorular = [], cevaplar = [], bitis = 0, sureSn = 0, zamanlayici = null;
+  const dakika = sn => `${Math.floor(sn / 60)}:${String(sn % 60).padStart(2, '0')}`;
+
+  // Sayfa yenilenirse süre baştan başlamasın, işaretler kaybolmasın diye aktif test saklanır.
+  const kaydet = () => { try { localStorage.setItem('aktifTest', JSON.stringify({ testId: test.id, ogrenci, bitis, cevaplar })); } catch (e) {} };
+  const temizle = () => { try { localStorage.removeItem('aktifTest'); } catch (e) {} };
 
   try { const t = localStorage.getItem('tema'); if (t) document.documentElement.dataset.theme = t; } catch (e) {}
 
@@ -73,7 +98,8 @@
         <label class="alan" for="sinif">Sınıf / Şube</label>
         <input type="text" id="sinif" maxlength="20" placeholder="Örn. 8-A" value="${kacis(kayitli.sinif || '')}">
         <label class="alan" for="test">Test</label>
-        <select class="test-sec" id="test">${TESTLER.map(t => `<option value="${t.id}" ${test && test.id === t.id ? 'selected' : ''}>${t.ad} (${t.sorular().length} soru)</option>`).join('')}</select>
+        <select class="test-sec" id="test">${[...new Set(TESTLER.map(t => t.unite))].map(u => `<optgroup label="${u}">${TESTLER.filter(t => t.unite === u).map(t => `<option value="${t.id}" ${test && test.id === t.id ? 'selected' : ''}>${t.ad} (${t.sorular().length} soru · ${String(t.sorular().length * SORU_SURESI / 60).replace('.', ',')} dk)</option>`).join('')}</optgroup>`).join('')}</select>
+        <p class="durum" style="margin-top:.8rem">⏱ Her soru için ortalama 2,5 dakika süren var. Süre bitince test kendiliğinden biter ve işaretlediğin cevaplar gönderilir.</p>
         <button class="dugme" id="basla">Teste başla →</button>
         <div class="hata" id="hata"></div>
       </div></div>`;
@@ -86,34 +112,48 @@
       test = TESTLER.find(t => t.id === $('test').value);
       sorular = test.sorular();
       cevaplar = sorular.map(() => null);
+      sureSn = sorular.length * SORU_SURESI;
+      bitis = Date.now() + sureSn * 1000;
+      kaydet();
       coz();
     };
   }
 
   // 2) Soru çözme ekranı
   function coz() {
-    document.body.innerHTML = `<div class="sayfa">${ust(test.ad)}
+    document.body.innerHTML = `<div class="sayfa">${ust(test.unite + ' · ' + test.ad)}
       <p class="durum">${kacis(ogrenci.ad)} · ${kacis(ogrenci.sinif)} — İşaretlediğin şıkkı değiştirebilirsin. Bitince en alttaki “Testi bitir” düğmesine bas.</p>
       ${sorular.map((q, i) => `<div class="kutu soru" id="s${i}">
         <div class="qhead"><span class="qno">${i + 1}</span></div>
         <div class="qtext">${q.q}</div>
         <div class="opts ${q.long ? 'long' : ''}">${q.opts.map((o, j) => `<button class="opt" data-i="${i}" data-j="${j}"><b>${L[j]})</b>${o}</button>`).join('')}</div>
       </div>`).join('')}
-      <div class="ilerleme"><span id="sayac"></span><button class="dugme" id="bitir">Testi bitir</button></div>
+      <div class="ilerleme"><div class="sol"><span class="sure" id="sure"></span><span id="sayac"></span></div><button class="dugme" id="bitir">Testi bitir</button></div>
     </div>`;
     document.querySelectorAll('.soru .opt').forEach(b => b.onclick = () => {
       const i = +b.dataset.i, j = +b.dataset.j;
       cevaplar[i] = cevaplar[i] === j ? null : j;   // aynı şıkka tekrar basınca işaret kalkar
       document.querySelectorAll(`#s${i} .opt`).forEach(x => x.classList.toggle('secili', +x.dataset.j === cevaplar[i]));
       sayac();
+      kaydet();
     });
     $('bitir').onclick = () => {
       const bos = cevaplar.filter(c => c === null).length;
       if (bos && !confirm(`${bos} soruyu boş bıraktın. Yine de testi bitirmek istiyor musun?`)) return;
-      sonuc();
+      sonuc(false);
     };
+    cevaplar.forEach((c, i) => c !== null && document.querySelector(`#s${i} .opt[data-j="${c}"]`).classList.add('secili'));
     sayac();
+    zamanlayici = setInterval(saat, 1000);
+    saat();   // süre zaten dolmuşsa (yenilemeden sonra) hemen sonucu gösterir
     window.scrollTo(0, 0);
+  }
+
+  function saat() {
+    const kalan = Math.max(0, Math.ceil((bitis - Date.now()) / 1000));
+    $('sure').textContent = '⏱ ' + dakika(kalan);
+    $('sure').classList.toggle('az', kalan <= 300);
+    if (kalan === 0) sonuc(true);
   }
 
   function sayac() {
@@ -122,20 +162,25 @@
   }
 
   // 3) Sonuç ekranı + gönderim
-  function sonuc() {
+  function sonuc(sureDoldu) {
+    clearInterval(zamanlayici);
+    temizle();
+    const harcanan = Math.min(sureSn, Math.round((Date.now() - (bitis - sureSn * 1000)) / 1000));
     const dogru = cevaplar.filter((c, i) => c === sorular[i].ans).length;
     const bos = cevaplar.filter(c => c === null).length;
     const yanlis = sorular.length - dogru - bos;
     const puan = Math.round(dogru / sorular.length * 100);
     const kayit = {
-      ad: ogrenci.ad, sinif: ogrenci.sinif, test: test.ad, testId: test.id,
+      ad: ogrenci.ad, sinif: ogrenci.sinif, test: test.unite + ' · ' + test.ad, testId: test.id,
       dogru, yanlis, bos, puan, soruSayisi: sorular.length,
+      sure: dakika(harcanan) + ' / ' + dakika(sureSn), sureDoldu: sureDoldu ? 'Evet' : 'Hayır',
       cevaplar: cevaplar.map((c, i) => `${i + 1}:${c === null ? '-' : L[c]}${c === null ? '' : c === sorular[i].ans ? '✓' : '✗(' + L[sorular[i].ans] + ')'}`).join(' ')
     };
 
-    document.body.innerHTML = `<div class="sayfa">${ust(test.ad + ' · Sonuç')}
+    document.body.innerHTML = `<div class="sayfa">${ust(test.unite + ' · ' + test.ad + ' · Sonuç')}
       <div class="kutu">
-        <p><b>${kacis(ogrenci.ad)}</b> · ${kacis(ogrenci.sinif)}</p>
+        <p><b>${kacis(ogrenci.ad)}</b> · ${kacis(ogrenci.sinif)} · ⏱ ${dakika(harcanan)} / ${dakika(sureSn)}</p>
+        ${sureDoldu ? '<p class="durum no">Süre doldu, test kendiliğinden bitirildi.</p>' : ''}
         <div class="puan"><div class="d"><b>${dogru}</b>Doğru</div><div class="y"><b>${yanlis}</b>Yanlış</div><div><b>${bos}</b>Boş</div><div class="p"><b>${puan}</b>Puan</div></div>
         <p class="durum" id="gonderim">Sonucun öğretmenine gönderiliyor…</p>
         <button class="dugme ikincil" id="tekrar" hidden>Tekrar göndermeyi dene</button>
@@ -174,7 +219,18 @@
 
   function kacis(s) { return String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
 
-  giris();
+  // Yarım kalmış test varsa (sayfa yenilendiyse) kaldığı yerden devam et.
+  let aktif = null;
+  try { aktif = JSON.parse(localStorage.getItem('aktifTest') || 'null'); } catch (e) {}
+  const aktifTest = aktif && TESTLER.find(t => t.id === aktif.testId);
+  if (aktifTest && aktif.ogrenci && aktif.bitis && aktif.cevaplar && aktif.cevaplar.length === aktifTest.sorular().length) {
+    test = aktifTest; ogrenci = aktif.ogrenci; bitis = aktif.bitis; cevaplar = aktif.cevaplar;
+    sorular = test.sorular(); sureSn = sorular.length * SORU_SURESI;
+    coz();
+  } else {
+    temizle();
+    giris();
+  }
 })();
 </script>
 </body>

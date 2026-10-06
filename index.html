@@ -10,46 +10,77 @@
   .sayfa > h1 { font-size: 1.6rem; margin: .5rem 0 .2rem; }
   .sayfa > h1 span { color: var(--accent); }
   .alt { color: var(--muted); margin: 0 0 1.5rem; }
-  h2 { font-size: 1.1rem; margin: 2rem 0 .8rem; }
   .izgara { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 1rem; }
   a.kart { display: block; text-decoration: none; color: var(--ink); background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 1.1rem 1.2rem; transition: border-color .15s, transform .15s; }
   a.kart:hover { border-color: var(--accent); transform: translateY(-2px); }
   a.kart b { display: block; font-size: 1.05rem; margin-bottom: .3rem; }
   a.kart span { color: var(--muted); font-size: .9rem; }
   a.kart .sayi { float: right; background: var(--accent-soft); color: var(--accent); font-weight: 700; border-radius: 999px; padding: 0 .6rem; font-size: .85rem; }
+  h3 { font-size: 1rem; margin: 1.4rem 0 .7rem; color: var(--muted); }
+  .unite { margin-top: 2.2rem; }
+  .unite-baslik { font-size: 1.35rem; margin: 0 0 .2rem; padding-bottom: .4rem; border-bottom: 2px solid var(--accent); }
+  .uniteler { display: flex; flex-wrap: wrap; gap: .5rem; }
+  .uniteler a { text-decoration: none; color: var(--ink); background: var(--card); border: 1px solid var(--line); border-radius: 999px; padding: .3rem .9rem; font-weight: 600; }
+  .uniteler a:hover { border-color: var(--accent); color: var(--accent); }
   .ipucu { margin-top: 2rem; color: var(--muted); font-size: .9rem; border-left: 3px solid var(--line); padding-left: .8rem; }
 </style>
 </head>
 <body>
 <div class="sayfa">
   <p class="marka buyuk">Emre Hoca</p>
-  <h1>8. Sınıf Matematik · <span>Üslü İfadeler</span></h1>
-  <p class="alt">LGS hazırlığı için etkileşimli çözüm kartları, benzer sorular ve yazdırılabilir çalışma kâğıtları.</p>
+  <h1>8. Sınıf Matematik · <span>LGS Hazırlık</span></h1>
+  <p class="alt">Etkileşimli çözüm kartları, benzer sorular, süreli online testler ve yazdırılabilir çalışma kâğıtları.</p>
+  <nav class="uniteler"><a href="#karekok">√ Kareköklü İfadeler</a><a href="#uslu">xⁿ Üslü İfadeler</a><a href="#test">📝 Online test</a></nav>
 
-  <h2>📘 Çözüm kartları (akıllı tahta için)</h2>
+  <section class="unite" id="karekok">
+  <h2 class="unite-baslik">√ Kareköklü İfadeler</h2>
+  <h3>📘 Çözüm kartları (akıllı tahta için)</h3>
+  <div class="izgara">
+    <a class="kart" href="cozum-kartlari/karekok-cikmis.html"><em class="sayi">31</em><b>LGS çıkmış sorular</b><span>2018–2026 arası çıkan tüm kareköklü ifadeler soruları, adım adım çözüm ve tuzaklar</span></a>
+    <a class="kart" href="cozum-kartlari/karekok-ornek.html"><em class="sayi">83</em><b>MEB örnek sorular</b><span>Konulara göre filtrelenebilir, her soru için ipucu ve çözüm</span></a>
+  </div>
+  <h3>✏️ Benzer yeni sorular</h3>
+  <div class="izgara">
+    <a class="kart" href="cozum-kartlari/karekok-benzer-cikmis.html"><em class="sayi">31</em><b>Çıkmış sorulara benzer</b><span>Her çıkmış sorunun mantığıyla yazılmış yeni soru</span></a>
+    <a class="kart" href="cozum-kartlari/karekok-benzer-ornek.html"><em class="sayi">83</em><b>MEB sorularına benzer</b><span>Her örnek sorunun mantığıyla yazılmış yeni soru</span></a>
+  </div>
+  <h3>🖨 Yazdırılabilir çalışma kâğıtları</h3>
+  <div class="izgara">
+    <a class="kart" href="cozum-kartlari/calisma-kagidi.html?set=kk-benzer-cikmis"><b>Benzer sorular (çıkmış)</b><span>31 soru + cevap anahtarı</span></a>
+    <a class="kart" href="cozum-kartlari/calisma-kagidi.html?set=kk-benzer-ornek"><b>Benzer sorular (MEB)</b><span>83 soru, konuya göre seçilebilir + cevap anahtarı</span></a>
+    <a class="kart" href="cozum-kartlari/calisma-kagidi.html?set=kk-cikmis"><b>Çıkmış sorular</b><span>31 soru + cevap anahtarı</span></a>
+    <a class="kart" href="cozum-kartlari/calisma-kagidi.html?set=kk-ornek"><b>MEB örnek sorular</b><span>83 soru, konuya göre seçilebilir + cevap anahtarı</span></a>
+  </div>
+  </section>
+
+  <section class="unite" id="uslu">
+  <h2 class="unite-baslik">xⁿ Üslü İfadeler</h2>
+  <h3>📘 Çözüm kartları (akıllı tahta için)</h3>
   <div class="izgara">
     <a class="kart" href="cozum-kartlari/uslu-cikmis.html"><em class="sayi">21</em><b>LGS çıkmış sorular</b><span>2018–2026 arası çıkan tüm üslü ifadeler soruları, adım adım çözüm ve tuzaklar</span></a>
     <a class="kart" href="cozum-kartlari/uslu-ornek.html"><em class="sayi">80</em><b>MEB örnek sorular</b><span>Konulara göre filtrelenebilir, her soru için ipucu ve çözüm</span></a>
   </div>
-
-  <h2>✏️ Benzer yeni sorular</h2>
+  <h3>✏️ Benzer yeni sorular</h3>
   <div class="izgara">
     <a class="kart" href="cozum-kartlari/benzer-cikmis.html"><em class="sayi">21</em><b>Çıkmış sorulara benzer</b><span>Her çıkmış sorunun mantığıyla yazılmış yeni soru</span></a>
     <a class="kart" href="cozum-kartlari/benzer-ornek.html"><em class="sayi">80</em><b>MEB sorularına benzer</b><span>Her örnek sorunun mantığıyla yazılmış yeni soru</span></a>
   </div>
-
-  <h2>📝 Online test</h2>
-  <div class="izgara">
-    <a class="kart" href="cozum-kartlari/test.html"><b>Online test çöz</b><span>Ad soyad ile gir, soruları çöz, sonucunu gör</span></a>
-  </div>
-
-  <h2>🖨 Yazdırılabilir çalışma kâğıtları</h2>
+  <h3>🖨 Yazdırılabilir çalışma kâğıtları</h3>
   <div class="izgara">
     <a class="kart" href="cozum-kartlari/calisma-kagidi.html?set=benzer-cikmis"><b>Benzer sorular (çıkmış)</b><span>21 soru + cevap anahtarı</span></a>
     <a class="kart" href="cozum-kartlari/calisma-kagidi.html?set=benzer-ornek"><b>Benzer sorular (MEB)</b><span>80 soru, konuya göre seçilebilir + cevap anahtarı</span></a>
     <a class="kart" href="cozum-kartlari/calisma-kagidi.html?set=cikmis"><b>Çıkmış sorular</b><span>21 soru + cevap anahtarı</span></a>
     <a class="kart" href="cozum-kartlari/calisma-kagidi.html?set=ornek"><b>MEB örnek sorular</b><span>80 soru, konuya göre seçilebilir + cevap anahtarı</span></a>
   </div>
+  </section>
+
+  <section class="unite" id="test">
+  <h2 class="unite-baslik">📝 Online test</h2>
+  <div class="izgara">
+    <a class="kart" href="cozum-kartlari/test.html?test=kk-karma-1"><b>Kareköklü İfadeler testleri</b><span>7 test · her soru için 2,5 dakika · sonuç öğretmene gider</span></a>
+    <a class="kart" href="cozum-kartlari/test.html?test=cikmis"><b>Üslü İfadeler testleri</b><span>6 test · her soru için 2,5 dakika · sonuç öğretmene gider</span></a>
+  </div>
+  </section>
 
   <p class="ipucu">Çözüm kartlarında: <kbd>→</kbd> sonraki adım, <kbd>←</kbd> geri, <kbd>İ</kbd> ipucu, <kbd>Page Down</kbd> sonraki soru. Çalışma kâğıdında “Yazdır / PDF” düğmesiyle kâğıda ya da PDF'e alabilirsiniz; cevap anahtarı ayrı sayfaya düşer.</p>
   <p class="imza">Hazırlayan: <span class="marka">Emre Hoca</span></p>

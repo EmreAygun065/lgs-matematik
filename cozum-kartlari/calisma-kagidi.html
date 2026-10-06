@@ -34,12 +34,18 @@
 </head>
 <body>
 <script>
-  // ?set=cikmis | ornek | benzer-cikmis | benzer-ornek   ve isteğe bağlı &konu=...
+  // ?set=cikmis | ornek | benzer-cikmis | benzer-ornek (Üslü) · kk-cikmis | kk-ornek | kk-benzer-cikmis | kk-benzer-ornek (Karekök)   ve isteğe bağlı &konu=...
+  const USLU = 'Üslü İfadeler', KAREKOK = 'Kareköklü İfadeler';
+  const kk = n => [1, 2, 3, 4].map(i => `veri/karekok-${n}-${i}.js`);
   const SETLER = {
-    'cikmis': { ad: 'LGS Çıkmış Sorular (2018–2026)', js: ['veri/uslu-cikmis.js'], al: () => KART_SETI.sorular },
-    'ornek': { ad: 'MEB Örnek Sorular', js: ['ortak/yardimci.js', 'veri/ornek-0.js', 'veri/ornek-1.js', 'veri/ornek-2.js', 'veri/ornek-3.js', 'veri/ornek-4.js'], al: () => ORNEK },
-    'benzer-cikmis': { ad: 'Çıkmış Sorulara Benzer Yeni Sorular', js: ['ortak/yardimci.js', 'veri/benzer-cikmis.js'], al: () => BENZER_CIKMIS },
-    'benzer-ornek': { ad: 'MEB Sorularına Benzer Yeni Sorular', js: ['ortak/yardimci.js', 'veri/benzer-ornek-1.js', 'veri/benzer-ornek-2.js', 'veri/benzer-ornek-3.js', 'veri/benzer-ornek-4.js'], al: () => BENZER_ORNEK }
+    'cikmis': { unite: USLU, ad: 'LGS Çıkmış Sorular (2018–2026)', js: ['veri/uslu-cikmis.js'], al: () => KART_SETI.sorular },
+    'ornek': { unite: USLU, ad: 'MEB Örnek Sorular', js: ['ortak/yardimci.js', 'veri/ornek-0.js', 'veri/ornek-1.js', 'veri/ornek-2.js', 'veri/ornek-3.js', 'veri/ornek-4.js'], al: () => ORNEK },
+    'benzer-cikmis': { unite: USLU, ad: 'Çıkmış Sorulara Benzer Yeni Sorular', js: ['ortak/yardimci.js', 'veri/benzer-cikmis.js'], al: () => BENZER_CIKMIS },
+    'benzer-ornek': { unite: USLU, ad: 'MEB Sorularına Benzer Yeni Sorular', js: ['ortak/yardimci.js', 'veri/benzer-ornek-1.js', 'veri/benzer-ornek-2.js', 'veri/benzer-ornek-3.js', 'veri/benzer-ornek-4.js'], al: () => BENZER_ORNEK },
+    'kk-cikmis': { unite: KAREKOK, ad: 'LGS Çıkmış Sorular (2018–2026)', js: ['ortak/yardimci.js', 'veri/karekok-cikmis.js'], al: () => KK_CIKMIS },
+    'kk-ornek': { unite: KAREKOK, ad: 'MEB Örnek Sorular', js: ['ortak/yardimci.js', ...kk('ornek')], al: () => KK_ORNEK },
+    'kk-benzer-cikmis': { unite: KAREKOK, ad: 'Çıkmış Sorulara Benzer Yeni Sorular', js: ['ortak/yardimci.js', 'veri/karekok-benzer-cikmis.js'], al: () => KK_BENZER_CIKMIS },
+    'kk-benzer-ornek': { unite: KAREKOK, ad: 'MEB Sorularına Benzer Yeni Sorular', js: ['ortak/yardimci.js', ...kk('benzer-ornek')], al: () => KK_BENZER_ORNEK }
   };
   const params = new URLSearchParams(location.search);
   const SET_ADI = SETLER[params.get('set')] ? params.get('set') : 'benzer-cikmis';
@@ -55,12 +61,12 @@
   const L = 'ABCD';
   const cozumAcik = params.get('cozum') === '1';
 
-  document.title = 'Çalışma Kâğıdı · ' + set.ad + ' · Emre Hoca';
+  document.title = 'Çalışma Kâğıdı · ' + set.unite + ' · ' + set.ad + ' · Emre Hoca';
   document.body.innerHTML = `
   <div class="bar">
     <a class="home" href="../index.html" title="Ana sayfa">⌂</a>
     <h1>Çalışma Kâğıdı · <span class="marka">Emre Hoca</span></h1>
-    <select id="set">${Object.entries(SETLER).map(([k, v]) => `<option value="${k}" ${k === SET_ADI ? 'selected' : ''}>${v.ad}</option>`).join('')}</select>
+    <select id="set">${[USLU, KAREKOK].map(u => `<optgroup label="${u}">${Object.entries(SETLER).filter(([, v]) => v.unite === u).map(([k, v]) => `<option value="${k}" ${k === SET_ADI ? 'selected' : ''}>${v.ad}</option>`).join('')}</optgroup>`).join('')}</select>
     ${konular.length > 1 ? `<select id="konu"><option value="">Tüm konular</option>${konular.map(k => `<option ${k === konu ? 'selected' : ''}>${k}</option>`).join('')}</select>` : ''}
     <label><input type="checkbox" id="coz" ${cozumAcik ? 'checked' : ''}> Çözümleri de ekle</label>
     <button class="primary" onclick="print()">🖨 Yazdır / PDF</button>
@@ -68,7 +74,7 @@
   <div class="imza-sabit">Emre Hoca · LGS Matematik</div>
   <div class="kagit">
     <span class="marka kagit-marka">Emre Hoca</span>
-    <h2>Üslü İfadeler · ${set.ad}${konu ? ' · ' + konu : ''}</h2>
+    <h2>${set.unite} · ${set.ad}${konu ? ' · ' + konu : ''}</h2>
     <p class="bilgi"><span>Ad Soyad: ……………………………</span><span>Sınıf: ……</span><span>Tarih: ……………</span><span>${sorular.length} soru</span></p>
     ${sorular.map((q, i) => `
       <div class="soru">
