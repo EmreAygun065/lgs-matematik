@@ -55,6 +55,7 @@
 <script src="veri/karekok-benzer-ornek-3.js?v=20261006b"></script>
 <script src="veri/karekok-benzer-ornek-4.js?v=20261006b"></script>
 <script src="ortak/sinavlar.js?v=20261006b"></script>
+<script src="ortak/gozetim.js?v=20261006b"></script>
 <script>
 (function () {
   const TESTLER = window.TESTLER;
@@ -64,10 +65,11 @@
   const params = new URLSearchParams(location.search);
   let test = TESTLER.find(t => t.id === params.get('test'));
   let ogrenci = null, sorular = [], cevaplar = [], bitis = 0, sureSn = 0, zamanlayici = null;
+  let D = {}, gozetimBitir = null;   // D: şık sırası ve sayfadan çıkma bilgisi (yenilemede korunur)
   const dakika = sn => `${Math.floor(sn / 60)}:${String(sn % 60).padStart(2, '0')}`;
 
   // Sayfa yenilenirse süre baştan başlamasın, işaretler kaybolmasın diye aktif test saklanır.
-  const kaydet = () => { try { localStorage.setItem('aktifTest', JSON.stringify({ testId: test.id, ogrenci, bitis, cevaplar })); } catch (e) {} };
+  const kaydet = () => { try { localStorage.setItem('aktifTest', JSON.stringify({ testId: test.id, ogrenci, bitis, cevaplar, ...D })); } catch (e) {} };
   const temizle = () => { try { localStorage.removeItem('aktifTest'); } catch (e) {} };
 
   try { const t = localStorage.getItem('tema'); if (t) document.documentElement.dataset.theme = t; } catch (e) {}
@@ -87,7 +89,7 @@
         <input type="text" id="sinif" maxlength="20" placeholder="Örn. 8-A" value="${kacis(kayitli.sinif || '')}">
         <label class="alan" for="test">Test</label>
         <select class="test-sec" id="test">${[...new Set(TESTLER.map(t => t.unite))].map(u => `<optgroup label="${u}">${TESTLER.filter(t => t.unite === u).map(t => `<option value="${t.id}" ${test && test.id === t.id ? 'selected' : ''}>${t.ad} (${t.sorular().length} soru · ${String(t.sorular().length * SORU_SURESI / 60).replace('.', ',')} dk)</option>`).join('')}</optgroup>`).join('')}</select>
-        <p class="durum" style="margin-top:.8rem">⏱ Her soru için ortalama 2,5 dakika süren var. Süre bitince test kendiliğinden biter ve işaretlediğin cevaplar gönderilir.</p>
+        <p class="durum" style="margin-top:.8rem">⏱ Her soru için ortalama 2,5 dakika süren var. Süre bitince test kendiliğinden biter ve işaretlediğin cevaplar gönderilir. Test bitene kadar bu sayfada kal: başka sekmeye ya da uygulamaya geçersen öğretmenine bildirilir.</p>
         <button class="dugme" id="basla">Teste başla →</button>
         <div class="hata" id="hata"></div>
       </div></div>`;
@@ -100,6 +102,7 @@
       test = TESTLER.find(t => t.id === $('test').value);
       sorular = test.sorular();
       cevaplar = sorular.map(() => null);
+      D = { sira: sikSirasiYap(sorular) };
       sureSn = sorular.length * SORU_SURESI;
       bitis = Date.now() + sureSn * 1000;
       kaydet();
@@ -111,10 +114,11 @@
   function coz() {
     document.body.innerHTML = `<div class="sayfa">${ust(test.unite + ' · ' + test.ad)}
       <p class="durum">${kacis(ogrenci.ad)} · ${kacis(ogrenci.sinif)} — İşaretlediğin şıkkı değiştirebilirsin. Bitince en alttaki “Testi bitir” düğmesine bas.</p>
+      <div id="uyari"></div>
       ${sorular.map((q, i) => `<div class="kutu soru" id="s${i}">
         <div class="qhead"><span class="qno">${i + 1}</span></div>
         <div class="qtext">${q.q}</div>
-        <div class="opts ${q.long ? 'long' : ''}">${q.opts.map((o, j) => `<button class="opt" data-i="${i}" data-j="${j}"><b>${L[j]})</b>${o}</button>`).join('')}</div>
+        <div class="opts ${q.long ? 'long' : ''}">${((D.sira && D.sira[i]) || [0, 1, 2, 3]).map((j, k) => `<button class="opt" data-i="${i}" data-j="${j}"><b>${L[k]})</b>${q.opts[j]}</button>`).join('')}</div>
       </div>`).join('')}
       <div class="ilerleme"><div class="sol"><span class="sure" id="sure"></span><span id="sayac"></span></div><button class="dugme" id="bitir">Testi bitir</button></div>
     </div>`;
@@ -127,11 +131,17 @@
     });
     $('bitir').onclick = () => {
       const bos = cevaplar.filter(c => c === null).length;
-      if (bos && !confirm(`${bos} soruyu boş bıraktın. Yine de testi bitirmek istiyor musun?`)) return;
+      window.gozetimSessiz = true;
+      const devam = !bos || confirm(`${bos} soruyu boş bıraktın. Yine de testi bitirmek istiyor musun?`);
+      window.gozetimSessiz = false;
+      if (!devam) return;
       sonuc(false);
     };
     cevaplar.forEach((c, i) => c !== null && document.querySelector(`#s${i} .opt[data-j="${c}"]`).classList.add('secili'));
     sayac();
+    gozetimBitir = gozetimBaslat(D, kaydet, c => {
+      $('uyari').innerHTML = `<p class="durum no" style="margin-top:.6rem">⚠ Test sırasında sayfadan ayrıldın (${cikisMetni(c)}). Bu bilgi öğretmenine gönderilecek; test bitene kadar bu sayfada kal.</p>`;
+    });
     zamanlayici = setInterval(saat, 1000);
     saat();   // süre zaten dolmuşsa (yenilemeden sonra) hemen sonucu gösterir
     window.scrollTo(0, 0);
@@ -152,6 +162,7 @@
   // 3) Sonuç ekranı + gönderim
   function sonuc(sureDoldu) {
     clearInterval(zamanlayici);
+    const cikis = gozetimBitir ? gozetimBitir() : { sayi: 0, sn: 0 };
     temizle();
     const harcanan = Math.min(sureSn, Math.round((Date.now() - (bitis - sureSn * 1000)) / 1000));
     const dogru = cevaplar.filter((c, i) => c === sorular[i].ans).length;
@@ -162,6 +173,7 @@
       ad: ogrenci.ad, sinif: ogrenci.sinif, test: test.unite + ' · ' + test.ad, testId: test.id,
       dogru, yanlis, bos, puan, soruSayisi: sorular.length,
       sure: dakika(harcanan) + ' / ' + dakika(sureSn), sureDoldu: sureDoldu ? 'Evet' : 'Hayır',
+      ekBilgi: { 'Sayfadan Çıkma': cikis.sayi, 'Dışarıda Geçen Süre': dakika(cikis.sn) },
       cevaplar: cevaplar.map((c, i) => `${i + 1}:${c === null ? '-' : L[c]}${c === null ? '' : c === sorular[i].ans ? '✓' : '✗(' + L[sorular[i].ans] + ')'}`).join(' ')
     };
 
@@ -169,11 +181,13 @@
       <div class="kutu">
         <p><b>${kacis(ogrenci.ad)}</b> · ${kacis(ogrenci.sinif)} · ⏱ ${dakika(harcanan)} / ${dakika(sureSn)}</p>
         ${sureDoldu ? '<p class="durum no">Süre doldu, test kendiliğinden bitirildi.</p>' : ''}
+        ${cikis.sayi ? `<p class="durum no">Test sırasında sayfadan ayrıldın: ${cikisMetni(cikis)}.</p>` : ''}
         <div class="puan"><div class="d"><b>${dogru}</b>Doğru</div><div class="y"><b>${yanlis}</b>Yanlış</div><div><b>${bos}</b>Boş</div><div class="p"><b>${puan}</b>Puan</div></div>
         <p class="durum" id="gonderim">Sonucun öğretmenine gönderiliyor…</p>
         <button class="dugme ikincil" id="tekrar" hidden>Tekrar göndermeyi dene</button>
       </div>
       <h2 style="font-size:1.1rem">Cevapların</h2>
+      <p style="color:var(--muted);font-size:.92rem">Şıklar burada asıl sırasıyla gösteriliyor; testte senin ekranında farklı sırada olabilirler. Yeşil doğru şık, kırmızı senin işaretlediğin yanlış şık.</p>
       ${sorular.map((q, i) => {
         const c = cevaplar[i], d = c === q.ans;
         const etiket = c === null ? '<span class="sonuc-etiket b">Boş</span>' : d ? '<span class="sonuc-etiket d">✓ Doğru</span>' : '<span class="sonuc-etiket y">✗ Yanlış</span>';
@@ -213,6 +227,7 @@
   const aktifTest = aktif && TESTLER.find(t => t.id === aktif.testId);
   if (aktifTest && aktif.ogrenci && aktif.bitis && aktif.cevaplar && aktif.cevaplar.length === aktifTest.sorular().length) {
     test = aktifTest; ogrenci = aktif.ogrenci; bitis = aktif.bitis; cevaplar = aktif.cevaplar;
+    D = { sira: aktif.sira, cikis: aktif.cikis, sonGorulme: aktif.sonGorulme };
     sorular = test.sorular(); sureSn = sorular.length * SORU_SURESI;
     coz();
   } else {

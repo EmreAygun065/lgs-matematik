@@ -9,9 +9,9 @@ const PANEL_SIFRE = '';
 
 const TEST_SAYFASI = 'Sonuçlar';
 const DENEME_SAYFASI = 'Denemeler';
-const TEST_BASLIKLAR = ['Tarih', 'Ad Soyad', 'Sınıf', 'Test', 'Doğru', 'Yanlış', 'Boş', 'Puan', 'Soru Sayısı', 'Cevaplar', 'Süre', 'Süre Doldu', 'Test Kodu'];
+const TEST_BASLIKLAR = ['Tarih', 'Ad Soyad', 'Sınıf', 'Test', 'Doğru', 'Yanlış', 'Boş', 'Puan', 'Soru Sayısı', 'Cevaplar', 'Süre', 'Süre Doldu', 'Sayfadan Çıkma', 'Dışarıda Geçen Süre', 'Test Kodu'];
 const DENEME_BASLIKLAR = ['Tarih', 'Ad Soyad', 'Sınıf', 'Deneme', 'Doğru', 'Yanlış', 'Boş', 'Net', 'Çarpanlar ve Katlar Neti', 'Üslü İfadeler Neti',
-  'Puan', 'Soru Sayısı', 'Süre', 'Süre Doldu', 'Cevaplar', 'Soru Süreleri', 'Deneme Kodu'];
+  'Puan', 'Soru Sayısı', 'Süre', 'Süre Doldu', 'Sayfadan Çıkma', 'Dışarıda Geçen Süre', 'Cevaplar', 'Soru Süreleri', 'Deneme Kodu'];
 
 function doPost(e) {
   const v = JSON.parse(e.postData.contents);
@@ -34,6 +34,14 @@ function doPost(e) {
     const netler = v.uniteNetleri || {};
     Object.keys(netler).slice(0, 10).forEach(u => { satir[temiz(u, 40) + ' Neti'] = sayi(netler[u]); });
   }
+  // Sitenin gönderdiği ek bilgiler (ör. sayfadan çıkma) kendi sütunlarına yazılır; yeni bir bilgi gelirse sütunu sona eklenir.
+  // Böylece sitede yeni bir bilgi eklendiğinde bu kodu değiştirmek gerekmez.
+  const ek = v.ekBilgi || {};
+  Object.keys(ek).slice(0, 10).forEach(k => {
+    const ad = temiz(k, 40);
+    if (ad in satir) return;   // asıl sütunların üstüne yazılmaz
+    satir[ad] = typeof ek[k] === 'number' ? sayi(ek[k]) : temiz(ek[k], 200);
+  });
   // Aynı anda gelen sonuçlar birbirinin üstüne yazılmasın diye sırayla eklenir.
   const kilit = LockService.getScriptLock();
   kilit.waitLock(20000);

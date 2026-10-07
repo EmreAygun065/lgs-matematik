@@ -153,6 +153,7 @@
       ad, sinif, anahtar: ad.toLocaleUpperCase('tr') + '|' + sinif,
       d, y, b, net, puan: +r['Puan'] || 0, soruSayisi: +r['Soru Sayısı'] || d + y + b,
       sure: sureSn(r['Süre']), sureDoldu: r['Süre Doldu'] === 'Evet',
+      cikisSayi: +r['Sayfadan Çıkma'] || 0, cikisSn: sureSn(r['Dışarıda Geçen Süre']) || 0,
       cevaplar: cevapCoz(r['Cevaplar']), sureler: sureleriCoz(r['Soru Süreleri']), uniteNet
     };
   }
@@ -237,6 +238,15 @@
 
   const sinifFiltre = k => !durum.sinif || k.sinif === durum.sinif;
 
+  // Kopya şüphesi işaretleri: sınav sırasında sayfadan ayrılma ve gerçekçi olmayan hız
+  // (soru başına 30 saniyeden az sürede bitirip soruların en az %70'ini doğru yapmak).
+  const cokHizli = k => k.sure != null && k.soruSayisi > 0 && k.sure / k.soruSayisi < 30 && k.d / k.soruSayisi >= .7;
+  const supheli = k => k.cikisSayi > 0 || cokHizli(k);
+  const uyarilar = k => [
+    k.cikisSayi ? `<span class="rozet" title="Sınav sırasında başka sekmeye ya da uygulamaya geçti">⚠ ${k.cikisSayi} kez çıktı · ${dakika(k.cikisSn)}</span>` : '',
+    cokHizli(k) ? `<span class="rozet" title="Soru başına ortalama ${dakika(Math.round(k.sure / k.soruSayisi))}">⚡ çok hızlı</span>` : ''
+  ].join('') || '–';
+
   // ---------- Deneme / test ekranı ----------
   function sinavEkrani(ic, tur) {
     const kayitlar = KAYITLAR.filter(k => k.tur === tur && sinifFiltre(k));
@@ -270,6 +280,7 @@
           <div><b>${sayiYaz(ort(puanlar))}</b><span>ortalama ${deneme ? 'net' : 'puan'}</span></div>
           <div><b>${sayiYaz(Math.max(...puanlar))}</b><span>en yüksek ${deneme ? 'net' : 'puan'}</span></div>
           <div><b>${dakika(ort(sureler))}</b><span>ortalama süre</span></div>
+          ${ilkler.some(supheli) ? `<div style="background:var(--red-soft)"><b style="color:var(--red)">${ilkler.filter(supheli).length}</b><span>öğrencide dikkat işareti</span></div>` : ''}
           ${uniteler.map(u => `<div><b>${sayiYaz(ort(ilkler.map(k => k.uniteNet[u]).filter(n => n != null)))}</b><span>${kacis(u)} ort. net</span></div>`).join('')}
         </div>
       </div>
@@ -286,10 +297,10 @@
       </div>
       <div class="kutu">
         <h2>Sıralama</h2>
-        <p class="bilgi">Bir öğrenciye dokununca bütün sonuçlarını görürsün.${hepsi.length > ilkler.length ? ' Aynı sınavı ikinci kez çözenlerin yalnızca ilk sonucu istatistiklere katıldı.' : ''}</p>
+        <p class="bilgi">Bir öğrenciye dokununca bütün sonuçlarını görürsün. <b>Dikkat</b> sütunu: ⚠ sınav sırasında başka sekmeye/uygulamaya geçti, ⚡ soru başına 30 saniyeden kısa sürede bitirip çoğunu doğru yaptı. Bunlar kopya kanıtı değil, konuşmanız gereken işaretlerdir.${hepsi.length > ilkler.length ? ' Aynı sınavı ikinci kez çözenlerin yalnızca ilk sonucu istatistiklere katıldı.' : ''}</p>
         <div class="tablo-kap"><table class="liste">
-          <tr><th>#</th><th class="sol">Ad Soyad</th><th>Sınıf</th><th>D</th><th>Y</th><th>B</th><th>${deneme ? 'Net' : 'Puan'}</th>${uniteler.map(u => `<th>${kacis(u.split(' ')[0])}</th>`).join('')}<th>Süre</th><th class="sol">Tarih</th></tr>
-          ${sirali.map((k, i) => `<tr class="tik" data-ogr="${kacis(k.anahtar)}"><td>${i + 1}</td><td class="sol">${kacis(k.ad)}${hepsi.some(x => x.anahtar === k.anahtar && x.tekrar) ? '<span class="rozet gri">tekrar çözdü</span>' : ''}</td><td>${kacis(k.sinif)}</td><td>${k.d}</td><td>${k.y}</td><td>${k.b}</td><td class="net">${sayiYaz(puanAl(k))}</td>${uniteler.map(u => `<td>${sayiYaz(k.uniteNet[u])}</td>`).join('')}<td>${dakika(k.sure)}${k.sureDoldu ? '<span class="rozet">süre bitti</span>' : ''}</td><td class="sol">${tarihYaz(k.tarih)}</td></tr>`).join('')}
+          <tr><th>#</th><th class="sol">Ad Soyad</th><th>Sınıf</th><th>D</th><th>Y</th><th>B</th><th>${deneme ? 'Net' : 'Puan'}</th>${uniteler.map(u => `<th>${kacis(u.split(' ')[0])}</th>`).join('')}<th>Süre</th><th class="sol">Dikkat</th><th class="sol">Tarih</th></tr>
+          ${sirali.map((k, i) => `<tr class="tik" data-ogr="${kacis(k.anahtar)}"><td>${i + 1}</td><td class="sol">${kacis(k.ad)}${hepsi.some(x => x.anahtar === k.anahtar && x.tekrar) ? '<span class="rozet gri">tekrar çözdü</span>' : ''}</td><td>${kacis(k.sinif)}</td><td>${k.d}</td><td>${k.y}</td><td>${k.b}</td><td class="net">${sayiYaz(puanAl(k))}</td>${uniteler.map(u => `<td>${sayiYaz(k.uniteNet[u])}</td>`).join('')}<td>${dakika(k.sure)}${k.sureDoldu ? '<span class="rozet gri">süre bitti</span>' : ''}</td><td class="sol">${uyarilar(k)}</td><td class="sol">${tarihYaz(k.tarih)}</td></tr>`).join('')}
         </table></div>
       </div>`;
 
@@ -404,8 +415,8 @@
       <div class="iki">
         <div class="kutu"><h2>Konulara göre başarı</h2><p class="bilgi">Çözdüğü bütün test ve denemelerdeki sorular; en zayıftan en iyiye.</p>${konuListesi(oge)}</div>
         <div class="kutu"><h2>Bütün sonuçları</h2><div class="tablo-kap"><table class="liste">
-          <tr><th class="sol">Tarih</th><th class="sol">Sınav</th><th>D</th><th>Y</th><th>B</th><th>Net / Puan</th><th>Süre</th></tr>
-          ${kayitSirali.map(k => `<tr><td class="sol">${tarihYaz(k.tarih)}</td><td class="sol">${kacis(k.baslik)}${k.tekrar ? '<span class="rozet gri">' + (k.tekrar + 1) + '. kez</span>' : ''}</td><td>${k.d}</td><td>${k.y}</td><td>${k.b}</td><td class="net">${k.tur === 'deneme' ? sayiYaz(k.net) + ' net' : k.puan + ' puan'}</td><td>${dakika(k.sure)}${k.sureDoldu ? '<span class="rozet">süre bitti</span>' : ''}</td></tr>`).join('')}
+          <tr><th class="sol">Tarih</th><th class="sol">Sınav</th><th>D</th><th>Y</th><th>B</th><th>Net / Puan</th><th>Süre</th><th class="sol">Dikkat</th></tr>
+          ${kayitSirali.map(k => `<tr><td class="sol">${tarihYaz(k.tarih)}</td><td class="sol">${kacis(k.baslik)}${k.tekrar ? '<span class="rozet gri">' + (k.tekrar + 1) + '. kez</span>' : ''}</td><td>${k.d}</td><td>${k.y}</td><td>${k.b}</td><td class="net">${k.tur === 'deneme' ? sayiYaz(k.net) + ' net' : k.puan + ' puan'}</td><td>${dakika(k.sure)}${k.sureDoldu ? '<span class="rozet gri">süre bitti</span>' : ''}</td><td class="sol">${uyarilar(k)}</td></tr>`).join('')}
         </table></div></div>
       </div>
       <div class="kutu"><h2>Yanlış yaptığı sorular</h2><p class="bilgi">En yeniden eskiye ${yanlislar.length} soru. Kırmızı öğrencinin işaretlediği, yeşil doğru şık.</p>
@@ -444,7 +455,8 @@
       });
       const top = sure.reduce((a, x) => a + x, 0);
       const ortak = { 'Tarih': tarih(gun, Math.floor(r() * 50)), 'Ad Soyad': o.ad, 'Sınıf': o.sinif, 'Doğru': d, 'Yanlış': y, 'Boş': b, 'Puan': Math.round(d / sorular.length * 100), 'Soru Sayısı': sorular.length,
-        'Süre': dakika(top) + ' / ' + dakika(sorular.length * (kod.startsWith('deneme') ? 120 : 150)), 'Süre Doldu': 'Hayır', 'Cevaplar': cev.join(' ') };
+        'Süre': dakika(top) + ' / ' + dakika(sorular.length * (kod.startsWith('deneme') ? 120 : 150)), 'Süre Doldu': 'Hayır', 'Cevaplar': cev.join(' '),
+        'Sayfadan Çıkma': o.ad.length % 5 === 0 ? 3 : 0, 'Dışarıda Geçen Süre': o.ad.length % 5 === 0 ? '4:12' : '0:00' };
       if (!kod.startsWith('deneme')) return { ...ortak, 'Test Kodu': kod, 'Test': kod };
       const s = { ...ortak, 'Deneme Kodu': kod, 'Deneme': kod, 'Net': Math.round((d - y / 3) * 100) / 100, 'Soru Süreleri': sure.map((x, i) => `${i + 1}:${dakika(x)}`).join(' ') };
       Object.keys(net).forEach(u => { s[u + ' Neti'] = Math.round(net[u] * 100) / 100; });

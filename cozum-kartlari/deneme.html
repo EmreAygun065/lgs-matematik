@@ -79,6 +79,7 @@
 <script src="veri/benzer-ornek-3.js?v=20261006b"></script>
 <script src="veri/benzer-ornek-4.js?v=20261006b"></script>
 <script src="ortak/sinavlar.js?v=20261006b"></script>
+<script src="ortak/gozetim.js?v=20261006b"></script>
 <script>
 (function () {
   const SURE_DK = 40;           // LGS matematik: 20 soru, 40 dakika
@@ -94,7 +95,7 @@
 
   // Durum: sayfa yenilenirse kaldığı yerden devam eder
   let D = null;   // { denemeId, ogrenci, bitis, cevaplar[], bayrak[], sureler[], aktif }
-  let deneme = null, zamanlayici = null, sonTik = 0;
+  let deneme = null, zamanlayici = null, sonTik = 0, gozetimBitir = null;
   const kaydet = () => { try { localStorage.setItem('aktifDeneme', JSON.stringify(D)); } catch (e) {} };
   const temizle = () => { try { localStorage.removeItem('aktifDeneme'); } catch (e) {} };
 
@@ -110,6 +111,7 @@
           <li>Sorular arasında serbestçe gezebilir, emin olmadığın soruyu işaretleyip sonra dönebilirsin.</li>
           <li>Süre bitince deneme kendiliğinden biter ve cevapların öğretmenine gönderilir.</li>
           <li>Net = doğru − yanlış ÷ 3. Emin olmadığın soruyu boş bırakmak da bir stratejidir.</li>
+          <li><b>Deneme bitene kadar bu sayfada kal.</b> Başka bir sekmeye ya da uygulamaya geçersen kaç kez ve ne kadar süre ayrıldığın öğretmenine bildirilir. Şıkların sırası her öğrencide farklıdır.</li>
         </ul>
         <label class="alan" for="ad">Ad Soyad</label>
         <input type="text" id="ad" autocomplete="name" maxlength="60" value="${kacis(kayitli.ad || '')}">
@@ -127,7 +129,7 @@
       try { localStorage.setItem('ogrenci', JSON.stringify({ ad, sinif })); } catch (e) {}
       deneme = DENEMELER.find(d => d.id === $('deneme').value);
       const n = deneme.sorular.length;
-      D = { denemeId: deneme.id, ogrenci: { ad, sinif }, bitis: Date.now() + SURE_DK * 60000, cevaplar: Array(n).fill(null), bayrak: Array(n).fill(false), sureler: Array(n).fill(0), aktif: 0 };
+      D = { denemeId: deneme.id, ogrenci: { ad, sinif }, bitis: Date.now() + SURE_DK * 60000, cevaplar: Array(n).fill(null), bayrak: Array(n).fill(false), sureler: Array(n).fill(0), aktif: 0, sira: sikSirasiYap(deneme.sorular) };
       kaydet();
       sinav();
     };
@@ -139,14 +141,20 @@
       <div class="serit"><a class="home" href="../index.html" title="Ana sayfa">⌂</a><span class="ad">${kacis(deneme.ad)} · ${kacis(D.ogrenci.ad)}</span><span class="sure" id="sure"></span><button class="dugme" id="bitir">Bitir</button></div>
       <div class="harita" id="harita"></div>
       <div class="harita-not"><span class="n-dolu">Cevaplandı</span><span class="n-bayrak">Sonra dönülecek</span><span id="sayac"></span></div>
+      <div id="uyari"></div>
       <div id="onay"></div>
       <div class="kutu soru" id="soru"></div>
     </div>`;
     $('bitir').onclick = onayGoster;
+    gozetimBitir = gozetimBaslat(D, kaydet, uyariGoster);
     sonTik = Date.now();
     zamanlayici = setInterval(tik, 1000);
     goster(D.aktif);
     tik();
+  }
+
+  function uyariGoster(c) {
+    $('uyari').innerHTML = `<p class="durum no">⚠ Deneme sırasında sayfadan ayrıldın (${cikisMetni(c)}). Bu bilgi öğretmenine gönderilecek; deneme bitene kadar bu sayfada kal.</p>`;
   }
 
   function harita() {
@@ -168,7 +176,7 @@
     const q = deneme.sorular[i];
     $('soru').innerHTML = `<div class="soru-ust"><span class="qno">${i + 1}</span><span class="tag">${q.unite}</span></div>
       <div class="qtext">${q.q}</div>
-      <div class="opts ${q.long ? 'long' : ''}">${q.opts.map((o, j) => `<button class="opt ${D.cevaplar[i] === j ? 'secili' : ''}" data-j="${j}"><b>${L[j]})</b>${o}</button>`).join('')}</div>
+      <div class="opts ${q.long ? 'long' : ''}">${((D.sira && D.sira[i]) || [0, 1, 2, 3]).map((j, k) => `<button class="opt ${D.cevaplar[i] === j ? 'secili' : ''}" data-j="${j}"><b>${L[k]})</b>${q.opts[j]}</button>`).join('')}</div>
       <div class="gezinme">
         <button class="dugme ikincil" id="onceki" ${i === 0 ? 'disabled' : ''}>← Önceki</button>
         <button class="dugme ikincil bayrak-btn ${D.bayrak[i] ? 'aktif' : ''}" id="bayrakBtn">${D.bayrak[i] ? '● Sonra dönülecek' : '○ Sonra dönmek için işaretle'}</button>
@@ -210,6 +218,7 @@
   function sonuc(sureDoldu) {
     clearInterval(zamanlayici);
     sureyiYaz();
+    const cikis = gozetimBitir ? gozetimBitir() : { sayi: 0, sn: 0 };
     temizle();
     const S = deneme.sorular;
     const harcanan = Math.min(SURE_DK * 60, SURE_DK * 60 - Math.max(0, Math.ceil((D.bitis - Date.now()) / 1000)));
@@ -229,6 +238,7 @@
       net: yuvarla(tum.n), uniteNetleri: Object.fromEntries(uniteler.map(u => [u.ad, yuvarla(u.r.n)])),
       sure: dakika(harcanan) + ' / ' + dakika(SURE_DK * 60), sureDoldu: sureDoldu ? 'Evet' : 'Hayır',
       cevaplar: D.cevaplar.map((c, i) => `${i + 1}:${c === null ? '-' : L[c]}${c === null ? '' : c === S[i].ans ? '✓' : '✗(' + L[S[i].ans] + ')'}`).join(' '),
+      ekBilgi: { 'Sayfadan Çıkma': cikis.sayi, 'Dışarıda Geçen Süre': dakika(cikis.sn) },
       soruSureleri: D.sureler.map((s, i) => `${i + 1}:${dakika(s)}`).join(' ')
     };
     const satir = (ad, r) => `<tr><td>${ad}</td><td>${r.d}</td><td>${r.y}</td><td>${r.b}</td><td><b>${netYaz(r.n)}</b></td></tr>`;
@@ -236,6 +246,7 @@
       <div class="kutu">
         <p><b>${kacis(D.ogrenci.ad)}</b> · ${kacis(D.ogrenci.sinif)} · ⏱ ${dakika(harcanan)} / ${SURE_DK}:00</p>
         ${sureDoldu ? '<p class="durum no">Süre doldu, deneme kendiliğinden bitirildi.</p>' : ''}
+        ${cikis.sayi ? `<p class="durum no">Deneme sırasında sayfadan ayrıldın: ${cikisMetni(cikis)}.</p>` : ''}
         <div class="ozet"><div class="d"><b>${tum.d}</b>Doğru</div><div class="y"><b>${tum.y}</b>Yanlış</div><div><b>${tum.b}</b>Boş</div><div class="n"><b>${netYaz(tum.n)}</b>Net</div></div>
         <table class="unite"><tr><th>Ünite</th><th>D</th><th>Y</th><th>B</th><th>Net</th></tr>${uniteler.map(u => satir(u.ad, u.r)).join('')}</table>
         <p class="durum" id="gonderim">Sonucun öğretmenine gönderiliyor…</p>
@@ -247,6 +258,7 @@
         <div class="zaman">${D.sureler.map((s, i) => { const c = D.cevaplar[i]; const sinif = c === null ? '' : c === S[i].ans ? 'd' : 'y'; return `<div class="${sinif} ${s > 2 * ort && s > 60 ? 'uzun' : ''}"><b>${i + 1}</b>${dakika(s)}</div>`; }).join('')}</div>
       </div>
       <h2 style="font-size:1.1rem">Cevapların ve çözümler</h2>
+      <p class="bilgi">Şıklar burada asıl sırasıyla gösteriliyor; denemede senin ekranında farklı sırada olabilirler. Yeşil doğru şık, kırmızı senin işaretlediğin yanlış şık.</p>
       ${S.map((q, i) => {
         const c = D.cevaplar[i], d = c === q.ans;
         const et = c === null ? '<span class="sonuc-etiket b">Boş</span>' : d ? '<span class="sonuc-etiket d">✓ Doğru</span>' : '<span class="sonuc-etiket y">✗ Yanlış</span>';
