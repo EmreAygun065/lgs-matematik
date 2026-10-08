@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Yanlışlarım · Emre Hoca</title>
+<link rel="stylesheet" href="ortak/stil.css?v=20261006b">
+<style>
+  .sayfa { max-width: 900px; margin: 0 auto; padding: 1rem 1rem 4rem; }
+  .ust { display: flex; align-items: center; gap: .8rem; flex-wrap: wrap; margin-bottom: 1rem; }
+  .ust h1 { font-size: 1.25rem; margin: 0; flex: 1; }
+  .kutu { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 1.1rem 1.3rem; margin-bottom: 1rem; min-width: 0; }
+  .bilgi { color: var(--muted); font-size: .92rem; margin: .2rem 0 .8rem; }
+  .dugme { font: inherit; font-weight: 700; border: none; border-radius: 10px; padding: .6rem 1.2rem; background: var(--accent); color: #fff; cursor: pointer; text-decoration: none; display: inline-block; }
+  .dugme.ikincil { background: var(--bg); color: var(--ink); border: 1px solid var(--line); font-weight: 500; }
+  .dugme.kucuk { padding: .35rem .8rem; font-size: .9rem; }
+  select { font: inherit; padding: .45rem .6rem; border: 1px solid var(--line); border-radius: 10px; background: var(--bg); color: var(--ink); max-width: 100%; }
+
+  .ozet { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: .6rem; margin: .4rem 0 .9rem; }
+  .ozet div { background: var(--bg); border-radius: 12px; padding: .65rem .8rem; }
+  .ozet b { display: block; font-size: 1.6rem; font-variant-numeric: tabular-nums; }
+  .ozet .y b { color: var(--red); } .ozet .o b { color: var(--green); }
+  .ozet span { color: var(--muted); font-size: .85rem; }
+  .konular { display: flex; flex-wrap: wrap; gap: .4rem; }
+  .konular button { font: inherit; font-size: .88rem; border: 1px solid var(--line); background: var(--bg); color: var(--ink); border-radius: 999px; padding: .25rem .75rem; cursor: pointer; }
+  .konular button b { color: var(--red); margin-left: .25rem; }
+  .konular button.secili { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .konular button.secili b { color: #fff; }
+  .suzgec { display: flex; flex-wrap: wrap; gap: .6rem 1rem; align-items: center; margin-top: .9rem; font-size: .92rem; }
+  .suzgec label { display: flex; gap: .35rem; align-items: center; }
+
+  .soru .ust-satir { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem; margin-bottom: .5rem; }
+  .soru .nereden { color: var(--muted); font-size: .85rem; }
+  .soru .onceki { font-size: .88rem; color: var(--muted); margin: .2rem 0 0; }
+  .soru .opt.secildi-d { border-color: var(--green); background: var(--green-soft); }
+  .soru .opt.secildi-y { border-color: var(--red); background: var(--red-soft); }
+  .soru .opt.dogru-goster { border-color: var(--green); }
+  .soru .opt:disabled { cursor: default; opacity: 1; }
+  .sonuc-mesaj { font-weight: 600; margin: .7rem 0 0; min-height: 1.4rem; }
+  .sonuc-mesaj.d { color: var(--green); } .sonuc-mesaj.y { color: var(--red); }
+  .alt-satir { display: flex; flex-wrap: wrap; gap: .6rem; align-items: center; margin-top: .7rem; }
+  details.cozum summary { cursor: pointer; color: var(--blue); font-weight: 600; }
+  details.cozum ol { margin: .5rem 0 0; padding-left: 1.3rem; }
+  .soru.ogrenildi { opacity: .6; }
+  .bos-durum { color: var(--muted); text-align: center; padding: 2rem 1rem; }
+
+  @media print {
+    .ust .home, .suzgec, .konular, .alt-satir button, .yazdir-gizle { display: none !important; }
+    .kutu { break-inside: avoid; border-color: #bbb; }
+    details.cozum { display: block; } details.cozum > * { display: block; }
+  }
+</style>
+</head>
+<body>
+<script src="ortak/ayarlar.js?v=20261006b"></script>
+<script src="ortak/yardimci.js?v=20261006b"></script>
+<script src="veri/benzer-cikmis.js?v=20261006b"></script>
+<script src="veri/benzer-ornek-1.js?v=20261006b"></script>
+<script src="veri/benzer-ornek-2.js?v=20261006b"></script>
+<script src="veri/benzer-ornek-3.js?v=20261006b"></script>
+<script src="veri/benzer-ornek-4.js?v=20261006b"></script>
+<script src="veri/carpan-benzer-cikmis.js?v=20261006b"></script>
+<script src="veri/carpan-benzer-ornek-1.js?v=20261006b"></script>
+<script src="veri/carpan-benzer-ornek-2.js?v=20261006b"></script>
+<script src="veri/carpan-benzer-ornek-3.js?v=20261006b"></script>
+<script src="veri/carpan-benzer-ornek-4.js?v=20261006b"></script>
+<script src="veri/karekok-benzer-cikmis.js?v=20261006b"></script>
+<script src="veri/karekok-benzer-ornek-1.js?v=20261006b"></script>
+<script src="veri/karekok-benzer-ornek-2.js?v=20261006b"></script>
+<script src="veri/karekok-benzer-ornek-3.js?v=20261006b"></script>
+<script src="veri/karekok-benzer-ornek-4.js?v=20261006b"></script>
+<script src="ortak/sinavlar.js?v=20261006b"></script>
+<script src="ortak/gecmis.js?v=20261006b"></script>
+<script>
+(function () {
+  const L = 'ABCD';
+  const $ = id => document.getElementById(id);
+  const kacis = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const tarihYaz = t => new Date(t).toLocaleDateString('tr-TR', { day: 'numeric', month: 'long' });
+  try { const t = localStorage.getItem('tema'); if (t) document.documentElement.dataset.theme = t; } catch (e) {}
+
+  // Sınav kodu → sorular (testler ve denemeler)
+  const SINAVLAR = new Map();
+  window.DENEMELER.forEach(d => SINAVLAR.set(d.id, d.sorular));
+  window.TESTLER.forEach(t => SINAVLAR.set(t.id, t.sorular()));
+
+  const gecmis = gecmisOku().filter(k => SINAVLAR.has(k.kod) && Array.isArray(k.cevaplar));
+  const ogrenciler = [...new Set(gecmis.map(k => k.ogrenci).filter(Boolean))];
+  let durum = { ogrenci: ogrenciler[ogrenciler.length - 1] || '', konu: '', sinav: '', boslar: true, ogrenilenleriGoster: false };
+
+  // Her sınavın yanlış/boş soruları; aynı soru birden çok kez yanlış yapıldıysa en son hali gösterilir.
+  function sorulariTopla() {
+    const harita = new Map();
+    gecmis.filter(k => !durum.ogrenci || k.ogrenci === durum.ogrenci).forEach(k => {
+      const sorular = SINAVLAR.get(k.kod);
+      k.cevaplar.forEach((c, i) => {
+        const q = sorular[i]; if (!q) return;
+        const anahtar = k.kod + '#' + i;
+        if (c === q.ans) { harita.delete(anahtar); return; }   // sonradan doğru yaptıysa listeden düşer
+        harita.set(anahtar, { anahtar, q, i, sec: c, kayit: k });
+      });
+    });
+    return [...harita.values()].sort((a, b) => new Date(b.kayit.tarih) - new Date(a.kayit.tarih) || a.i - b.i);
+  }
+
+  function ciz() {
+    const ust = `<div class="ust"><a class="home" href="../index.html" title="Ana sayfa">⌂</a><h1>📒 Yanlışlarım</h1><span class="marka">Emre Hoca</span></div>`;
+    if (!gecmis.length) {
+      document.body.innerHTML = `<div class="sayfa">${ust}<div class="kutu bos-durum">
+        <p><b>Bu cihazda henüz çözülmüş bir test ya da deneme yok.</b></p>
+        <p>Bir online test ya da deneme bitirdiğinde yanlış yaptığın ve boş bıraktığın sorular burada toplanır. Sonra onları tekrar çözebilir, çözümlerine bakabilirsin.</p>
+        <p><a class="dugme" href="deneme.html">Deneme çöz</a> <a class="dugme ikincil" href="test.html">Online test çöz</a></p></div></div>`;
+      return;
+    }
+    const ogrenilen = ogrenilenler();
+    const hepsi = sorulariTopla();
+    const sinavlar = [...new Map(hepsi.map(x => [x.kayit.kod, x.kayit.baslik])).entries()];
+    if (durum.sinav && !sinavlar.some(([k]) => k === durum.sinav)) durum.sinav = '';
+    const gorunur = x => (durum.boslar || x.sec !== null) && (durum.ogrenilenleriGoster || !ogrenilen.has(x.anahtar));
+    const sinavdaki = hepsi.filter(x => !durum.sinav || x.kayit.kod === durum.sinav).filter(gorunur);
+    const konuSay = new Map();
+    sinavdaki.forEach(x => konuSay.set(x.q.konu || 'Diğer', (konuSay.get(x.q.konu || 'Diğer') || 0) + 1));
+    if (durum.konu && !konuSay.has(durum.konu)) durum.konu = '';
+    const liste = sinavdaki.filter(x => !durum.konu || (x.q.konu || 'Diğer') === durum.konu);
+    const yanlisSay = hepsi.filter(x => x.sec !== null && !ogrenilen.has(x.anahtar)).length;
+    const bosSay = hepsi.filter(x => x.sec === null && !ogrenilen.has(x.anahtar)).length;
+    const ogrenildiSay = hepsi.filter(x => ogrenilen.has(x.anahtar)).length;
+
+    document.body.innerHTML = `<div class="sayfa">${ust}
+      <div class="kutu">
+        ${ogrenciler.length > 1 ? `<p class="yazdir-gizle" style="margin:0 0 .6rem">Öğrenci: <select id="ogrenci">${ogrenciler.map(o => `<option ${o === durum.ogrenci ? 'selected' : ''}>${kacis(o)}</option>`).join('')}</select></p>` : ''}
+        <p class="bilgi">${durum.ogrenci ? `<b>${kacis(durum.ogrenci)}</b> · ` : ''}Bu cihazda çözdüğün test ve denemelerdeki yanlış ve boş soruların. Önce soruyu tekrar çöz, sonra çözüme bak. Doğru yaptığın soruyu “Öğrendim” deyip listeden çıkarabilirsin.</p>
+        <div class="ozet">
+          <div class="y"><b>${yanlisSay}</b><span>yanlış soru</span></div>
+          <div><b>${bosSay}</b><span>boş soru</span></div>
+          <div class="o"><b>${ogrenildiSay}</b><span>öğrenildi</span></div>
+          <div><b>${new Set(gecmis.filter(k => !durum.ogrenci || k.ogrenci === durum.ogrenci).map(k => k.kod + k.tarih)).size}</b><span>çözülen test/deneme</span></div>
+        </div>
+        <div class="konular">${[['', 'Bütün konular', sinavdaki.length], ...[...konuSay.entries()].sort((a, b) => b[1] - a[1]).map(([k, n]) => [k, k, n])].map(([k, ad, n]) => `<button data-konu="${kacis(k)}" class="${durum.konu === k ? 'secili' : ''}">${kacis(ad)}<b>${n}</b></button>`).join('')}</div>
+        <div class="suzgec">
+          <select id="sinav"><option value="">Bütün test ve denemeler</option>${sinavlar.map(([k, b]) => `<option value="${kacis(k)}" ${k === durum.sinav ? 'selected' : ''}>${kacis(b)}</option>`).join('')}</select>
+          <label><input type="checkbox" id="boslar" ${durum.boslar ? 'checked' : ''}> Boş bıraktıklarım da</label>
+          <label><input type="checkbox" id="ogrenilenler" ${durum.ogrenilenleriGoster ? 'checked' : ''}> Öğrendiklerimi de göster</label>
+          <button class="dugme ikincil kucuk" id="yazdir">🖨 Yazdır</button>
+        </div>
+      </div>
+      <div id="liste">${liste.length ? liste.map(kart).join('') : `<div class="kutu bos-durum">${hepsi.length ? 'Bu seçimde soru kalmadı. 👏' : 'Hiç yanlışın yok, harikasın! 👏'}</div>`}</div>
+    </div>`;
+
+    if ($('ogrenci')) $('ogrenci').onchange = e => { durum.ogrenci = e.target.value; durum.konu = ''; durum.sinav = ''; ciz(); };
+    document.querySelectorAll('[data-konu]').forEach(b => b.onclick = () => { durum.konu = b.dataset.konu; ciz(); });
+    $('sinav').onchange = e => { durum.sinav = e.target.value; durum.konu = ''; ciz(); };
+    $('boslar').onchange = e => { durum.boslar = e.target.checked; ciz(); };
+    $('ogrenilenler').onchange = e => { durum.ogrenilenleriGoster = e.target.checked; ciz(); };
+    $('yazdir').onclick = () => { document.querySelectorAll('details.cozum').forEach(d => { d.open = true; }); window.print(); };
+    liste.forEach(etkilestir);
+  }
+
+  const kartId = x => 'k-' + x.anahtar.replace(/[^a-z0-9]/gi, '_');
+  function kart(x) {
+    const { q, sec, kayit, anahtar } = x;
+    const ogrenildi = ogrenilenler().has(anahtar);
+    return `<div class="kutu soru ${ogrenildi ? 'ogrenildi' : ''}" id="${kartId(x)}">
+      <div class="ust-satir"><span class="qno">${x.i + 1}</span><span class="tag">${kacis(q.unite || '')}</span>${q.konu ? `<span class="tag">${kacis(q.konu)}</span>` : ''}<span class="nereden">${kacis(kayit.baslik)} · ${tarihYaz(kayit.tarih)}</span></div>
+      <div class="qtext">${q.q}</div>
+      <div class="opts ${q.long ? 'long' : ''}">${q.opts.map((o, j) => `<button class="opt" data-j="${j}"><b>${L[j]})</b>${o}</button>`).join('')}</div>
+      <p class="onceki">${sec === null ? 'O gün bu soruyu boş bırakmıştın.' : `O gün <b>${L[sec]}</b> şıkkını işaretlemiştin (yanlış).`} Şimdi tekrar dene.</p>
+      <p class="sonuc-mesaj"></p>
+      <div class="alt-satir">
+        <details class="cozum"><summary>Çözümü göster</summary><ol>${q.steps.map(s => `<li>${s}</li>`).join('')}</ol><p class="answer">${q.answer}</p>${q.trap ? `<p class="bilgi">⚠ ${q.trap}</p>` : ''}</details>
+      </div>
+      <div class="alt-satir"><button class="dugme ikincil kucuk ogren">${ogrenildi ? '↩ Listeye geri al' : '✓ Öğrendim, listeden çıkar'}</button></div>
+    </div>`;
+  }
+
+  function etkilestir(x) {
+    const el = $(kartId(x)); if (!el) return;
+    const q = x.q;
+    el.querySelectorAll('.opt').forEach(b => b.onclick = () => {
+      const j = +b.dataset.j, dogru = j === q.ans;
+      el.querySelectorAll('.opt').forEach(o => { o.disabled = true; o.classList.toggle('dogru-goster', +o.dataset.j === q.ans && !dogru); });
+      b.classList.add(dogru ? 'secildi-d' : 'secildi-y');
+      const m = el.querySelector('.sonuc-mesaj');
+      m.className = 'sonuc-mesaj ' + (dogru ? 'd' : 'y');
+      m.textContent = dogru ? '✓ Doğru! Bu soruyu artık biliyorsan “Öğrendim” diyebilirsin.' : `✗ Yine olmadı; doğru cevap ${L[q.ans]}. Çözüme bakıp adımları takip et.`;
+      if (!dogru) el.querySelector('details.cozum').open = true;
+    });
+    el.querySelector('.ogren').onclick = () => {
+      ogrenildiYap(x.anahtar, !ogrenilenler().has(x.anahtar));
+      const y = window.scrollY; ciz(); window.scrollTo(0, y);
+    };
+  }
+
+  ciz();
+})();
+</script>
+</body>
+</html>

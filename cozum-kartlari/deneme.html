@@ -80,6 +80,7 @@
 <script src="veri/benzer-ornek-4.js?v=20261006b"></script>
 <script src="ortak/sinavlar.js?v=20261006b"></script>
 <script src="ortak/gozetim.js?v=20261006b"></script>
+<script src="ortak/gecmis.js?v=20261006b"></script>
 <script>
 (function () {
   const SURE_DK = 40;           // LGS matematik: 20 soru, 40 dakika
@@ -241,6 +242,7 @@
       ekBilgi: { 'Sayfadan Çıkma': cikis.sayi, 'Dışarıda Geçen Süre': dakika(cikis.sn) },
       soruSureleri: D.sureler.map((s, i) => `${i + 1}:${dakika(s)}`).join(' ')
     };
+    gecmiseEkle({ kod: deneme.id, tur: 'deneme', baslik: deneme.ad, ogrenci: D.ogrenci.ad, tarih: new Date().toISOString(), cevaplar: [...D.cevaplar], dogru: tum.d, yanlis: tum.y, bos: tum.b, net: yuvarla(tum.n) });
     const satir = (ad, r) => `<tr><td>${ad}</td><td>${r.d}</td><td>${r.y}</td><td>${r.b}</td><td><b>${netYaz(r.n)}</b></td></tr>`;
     document.body.innerHTML = `<div class="sayfa">${ust(deneme.ad + ' · Sonuç')}
       <div class="kutu">
@@ -267,7 +269,8 @@
           <div class="opts ${q.long ? 'long' : ''}">${q.opts.map((o, j) => `<div class="opt ${j === q.ans ? 'dogru' : j === c ? 'yanlis' : ''}"><b>${L[j]})</b>${o}</div>`).join('')}</div>
           <details class="cozum"><summary>Çözümü göster</summary><ol>${q.steps.map(s => `<li>${s}</li>`).join('')}</ol><p class="answer">${q.answer}</p></details></div>`;
       }).join('')}
-      <p><button class="dugme" onclick="location.href=location.pathname">Başka bir deneme çöz</button></p>
+      <p style="display:flex;gap:.6rem;flex-wrap:wrap"><button class="dugme" onclick="location.href=location.pathname">Başka bir deneme çöz</button><a class="dugme ikincil" href="yanlislarim.html" style="text-decoration:none">📒 Yanlışlarım</a></p>
+      <p class="bilgi">Yanlış yaptığın ve boş bıraktığın sorular bu cihazda saklanır; “Yanlışlarım” sayfasından istediğin zaman tekrar çözebilirsin.</p>
     </div>`;
     window.scrollTo(0, 0);
     gonder(kayit);

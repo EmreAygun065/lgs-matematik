@@ -56,6 +56,7 @@
 <script src="veri/karekok-benzer-ornek-4.js?v=20261006b"></script>
 <script src="ortak/sinavlar.js?v=20261006b"></script>
 <script src="ortak/gozetim.js?v=20261006b"></script>
+<script src="ortak/gecmis.js?v=20261006b"></script>
 <script>
 (function () {
   const TESTLER = window.TESTLER;
@@ -177,6 +178,7 @@
       cevaplar: cevaplar.map((c, i) => `${i + 1}:${c === null ? '-' : L[c]}${c === null ? '' : c === sorular[i].ans ? '✓' : '✗(' + L[sorular[i].ans] + ')'}`).join(' ')
     };
 
+    gecmiseEkle({ kod: test.id, tur: 'test', baslik: test.unite + ' · ' + test.ad, ogrenci: ogrenci.ad, tarih: new Date().toISOString(), cevaplar: [...cevaplar], dogru, yanlis, bos, puan });
     document.body.innerHTML = `<div class="sayfa">${ust(test.unite + ' · ' + test.ad + ' · Sonuç')}
       <div class="kutu">
         <p><b>${kacis(ogrenci.ad)}</b> · ${kacis(ogrenci.sinif)} · ⏱ ${dakika(harcanan)} / ${dakika(sureSn)}</p>
@@ -198,7 +200,8 @@
           <details class="cozum"><summary>Çözümü göster</summary><ol>${q.steps.map(s => `<li>${s}</li>`).join('')}</ol><p class="answer">${q.answer}</p></details>
         </div>`;
       }).join('')}
-      <button class="dugme" onclick="location.reload()">Başka bir test çöz</button>
+      <p style="display:flex;gap:.6rem;flex-wrap:wrap"><button class="dugme" onclick="location.reload()">Başka bir test çöz</button><a class="dugme ikincil" href="yanlislarim.html" style="text-decoration:none;margin-top:1.2rem">📒 Yanlışlarım</a></p>
+      <p style="color:var(--muted);font-size:.9rem">Yanlış yaptığın ve boş bıraktığın sorular bu cihazda saklanır; “Yanlışlarım” sayfasından istediğin zaman tekrar çözebilirsin.</p>
     </div>`;
     window.scrollTo(0, 0);
     gonder(kayit);
