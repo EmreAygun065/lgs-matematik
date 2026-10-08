@@ -84,11 +84,12 @@ function doGet(e) {
 
 // ---------- Gelen sonucun denetimi ----------
 // Sitenin gönderdiği gerçek bir sonuç bu kontrollerin hepsinden geçer; elle uydurulmuş kayıtlar takılır.
-const KOTU_KELIMELER = ['amk', 'aq', 'oç', 'oc', 'sik', 'sikik', 'sikerim', 'siktir', 'yarak', 'yarrak', 'piç', 'pic', 'orospu', 'göt', 'got', 'gavat',
-  'pezevenk', 'kahpe', 'ibne', 'annen', 'anan', 'ananı', 'salak', 'aptal', 'gerizekalı', 'mal', 'test', 'xss', 'asd', 'asdf', 'qwe', 'deneme', 'admin', 'script'];
-
-// Kelimenin içinde geçmesi bile yetecek kökler (harf eklenmiş/oynanmış halleri de yakalanır).
-const KOTU_KOKLER = ['yarra', 'yarak', 'orosp', 'sikt', 'siker', 'sikim', 'sikiş', 'amcı', 'amına', 'amina', 'pezeven', 'gavat', 'kahpe', 'ibne', 'göte', 'piçl'];
+// Uygunsuz kelimeler Türkçe harfler sadeleştirilerek karşılaştırılır (ş→s, ç→c, ğ→g, ö→o, ü→u; ı ayrı tutulur ki "Işık" gibi adlar takılmasın).
+const sadelestir = t => String(t).toLocaleLowerCase('tr').replace(/[şçğöüâîû]/g, h => ({ ş: 's', ç: 'c', ğ: 'g', ö: 'o', ü: 'u', â: 'a', î: 'i', û: 'u' }[h]));
+// Tek başına kelime olarak geçerse reddedilenler:
+const KOTU_KELIMELER = ['amk', 'amq', 'aq', 'mq', 'oc', 'sik', 'sikik', 'sikerim', 'siktir', 'yarak', 'yarrak', 'pic', 'orospu', 'got', 'gavat', 'pezevenk', 'kahpe', 'ibne', 'annen', 'anan', 'ananı', 'salak', 'aptal', 'gerizekalı', 'mal', 'am', 'amcık', 'tasak', 'yavsak', 'pust', 'kasar', 'fahise', 'surtuk', 'dangalak', 'serefsiz', 'kancık', 'godos', 'sapık', 'meme', 'penis', 'vajina', 'seks', 'sex', 'porno', 'pipi', 'popo', 'kıc', 'osur', 'embesil', 'hıyar', 'dallama', 'keriz', 'lavuk', 'test', 'xss', 'asd', 'asdf', 'qwe', 'deneme', 'admin', 'script', 'evil', 'payload', 'null', 'undefined'];
+// Kelimenin içinde geçmesi bile yetecek kökler (harf eklenmiş/oynanmış halleri de yakalanır):
+const KOTU_KOKLER = ['yarra', 'yarak', 'orosp', 'orosb', 'siktir', 'sikerim', 'sikeyim', 'sikis', 'amcık', 'amına', 'amınak', 'aminak', 'pezeven', 'gavat', 'kahpe', 'ibne', 'gote', 'picl', 'yavsa', 'fahis', 'surtu', 'serefsiz', 'dalyara', 'porno', 'godos', 'oglanc', 'tasag', 'tasak', 'kancık'];
 
 function sinifDuzelt(sinif) {
   return String(sinif == null ? '' : sinif).trim().toLocaleUpperCase('tr').replace(/\s+/g, '').replace(/[\/._]/g, '-')
@@ -102,7 +103,8 @@ function adHatasi(ad) {
   const kelimeler = a.split(/\s+/);
   if (kelimeler.length < 2 || kelimeler.length > 4 || kelimeler.some(k => k.length < 2)) return 'ad soyad biçimi';
   if (kelimeler.some(k => /(.)\1\1/i.test(k))) return 'aynı harf tekrarı';
-  const kucuk = kelimeler.map(k => k.toLocaleLowerCase('tr'));
+  if (kelimeler.some(k => !/[aeıioöuüâîûAEIİOÖUÜÂÎÛ]/.test(k))) return 'sesli harfsiz kelime';
+  const kucuk = kelimeler.map(sadelestir);
   if (kucuk.some(k => KOTU_KELIMELER.indexOf(k) >= 0)) return 'uygunsuz kelime';
   const bitisik = kucuk.join('');
   if (KOTU_KOKLER.some(k => bitisik.indexOf(k) >= 0)) return 'uygunsuz kelime';
@@ -164,7 +166,13 @@ function reddedileniYaz(v, sebep) {
 function sayfaGetir(ad, basliklar) {
   const tablo = SpreadsheetApp.getActiveSpreadsheet();
   const sayfa = tablo.getSheetByName(ad) || tablo.insertSheet(ad);
-  const mevcut = sayfa.getLastColumn() ? sayfa.getRange(1, 1, 1, sayfa.getLastColumn()).getValues()[0].map(String) : [];
+  let mevcut = sayfa.getLastColumn() ? sayfa.getRange(1, 1, 1, sayfa.getLastColumn()).getValues()[0].map(String) : [];
+  // Başlık satırı yerinde değilse (ör. sayfa sıralanırken başlık da aşağı kaydıysa) en üste yeni bir başlık satırı eklenir.
+  // Böylece sonuçlar yanlış sütunlara dağılmaz.
+  if (mevcut.length && mevcut.indexOf(basliklar[0]) < 0) {
+    sayfa.insertRowBefore(1);
+    mevcut = [];
+  }
   const eksik = basliklar.filter(b => mevcut.indexOf(b) < 0);
   if (eksik.length) {
     sayfa.getRange(1, mevcut.length + 1, 1, eksik.length).setValues([eksik]).setFontWeight('bold');
@@ -194,6 +202,7 @@ function oku(ad) {
   const basliklar = veri[0].map(String);
   return veri.slice(1)
     .filter(r => r.some(x => x !== ''))
+    .filter(r => !(r.indexOf('Tarih') >= 0 && r.indexOf('Ad Soyad') >= 0))   // sıralamayla aşağı kaymış eski başlık satırı
     .map(r => {
       const o = {};
       basliklar.forEach((b, i) => { if (b) o[b] = r[i] instanceof Date ? r[i].toISOString() : r[i]; });

@@ -14,10 +14,11 @@ window.adHatasi = function (ad) {
   if (a.length > 40 || kelimeler.length > 4) return 'Ad soyad çok uzun.';
   if (!/^[A-Za-zÇĞİÖŞÜÂÎÛçğıöşüâîû' ]+$/.test(a)) return 'Ad soyadda sadece harf kullan.';
   if (kelimeler.some(k => /(.)\1\1/i.test(k))) return 'Ad soyadını doğru yaz.';
-  const kotu = ['amk', 'aq', 'oç', 'oc', 'sik', 'sikik', 'sikerim', 'siktir', 'yarak', 'yarrak', 'piç', 'pic', 'orospu', 'göt', 'got', 'gavat',
-    'pezevenk', 'kahpe', 'ibne', 'annen', 'anan', 'ananı', 'salak', 'aptal', 'gerizekalı', 'mal', 'test', 'xss', 'asd', 'asdf', 'qwe', 'deneme', 'admin', 'script'];
-  if (kelimeler.some(k => kotu.includes(k.toLocaleLowerCase('tr')))) return 'Lütfen gerçek adını ve soyadını yaz.';
-  const bitisik = kelimeler.join('').toLocaleLowerCase('tr');
-  if (['yarra', 'yarak', 'orosp', 'sikt', 'siker', 'sikim', 'sikiş', 'amcı', 'amına', 'amina', 'pezeven', 'gavat', 'kahpe', 'ibne', 'göte', 'piçl'].some(k => bitisik.includes(k))) return 'Lütfen gerçek adını ve soyadını yaz.';
+  if (kelimeler.some(k => !/[aeıioöuüâîûAEIİOÖUÜÂÎÛ]/.test(k))) return 'Ad soyadını doğru yaz.';
+  const sadelestir = t => String(t).toLocaleLowerCase('tr').replace(/[şçğöüâîû]/g, h => ({ ş: 's', ç: 'c', ğ: 'g', ö: 'o', ü: 'u', â: 'a', î: 'i', û: 'u' }[h]));
+  const kotu = ['amk', 'amq', 'aq', 'mq', 'oc', 'sik', 'sikik', 'sikerim', 'siktir', 'yarak', 'yarrak', 'pic', 'orospu', 'got', 'gavat', 'pezevenk', 'kahpe', 'ibne', 'annen', 'anan', 'ananı', 'salak', 'aptal', 'gerizekalı', 'mal', 'am', 'amcık', 'tasak', 'yavsak', 'pust', 'kasar', 'fahise', 'surtuk', 'dangalak', 'serefsiz', 'kancık', 'godos', 'sapık', 'meme', 'penis', 'vajina', 'seks', 'sex', 'porno', 'pipi', 'popo', 'kıc', 'osur', 'embesil', 'hıyar', 'dallama', 'keriz', 'lavuk', 'test', 'xss', 'asd', 'asdf', 'qwe', 'deneme', 'admin', 'script', 'evil', 'payload', 'null', 'undefined'];
+  const kokler = ['yarra', 'yarak', 'orosp', 'orosb', 'siktir', 'sikerim', 'sikeyim', 'sikis', 'amcık', 'amına', 'amınak', 'aminak', 'pezeven', 'gavat', 'kahpe', 'ibne', 'gote', 'picl', 'yavsa', 'fahis', 'surtu', 'serefsiz', 'dalyara', 'porno', 'godos', 'oglanc', 'tasag', 'tasak', 'kancık'];
+  const kucuk = kelimeler.map(sadelestir);
+  if (kucuk.some(k => kotu.includes(k)) || kokler.some(k => kucuk.join('').includes(k))) return 'Lütfen gerçek adını ve soyadını yaz.';
   return '';
 };
