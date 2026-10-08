@@ -25,6 +25,8 @@ const DENEME_BASLIKLAR = ['Tarih', 'Ad Soyad', 'Sınıf', 'Deneme', 'Doğru', 'Y
 function doPost(e) {
   let v;
   try { v = JSON.parse(e.postData.contents); } catch (x) { return ContentService.createTextOutput('reddedildi'); }
+  // "8 A", "8a", "8/A" gibi yazımlar "8-A" yapılır (sınıf listesinden önce açılmış denemeler bu biçimde gelebilir).
+  if (v && typeof v === 'object') v.sinif = sinifDuzelt(v.sinif);
   // Siteden gelmeyen ya da tutarsız sonuçlar tabloya yazılmaz; ayrı bir sayfaya kısa bir not düşülür.
   const sebep = dogrula(v);
   if (sebep) {
@@ -87,6 +89,11 @@ const KOTU_KELIMELER = ['amk', 'aq', 'oç', 'oc', 'sik', 'sikik', 'sikerim', 'si
 
 // Kelimenin içinde geçmesi bile yetecek kökler (harf eklenmiş/oynanmış halleri de yakalanır).
 const KOTU_KOKLER = ['yarra', 'yarak', 'orosp', 'sikt', 'siker', 'sikim', 'sikiş', 'amcı', 'amına', 'amina', 'pezeven', 'gavat', 'kahpe', 'ibne', 'göte', 'piçl'];
+
+function sinifDuzelt(sinif) {
+  return String(sinif == null ? '' : sinif).trim().toLocaleUpperCase('tr').replace(/\s+/g, '').replace(/[\/._]/g, '-')
+    .replace(/^(\d+)-?([A-ZÇĞİÖŞÜ])$/, '$1-$2');
+}
 
 function adHatasi(ad) {
   const a = String(ad || '').trim();
