@@ -84,7 +84,7 @@
 </style>
 </head>
 <body>
-<script src="ortak/ayarlar.js?v=20261008b"></script>
+<script src="ortak/ayarlar.js?v=20261008c"></script>
 <script src="ortak/yardimci.js?v=20261006b"></script>
 <script src="veri/benzer-cikmis.js?v=20261006b"></script>
 <script src="veri/benzer-ornek-1.js?v=20261006b"></script>
@@ -292,7 +292,8 @@
 
   // Kopya şüphesi işaretleri: sınav sırasında sayfadan ayrılma ve gerçekçi olmayan hız
   // (soru başına 30 saniyeden az sürede bitirip soruların en az %70'ini doğru yapmak).
-  const cokHizli = k => k.sure != null && k.soruSayisi > 0 && k.sure / k.soruSayisi < 30 && k.d / k.soruSayisi >= .7;
+  // ya da cevapladığı soru başına 20 saniyeden kısa sürede bitirmek (okumadan işaretleme).
+  const cokHizli = k => k.sure != null && k.soruSayisi > 0 && ((k.sure / k.soruSayisi < 30 && k.d / k.soruSayisi >= .7) || (k.d + k.y >= 3 && k.sure / (k.d + k.y) < 20));
   const supheli = k => k.cikisSayi > 0 || cokHizli(k);
   const uyarilar = k => [
     k.cikisSayi ? `<span class="rozet" title="Sınav sırasında başka sekmeye ya da uygulamaya geçti">⚠ ${k.cikisSayi} kez çıktı · ${dakika(k.cikisSn)}</span>` : '',

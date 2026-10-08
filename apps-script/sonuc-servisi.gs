@@ -81,6 +81,9 @@ function doGet(e) {
 const KOTU_KELIMELER = ['amk', 'aq', 'oç', 'oc', 'sik', 'sikik', 'sikerim', 'siktir', 'yarak', 'yarrak', 'piç', 'pic', 'orospu', 'göt', 'got', 'gavat',
   'pezevenk', 'kahpe', 'ibne', 'annen', 'anan', 'ananı', 'salak', 'aptal', 'gerizekalı', 'mal', 'test', 'xss', 'asd', 'asdf', 'qwe', 'deneme', 'admin', 'script'];
 
+// Kelimenin içinde geçmesi bile yetecek kökler (harf eklenmiş/oynanmış halleri de yakalanır).
+const KOTU_KOKLER = ['yarra', 'yarak', 'orosp', 'sikt', 'siker', 'sikim', 'sikiş', 'amcı', 'amına', 'amina', 'pezeven', 'gavat', 'kahpe', 'ibne', 'göte', 'piçl'];
+
 function adHatasi(ad) {
   const a = String(ad || '').trim();
   if (a.length < 5 || a.length > 40) return 'ad uzunluğu';
@@ -90,6 +93,8 @@ function adHatasi(ad) {
   if (kelimeler.some(k => /(.)\1\1/i.test(k))) return 'aynı harf tekrarı';
   const kucuk = kelimeler.map(k => k.toLocaleLowerCase('tr'));
   if (kucuk.some(k => KOTU_KELIMELER.indexOf(k) >= 0)) return 'uygunsuz kelime';
+  const bitisik = kucuk.join('');
+  if (KOTU_KOKLER.some(k => bitisik.indexOf(k) >= 0)) return 'uygunsuz kelime';
   return '';
 }
 
@@ -114,6 +119,10 @@ function dogrula(v) {
   if (dd !== d || bb !== b) return 'cevaplar sayılarla tutmuyor';
   if (!/^\d{1,3}:\d{2} \/ \d{1,3}:\d{2}$/.test(String(v.sure || ''))) return 'süre biçimi';
   if (['Evet', 'Hayır'].indexOf(v.sureDoldu) < 0) return 'süre doldu alanı';
+  // Okumadan işaretleme: cevaplanan soru başına 8 saniyeden az süre gerçekçi değil.
+  const sm = /^(\d+):(\d{2})/.exec(String(v.sure));
+  const gecen = Number(sm[1]) * 60 + Number(sm[2]), cevaplanan = n - b;
+  if (cevaplanan >= 3 && gecen < cevaplanan * 8) return 'rastgele işaretleme (çok kısa süre)';
   if (/^deneme-/.test(kod)) {
     if (Math.abs(Number(v.net) - (d - y / 3)) > 0.02) return 'net tutmuyor';
     const sureler = String(v.soruSureleri || '').split(' ');

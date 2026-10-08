@@ -17,5 +17,7 @@ window.adHatasi = function (ad) {
   const kotu = ['amk', 'aq', 'oç', 'oc', 'sik', 'sikik', 'sikerim', 'siktir', 'yarak', 'yarrak', 'piç', 'pic', 'orospu', 'göt', 'got', 'gavat',
     'pezevenk', 'kahpe', 'ibne', 'annen', 'anan', 'ananı', 'salak', 'aptal', 'gerizekalı', 'mal', 'test', 'xss', 'asd', 'asdf', 'qwe', 'deneme', 'admin', 'script'];
   if (kelimeler.some(k => kotu.includes(k.toLocaleLowerCase('tr')))) return 'Lütfen gerçek adını ve soyadını yaz.';
+  const bitisik = kelimeler.join('').toLocaleLowerCase('tr');
+  if (['yarra', 'yarak', 'orosp', 'sikt', 'siker', 'sikim', 'sikiş', 'amcı', 'amına', 'amina', 'pezeven', 'gavat', 'kahpe', 'ibne', 'göte', 'piçl'].some(k => bitisik.includes(k))) return 'Lütfen gerçek adını ve soyadını yaz.';
   return '';
 };
