@@ -98,10 +98,11 @@
         const q = sorular[i]; if (!q) return;
         const anahtar = k.kod + '#' + i;
         if (c === q.ans) { harita.delete(anahtar); return; }   // sonradan doğru yaptıysa listeden düşer
-        harita.set(anahtar, { anahtar, q, i, sec: c, kayit: k });
+        const no = Array.isArray(k.sira) && k.sira.includes(i) ? k.sira.indexOf(i) + 1 : i + 1;   // öğrencinin ekranındaki numara
+        harita.set(anahtar, { anahtar, q, i, no, sec: c, kayit: k });
       });
     });
-    return [...harita.values()].sort((a, b) => new Date(b.kayit.tarih) - new Date(a.kayit.tarih) || a.i - b.i);
+    return [...harita.values()].sort((a, b) => new Date(b.kayit.tarih) - new Date(a.kayit.tarih) || a.no - b.no);
   }
 
   function ciz() {
@@ -162,7 +163,7 @@
     const { q, sec, kayit, anahtar } = x;
     const ogrenildi = ogrenilenler().has(anahtar);
     return `<div class="kutu soru ${ogrenildi ? 'ogrenildi' : ''}" id="${kartId(x)}">
-      <div class="ust-satir"><span class="qno">${x.i + 1}</span><span class="tag">${kacis(q.unite || '')}</span>${q.konu ? `<span class="tag">${kacis(q.konu)}</span>` : ''}<span class="nereden">${kacis(kayit.baslik)} · ${tarihYaz(kayit.tarih)}</span></div>
+      <div class="ust-satir"><span class="qno">${x.no}</span><span class="tag">${kacis(q.unite || '')}</span>${q.konu ? `<span class="tag">${kacis(q.konu)}</span>` : ''}<span class="nereden">${kacis(kayit.baslik)} · ${tarihYaz(kayit.tarih)}</span></div>
       <div class="qtext">${q.q}</div>
       <div class="opts ${q.long ? 'long' : ''}">${q.opts.map((o, j) => `<button class="opt" data-j="${j}"><b>${L[j]})</b>${o}</button>`).join('')}</div>
       <p class="onceki">${sec === null ? 'O gün bu soruyu boş bırakmıştın.' : `O gün <b>${L[sec]}</b> şıkkını işaretlemiştin (yanlış).`} Şimdi tekrar dene.</p>

@@ -9,6 +9,7 @@ Site GitHub Pages ile `main` dalından yayınlanır. Değişiklikler önce öniz
 - "Benzer" demek **mantığı benzer** demektir: aynı kazanım, aynı çözüm fikri ve LGS tarzı; ama farklı bağlam, farklı sayılar, farklı soru kökü. Sorular sitede başka bir yerde görünmemeli ki öğrenci cevaplarını bulamasın.
 - Deneme soruları ayrı veri dosyalarında tutulur (ör. `veri/deneme-N.js`) ve çözüm kartı / çalışma kâğıdı sayfalarına eklenmez.
 - Biçim: LGS gibi 20 soru, 40 dakika; üniteler karışık sırada; her soruda `konu`, `unite`, 4 şık, `ans`, `steps`, `answer` bulunur. Cevap harfleri dengeli dağıtılır; her soru elle çözülerek doğrulanır.
+- Sorular ve şıklar her öğrencide farklı sırada gösterilir (ortak/gozetim.js); cevaplar, süreler ve panel analizi her zaman denemenin **asıl sırasına** göre tutulur.
 - Yayındaki bir denemenin sorularını ya da sırasını değiştirme (panel eski sonuçları bu sıraya göre eşler); değişiklik gerekirse yeni id ile yeni deneme ekle.
 
 ## Yapı

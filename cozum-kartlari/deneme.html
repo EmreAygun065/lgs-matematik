@@ -130,7 +130,7 @@
       try { localStorage.setItem('ogrenci', JSON.stringify({ ad, sinif })); } catch (e) {}
       deneme = DENEMELER.find(d => d.id === $('deneme').value);
       const n = deneme.sorular.length;
-      D = { denemeId: deneme.id, ogrenci: { ad, sinif }, bitis: Date.now() + SURE_DK * 60000, cevaplar: Array(n).fill(null), bayrak: Array(n).fill(false), sureler: Array(n).fill(0), aktif: 0, sira: sikSirasiYap(deneme.sorular) };
+      D = { denemeId: deneme.id, ogrenci: { ad, sinif }, bitis: Date.now() + SURE_DK * 60000, cevaplar: Array(n).fill(null), bayrak: Array(n).fill(false), sureler: Array(n).fill(0), aktif: 0, sira: sikSirasiYap(deneme.sorular), soruSirasi: soruSirasiYap(n) };
       kaydet();
       sinav();
     };
@@ -158,8 +158,12 @@
     $('uyari').innerHTML = `<p class="durum no">⚠ Deneme sırasında sayfadan ayrıldın (${cikisMetni(c)}). Bu bilgi öğretmenine gönderilecek; deneme bitene kadar bu sayfada kal.</p>`;
   }
 
+  // Sorular her öğrencide farklı sıradadır. D.aktif ekrandaki konumdur; cevap, bayrak ve süreler asıl soru numarasıyla tutulur.
+  const sira = () => D.soruSirasi || deneme.sorular.map((_, i) => i);
+  const asil = p => sira()[p];
+
   function harita() {
-    $('harita').innerHTML = deneme.sorular.map((q, i) => `<button class="${D.cevaplar[i] !== null ? 'dolu' : ''} ${D.bayrak[i] ? 'bayrak' : ''} ${i === D.aktif ? 'aktif' : ''}" data-i="${i}" title="${q.unite}">${i + 1}</button>`).join('');
+    $('harita').innerHTML = sira().map((i, p) => `<button class="${D.cevaplar[i] !== null ? 'dolu' : ''} ${D.bayrak[i] ? 'bayrak' : ''} ${p === D.aktif ? 'aktif' : ''}" data-i="${p}" title="${deneme.sorular[i].unite}">${p + 1}</button>`).join('');
     $('harita').querySelectorAll('button').forEach(b => b.onclick = () => goster(+b.dataset.i));
     const n = D.cevaplar.filter(c => c !== null).length;
     $('sayac').textContent = `${n} / ${deneme.sorular.length} cevaplandı`;
@@ -167,21 +171,21 @@
 
   function sureyiYaz() {
     const simdi = Date.now();
-    D.sureler[D.aktif] += Math.round((simdi - sonTik) / 1000);
+    D.sureler[asil(D.aktif)] += Math.round((simdi - sonTik) / 1000);
     sonTik = simdi;
   }
 
-  function goster(i) {
+  function goster(p) {
     sureyiYaz();
-    D.aktif = i;
-    const q = deneme.sorular[i];
-    $('soru').innerHTML = `<div class="soru-ust"><span class="qno">${i + 1}</span><span class="tag">${q.unite}</span></div>
+    D.aktif = p;
+    const i = asil(p), q = deneme.sorular[i];
+    $('soru').innerHTML = `<div class="soru-ust"><span class="qno">${p + 1}</span><span class="tag">${q.unite}</span></div>
       <div class="qtext">${q.q}</div>
       <div class="opts ${q.long ? 'long' : ''}">${((D.sira && D.sira[i]) || [0, 1, 2, 3]).map((j, k) => `<button class="opt ${D.cevaplar[i] === j ? 'secili' : ''}" data-j="${j}"><b>${L[k]})</b>${q.opts[j]}</button>`).join('')}</div>
       <div class="gezinme">
-        <button class="dugme ikincil" id="onceki" ${i === 0 ? 'disabled' : ''}>← Önceki</button>
+        <button class="dugme ikincil" id="onceki" ${p === 0 ? 'disabled' : ''}>← Önceki</button>
         <button class="dugme ikincil bayrak-btn ${D.bayrak[i] ? 'aktif' : ''}" id="bayrakBtn">${D.bayrak[i] ? '● Sonra dönülecek' : '○ Sonra dönmek için işaretle'}</button>
-        <button class="dugme ikincil" id="sonraki" ${i === deneme.sorular.length - 1 ? 'disabled' : ''}>Sonraki →</button>
+        <button class="dugme ikincil" id="sonraki" ${p === deneme.sorular.length - 1 ? 'disabled' : ''}>Sonraki →</button>
       </div>`;
     $('soru').querySelectorAll('.opt').forEach(b => b.onclick = () => {
       const j = +b.dataset.j;
@@ -189,9 +193,9 @@
       $('soru').querySelectorAll('.opt').forEach(x => x.classList.toggle('secili', +x.dataset.j === D.cevaplar[i]));
       harita(); kaydet();
     });
-    $('onceki').onclick = () => goster(i - 1);
-    $('sonraki').onclick = () => goster(i + 1);
-    $('bayrakBtn').onclick = () => { D.bayrak[i] = !D.bayrak[i]; goster(i); };
+    $('onceki').onclick = () => goster(p - 1);
+    $('sonraki').onclick = () => goster(p + 1);
+    $('bayrakBtn').onclick = () => { D.bayrak[i] = !D.bayrak[i]; goster(p); };
     harita(); kaydet();
     window.scrollTo(0, 0);
   }
@@ -242,7 +246,7 @@
       ekBilgi: { 'Sayfadan Çıkma': cikis.sayi, 'Dışarıda Geçen Süre': dakika(cikis.sn) },
       soruSureleri: D.sureler.map((s, i) => `${i + 1}:${dakika(s)}`).join(' ')
     };
-    gecmiseEkle({ kod: deneme.id, tur: 'deneme', baslik: deneme.ad, ogrenci: D.ogrenci.ad, tarih: new Date().toISOString(), cevaplar: [...D.cevaplar], dogru: tum.d, yanlis: tum.y, bos: tum.b, net: yuvarla(tum.n) });
+    gecmiseEkle({ kod: deneme.id, tur: 'deneme', baslik: deneme.ad, ogrenci: D.ogrenci.ad, tarih: new Date().toISOString(), cevaplar: [...D.cevaplar], sira: sira(), dogru: tum.d, yanlis: tum.y, bos: tum.b, net: yuvarla(tum.n) });
     const satir = (ad, r) => `<tr><td>${ad}</td><td>${r.d}</td><td>${r.y}</td><td>${r.b}</td><td><b>${netYaz(r.n)}</b></td></tr>`;
     document.body.innerHTML = `<div class="sayfa">${ust(deneme.ad + ' · Sonuç')}
       <div class="kutu">
@@ -257,14 +261,14 @@
       <div class="kutu">
         <h2 style="font-size:1.05rem;margin:0 0 .3rem">Soru başına harcadığın süre</h2>
         <p class="bilgi" style="margin:0 0 .7rem">Ortalama ${dakika(Math.round(ort))}. Sarı kutular ortalamanın iki katından uzun sürenler: bu tür sorularda takılmak yerine işaretleyip geçmeyi dene.</p>
-        <div class="zaman">${D.sureler.map((s, i) => { const c = D.cevaplar[i]; const sinif = c === null ? '' : c === S[i].ans ? 'd' : 'y'; return `<div class="${sinif} ${s > 2 * ort && s > 60 ? 'uzun' : ''}"><b>${i + 1}</b>${dakika(s)}</div>`; }).join('')}</div>
+        <div class="zaman">${sira().map((i, p) => { const s = D.sureler[i], c = D.cevaplar[i]; const sinif = c === null ? '' : c === S[i].ans ? 'd' : 'y'; return `<div class="${sinif} ${s > 2 * ort && s > 60 ? 'uzun' : ''}"><b>${p + 1}</b>${dakika(s)}</div>`; }).join('')}</div>
       </div>
       <h2 style="font-size:1.1rem">Cevapların ve çözümler</h2>
       <p class="bilgi">Şıklar burada asıl sırasıyla gösteriliyor; denemede senin ekranında farklı sırada olabilirler. Yeşil doğru şık, kırmızı senin işaretlediğin yanlış şık.</p>
-      ${S.map((q, i) => {
-        const c = D.cevaplar[i], d = c === q.ans;
+      ${sira().map((i, p) => {
+        const q = S[i], c = D.cevaplar[i], d = c === q.ans;
         const et = c === null ? '<span class="sonuc-etiket b">Boş</span>' : d ? '<span class="sonuc-etiket d">✓ Doğru</span>' : '<span class="sonuc-etiket y">✗ Yanlış</span>';
-        return `<div class="kutu soru"><div class="soru-ust"><span class="qno">${i + 1}</span>${et}<span class="tag">${q.unite}</span></div>
+        return `<div class="kutu soru"><div class="soru-ust"><span class="qno">${p + 1}</span>${et}<span class="tag">${q.unite}</span></div>
           <div class="qtext">${q.q}</div>
           <div class="opts ${q.long ? 'long' : ''}">${q.opts.map((o, j) => `<div class="opt ${j === q.ans ? 'dogru' : j === c ? 'yanlis' : ''}"><b>${L[j]})</b>${o}</div>`).join('')}</div>
           <details class="cozum"><summary>Çözümü göster</summary><ol>${q.steps.map(s => `<li>${s}</li>`).join('')}</ol><p class="answer">${q.answer}</p></details></div>`;

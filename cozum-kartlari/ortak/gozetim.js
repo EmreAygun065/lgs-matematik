@@ -48,6 +48,14 @@
     });
   };
 
+  // Soruların öğrencinin ekranında görüneceği sıra: sira[ekrandaki konum] = asıl soru numarası.
+  // Cevaplar ve süreler yine asıl sıraya göre kaydedilir; öğretmen paneli bu sayede bozulmaz.
+  window.soruSirasiYap = function (n) {
+    const a = Array.from({ length: n }, (_, i) => i);
+    for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; }
+    return a;
+  };
+
   window.cikisMetni = (c) => {
     const dk = `${Math.floor(c.sn / 60)}:${String(c.sn % 60).padStart(2, '0')}`;
     return `${c.sayi} kez, toplam ${dk}`;

@@ -66,7 +66,9 @@
   const params = new URLSearchParams(location.search);
   let test = TESTLER.find(t => t.id === params.get('test'));
   let ogrenci = null, sorular = [], cevaplar = [], bitis = 0, sureSn = 0, zamanlayici = null;
-  let D = {}, gozetimBitir = null;   // D: şık sırası ve sayfadan çıkma bilgisi (yenilemede korunur)
+  let D = {}, gozetimBitir = null;
+  // Sorular her öğrencide farklı sıradadır; cevaplar asıl soru numarasıyla tutulur.
+  const soruSirasi = () => D.soruSirasi || sorular.map((_, i) => i);   // D: şık sırası ve sayfadan çıkma bilgisi (yenilemede korunur)
   const dakika = sn => `${Math.floor(sn / 60)}:${String(sn % 60).padStart(2, '0')}`;
 
   // Sayfa yenilenirse süre baştan başlamasın, işaretler kaybolmasın diye aktif test saklanır.
@@ -103,7 +105,7 @@
       test = TESTLER.find(t => t.id === $('test').value);
       sorular = test.sorular();
       cevaplar = sorular.map(() => null);
-      D = { sira: sikSirasiYap(sorular) };
+      D = { sira: sikSirasiYap(sorular), soruSirasi: soruSirasiYap(sorular.length) };
       sureSn = sorular.length * SORU_SURESI;
       bitis = Date.now() + sureSn * 1000;
       kaydet();
@@ -116,11 +118,11 @@
     document.body.innerHTML = `<div class="sayfa">${ust(test.unite + ' · ' + test.ad)}
       <p class="durum">${kacis(ogrenci.ad)} · ${kacis(ogrenci.sinif)} — İşaretlediğin şıkkı değiştirebilirsin. Bitince en alttaki “Testi bitir” düğmesine bas.</p>
       <div id="uyari"></div>
-      ${sorular.map((q, i) => `<div class="kutu soru" id="s${i}">
-        <div class="qhead"><span class="qno">${i + 1}</span></div>
+      ${soruSirasi().map((i, p) => { const q = sorular[i]; return `<div class="kutu soru" id="s${i}">
+        <div class="qhead"><span class="qno">${p + 1}</span></div>
         <div class="qtext">${q.q}</div>
         <div class="opts ${q.long ? 'long' : ''}">${((D.sira && D.sira[i]) || [0, 1, 2, 3]).map((j, k) => `<button class="opt" data-i="${i}" data-j="${j}"><b>${L[k]})</b>${q.opts[j]}</button>`).join('')}</div>
-      </div>`).join('')}
+      </div>`; }).join('')}
       <div class="ilerleme"><div class="sol"><span class="sure" id="sure"></span><span id="sayac"></span></div><button class="dugme" id="bitir">Testi bitir</button></div>
     </div>`;
     document.querySelectorAll('.soru .opt').forEach(b => b.onclick = () => {
@@ -178,7 +180,7 @@
       cevaplar: cevaplar.map((c, i) => `${i + 1}:${c === null ? '-' : L[c]}${c === null ? '' : c === sorular[i].ans ? '✓' : '✗(' + L[sorular[i].ans] + ')'}`).join(' ')
     };
 
-    gecmiseEkle({ kod: test.id, tur: 'test', baslik: test.unite + ' · ' + test.ad, ogrenci: ogrenci.ad, tarih: new Date().toISOString(), cevaplar: [...cevaplar], dogru, yanlis, bos, puan });
+    gecmiseEkle({ kod: test.id, tur: 'test', baslik: test.unite + ' · ' + test.ad, ogrenci: ogrenci.ad, tarih: new Date().toISOString(), cevaplar: [...cevaplar], sira: soruSirasi(), dogru, yanlis, bos, puan });
     document.body.innerHTML = `<div class="sayfa">${ust(test.unite + ' · ' + test.ad + ' · Sonuç')}
       <div class="kutu">
         <p><b>${kacis(ogrenci.ad)}</b> · ${kacis(ogrenci.sinif)} · ⏱ ${dakika(harcanan)} / ${dakika(sureSn)}</p>
@@ -190,11 +192,11 @@
       </div>
       <h2 style="font-size:1.1rem">Cevapların</h2>
       <p style="color:var(--muted);font-size:.92rem">Şıklar burada asıl sırasıyla gösteriliyor; testte senin ekranında farklı sırada olabilirler. Yeşil doğru şık, kırmızı senin işaretlediğin yanlış şık.</p>
-      ${sorular.map((q, i) => {
-        const c = cevaplar[i], d = c === q.ans;
+      ${soruSirasi().map((i, p) => {
+        const q = sorular[i], c = cevaplar[i], d = c === q.ans;
         const etiket = c === null ? '<span class="sonuc-etiket b">Boş</span>' : d ? '<span class="sonuc-etiket d">✓ Doğru</span>' : '<span class="sonuc-etiket y">✗ Yanlış</span>';
         return `<div class="kutu soru">
-          <div class="qhead"><span class="qno">${i + 1}</span>${etiket}</div>
+          <div class="qhead"><span class="qno">${p + 1}</span>${etiket}</div>
           <div class="qtext">${q.q}</div>
           <div class="opts ${q.long ? 'long' : ''}">${q.opts.map((o, j) => `<div class="opt ${j === q.ans ? 'dogru' : j === c ? 'yanlis' : ''}"><b>${L[j]})</b>${o}</div>`).join('')}</div>
           <details class="cozum"><summary>Çözümü göster</summary><ol>${q.steps.map(s => `<li>${s}</li>`).join('')}</ol><p class="answer">${q.answer}</p></details>
@@ -230,7 +232,7 @@
   const aktifTest = aktif && TESTLER.find(t => t.id === aktif.testId);
   if (aktifTest && aktif.ogrenci && aktif.bitis && aktif.cevaplar && aktif.cevaplar.length === aktifTest.sorular().length) {
     test = aktifTest; ogrenci = aktif.ogrenci; bitis = aktif.bitis; cevaplar = aktif.cevaplar;
-    D = { sira: aktif.sira, cikis: aktif.cikis, sonGorulme: aktif.sonGorulme };
+    D = { sira: aktif.sira, soruSirasi: aktif.soruSirasi, cikis: aktif.cikis, sonGorulme: aktif.sonGorulme };
     sorular = test.sorular(); sureSn = sorular.length * SORU_SURESI;
     coz();
   } else {
