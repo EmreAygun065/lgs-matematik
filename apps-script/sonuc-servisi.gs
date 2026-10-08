@@ -10,6 +10,11 @@ const PANEL_SIFRE = '';
 // Sonuç gönderebilecek sınıflar. Yeni şube açılırsa buraya ve sitedeki ortak/ayarlar.js dosyasına ekle.
 const SINIFLAR = ['8-A', '8-B', '8-C', '8-D', '8-E'];
 
+// Tabloya yazılabilecek ek bilgiler ve ünite adları: sadece bu listedekiler kabul edilir, dışarıdan yeni sütun açılamaz.
+const EK_BILGILER = ['Sayfadan Çıkma', 'Dışarıda Geçen Süre'];
+const UNITELER = ['Çarpanlar ve Katlar', 'Üslü İfadeler', 'Kareköklü İfadeler', 'Veri Analizi', 'Basit Olayların Olma Olasılığı',
+  'Cebirsel İfadeler ve Özdeşlikler', 'Doğrusal Denklemler', 'Eşitsizlikler', 'Üçgenler', 'Eşlik ve Benzerlik', 'Dönüşüm Geometrisi', 'Geometrik Cisimler'];
+
 const TEST_SAYFASI = 'Sonuçlar';
 const RED_SAYFASI = 'Reddedilenler';
 const DENEME_SAYFASI = 'Denemeler';
@@ -41,12 +46,11 @@ function doPost(e) {
   if (deneme) {
     satir['Net'] = sayi(v.net);
     satir['Soru Süreleri'] = temiz(v.soruSureleri, 4000);
-    // Her ünitenin neti ayrı sütuna yazılır; yeni bir ünite gelirse sütunu sona eklenir.
+    // Her ünitenin neti ayrı sütuna yazılır (sadece UNITELER listesindeki üniteler); sütunu yoksa sona eklenir.
     const netler = v.uniteNetleri || {};
     Object.keys(netler).slice(0, 10).forEach(u => { satir[temiz(u, 40) + ' Neti'] = sayi(netler[u]); });
   }
-  // Sitenin gönderdiği ek bilgiler (ör. sayfadan çıkma) kendi sütunlarına yazılır; yeni bir bilgi gelirse sütunu sona eklenir.
-  // Böylece sitede yeni bir bilgi eklendiğinde bu kodu değiştirmek gerekmez.
+  // Sitenin gönderdiği ek bilgiler (ör. sayfadan çıkma) kendi sütunlarına yazılır; sadece EK_BILGILER listesindekiler kabul edilir.
   const ek = v.ekBilgi || {};
   Object.keys(ek).slice(0, 10).forEach(k => {
     const ad = temiz(k, 40);
@@ -128,10 +132,10 @@ function dogrula(v) {
     const sureler = String(v.soruSureleri || '').split(' ');
     if (sureler.length !== n || sureler.some((x, i) => !new RegExp('^' + (i + 1) + ':\\d{1,3}:\\d{2}$').test(x))) return 'soru süreleri';
     const netler = v.uniteNetleri || {};
-    if (typeof netler !== 'object' || Object.keys(netler).some(k => !/^[A-Za-zÇĞİÖŞÜçğıöşü ]{3,40}$/.test(k) || !(Math.abs(Number(netler[k])) <= 40))) return 'ünite netleri';
+    if (typeof netler !== 'object' || Object.keys(netler).some(k => UNITELER.indexOf(k) < 0 || !(Math.abs(Number(netler[k])) <= 40))) return 'ünite netleri';
   }
   const ek = v.ekBilgi || {};
-  if (typeof ek !== 'object' || Object.keys(ek).some(k => !/^[A-Za-zÇĞİÖŞÜçğıöşü ]{3,30}$/.test(k) || !(typeof ek[k] === 'number' ? Math.abs(ek[k]) < 100000 : /^\d{1,4}:\d{2}$/.test(String(ek[k]))))) return 'ek bilgi';
+  if (typeof ek !== 'object' || Object.keys(ek).some(k => EK_BILGILER.indexOf(k) < 0 || !(typeof ek[k] === 'number' ? Math.abs(ek[k]) < 100000 : /^\d{1,4}:\d{2}$/.test(String(ek[k]))))) return 'ek bilgi';
   return '';
 }
 
