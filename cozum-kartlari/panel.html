@@ -177,6 +177,7 @@
         <input type="password" id="sifre" autocomplete="current-password" value="${kacis(kayitli)}">
         <label style="display:flex;gap:.5rem;align-items:center;margin-top:.7rem;font-size:.92rem"><input type="checkbox" id="hatirla" ${kayitli ? 'checked' : ''}> Bu cihazda hatırla (sadece kendi bilgisayarında işaretle)</label>
         <div style="display:flex;gap:.8rem;align-items:center;flex-wrap:wrap;margin-top:1rem"><button class="dugme" id="gir">Sonuçları getir</button><button class="bag" id="ornek">Örnek verilerle göz at</button></div>
+        <p class="bilgi" id="yukleme" style="margin:.6rem 0 0"></p>
         <div class="hata" id="hata">${kacis(mesaj || '')}</div>
       </div></div>`;
     $('sifre').onkeydown = e => { if (e.key === 'Enter') $('gir').click(); };
@@ -185,28 +186,66 @@
     if (!mesaj) $('sifre').focus();
   }
 
+  // Google Apps Script bir süre kullanılmayınca "uyur"; ilk istek 10–20 saniye sürebilir ve ara sıra veri yerine
+  // geçici bir hata sayfası döner. Bu yüzden her istek en çok 30 saniye beklenir, geçici hatalarda 3 kez yeniden denenir.
+  class SifreHatasi extends Error {}
+  async function veriAl(sifre, ilerleme) {
+    const DENEME = 3;
+    let sonHata;
+    for (let i = 1; i <= DENEME; i++) {
+      ilerleme(i, DENEME);
+      const kontrol = new AbortController();
+      const zaman = setTimeout(() => kontrol.abort(), 30000);
+      try {
+        const yanit = await fetch(window.SONUC_ADRESI + '?sifre=' + encodeURIComponent(sifre) + '&t=' + Date.now(), { signal: kontrol.signal, cache: 'no-store' });
+        let v;
+        try { v = JSON.parse(await yanit.text()); } catch (e) { throw new Error('Google geçici bir hata sayfası döndürdü.'); }
+        if (v.hata) throw new SifreHatasi(v.hata);
+        return v;
+      } catch (e) {
+        if (e instanceof SifreHatasi) throw e;
+        sonHata = e;
+      } finally {
+        clearTimeout(zaman);
+      }
+      if (i < DENEME) await new Promise(r => setTimeout(r, 1500 * i));
+    }
+    throw sonHata;
+  }
+  const BAGLANTI_HATASI = 'Google şu an yanıt vermedi (3 kez denendi). Bir dakika sonra tekrar dene; sorun sürerse internet bağlantını kontrol et.';
+
+  // Bu cihazda hatırlanan sonuçlar: panel açılır açılmaz gösterilir, yenileri arka planda gelir.
+  const onbellekOku = () => { try { return JSON.parse(localStorage.getItem('panelVeri') || 'null'); } catch (e) { return null; } };
+  const onbellekYaz = v => { try { localStorage.setItem('panelVeri', JSON.stringify(v)); } catch (e) {} };
+  const onbellekSil = () => { try { localStorage.removeItem('panelVeri'); } catch (e) {} };
+
   async function getir(sifre, hatirla) {
     if (!sifre) { $('hata').textContent = 'Şifreyi yaz.'; return; }
     if (!window.SONUC_ADRESI) { $('hata').textContent = 'Sonuç adresi (ortak/ayarlar.js) ayarlanmamış.'; return; }
-    $('hata').textContent = ''; $('gir').disabled = true; $('gir').textContent = 'Getiriliyor…';
+    $('hata').textContent = ''; $('gir').disabled = true;
+    const basla = Date.now();
+    let deneme = 1;
+    const yaz = () => { if ($('gir')) $('gir').textContent = `Getiriliyor… ${Math.round((Date.now() - basla) / 1000)} sn`; };
+    const sayac = setInterval(yaz, 1000); yaz();
+    $('yukleme').textContent = 'Sonuçlar Google E-Tablo\'dan alınıyor. Bir süredir açılmadıysa ilk açılış 10–20 saniye sürebilir.';
     try {
-      const yanit = await fetch(window.SONUC_ADRESI + '?sifre=' + encodeURIComponent(sifre));
-      const v = await yanit.json();
-      if (v.hata) throw new Error(v.hata);
-      try { if (hatirla) localStorage.setItem('panelSifre', sifre); else localStorage.removeItem('panelSifre'); } catch (e) {}
-      oturum = sifre; durum.ornek = false;
+      const v = await veriAl(sifre, (i, n) => { deneme = i; if (i > 1) $('yukleme').textContent = `Google yanıt vermedi, yeniden deneniyor (${i}/${n})…`; });
+      try { if (hatirla) localStorage.setItem('panelSifre', sifre); else { localStorage.removeItem('panelSifre'); } } catch (e) {}
+      if (hatirla) onbellekYaz(v); else onbellekSil();
+      oturum = sifre; hatirlaniyor = hatirla; durum.ornek = false;
       veriYukle(v); ciz();
     } catch (e) {
-      const m = e instanceof SyntaxError || e instanceof TypeError
-        ? 'Sonuçlar alınamadı. Apps Script kodunu güncelleyip "Yeni sürüm" olarak dağıttığından emin ol; internet bağlantını da kontrol et.'
-        : e.message;
-      if ($('gir')) { $('gir').disabled = false; $('gir').textContent = 'Sonuçları getir'; $('hata').textContent = m; } else giris(m);
+      const m = e instanceof SifreHatasi ? e.message : BAGLANTI_HATASI;
+      if (!$('gir')) return giris(m);
+      $('gir').disabled = false; $('gir').textContent = 'Sonuçları getir'; $('hata').textContent = m; $('yukleme').textContent = '';
+    } finally {
+      clearInterval(sayac);
     }
   }
-  let oturum = '';
+  let oturum = '', hatirlaniyor = false, guncelleniyor = false, guncellemeHatasi = '';
 
   // ---------- Ana ekran ----------
-  function ciz() {
+  function ciz(basaKaydir = true) {
     const siniflar = [...new Set(KAYITLAR.map(k => k.sinif))].filter(Boolean).sort((a, b) => a.localeCompare(b, 'tr', { numeric: true }));
     if (durum.sinif && !siniflar.includes(durum.sinif)) durum.sinif = '';
     document.body.innerHTML = `<div class="sayfa">${ust}
@@ -215,25 +254,38 @@
         <div class="sekmeler">${[['deneme', '⏱ Denemeler'], ['test', '📝 Testler'], ['ogrenci', '👤 Öğrenciler']].map(([k, a]) => `<button data-sekme="${k}" class="${durum.sekme === k ? 'secili' : ''}">${a}</button>`).join('')}</div>
         <select id="sinif"><option value="">Bütün sınıflar</option>${siniflar.map(s => `<option ${s === durum.sinif ? 'selected' : ''}>${kacis(s)}</option>`).join('')}</select>
         <span class="bosluk"></span>
-        ${durum.ornek ? '' : `<span class="zaman-notu">${KAYITLAR.length} sonuç · ${alinma.toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })} itibarıyla</span>
+        ${durum.ornek ? '' : `<span class="zaman-notu" id="zamanNotu"></span>
         <button class="dugme ikincil kucuk" id="yenile">↻ Yenile</button><button class="dugme ikincil kucuk" id="cik">Çıkış</button>`}
       </div>
       <div id="icerik"></div>
     </div>`;
     document.querySelectorAll('[data-sekme]').forEach(b => b.onclick = () => { durum.sekme = b.dataset.sekme; durum.soru = null; ciz(); });
     $('sinif').onchange = e => { durum.sinif = e.target.value; durum.soru = null; ciz(); };
-    if ($('yenile')) $('yenile').onclick = () => { document.body.innerHTML = `<div class="sayfa">${ust}<p class="bos-durum">Sonuçlar yenileniyor…</p></div>`; getirSessiz(); };
-    if ($('cik')) $('cik').onclick = () => { try { if (!durum.ornek) localStorage.removeItem('panelSifre'); } catch (e) {} oturum = ''; durum.ornek = false; KAYITLAR = []; giris(); };
+    if ($('yenile')) $('yenile').onclick = () => getirSessiz();
+    if ($('cik')) $('cik').onclick = () => { if (!durum.ornek) { try { localStorage.removeItem('panelSifre'); } catch (e) {} onbellekSil(); } oturum = ''; durum.ornek = false; KAYITLAR = []; giris(); };
+    notYaz();
     const ic = $('icerik');
     if (durum.sekme === 'ogrenci') ogrenciEkrani(ic); else sinavEkrani(ic, durum.sekme);
-    window.scrollTo(0, 0);
+    if (basaKaydir) window.scrollTo(0, 0);
   }
+  // Arka planda yeniler; ekran açık kalır, sadece üstteki not değişir.
   async function getirSessiz() {
+    if (guncelleniyor) return;
+    guncelleniyor = true; guncellemeHatasi = ''; notYaz();
     try {
-      const v = await (await fetch(window.SONUC_ADRESI + '?sifre=' + encodeURIComponent(oturum))).json();
-      if (v.hata) throw new Error(v.hata);
-      veriYukle(v); ciz();
-    } catch (e) { giris(e.message && !(e instanceof TypeError) ? e.message : 'Sonuçlar yenilenemedi, tekrar dene.'); }
+      const v = await veriAl(oturum, () => {});
+      if (hatirlaniyor) onbellekYaz(v);
+      veriYukle(v); guncelleniyor = false; ciz(false);
+    } catch (e) {
+      guncelleniyor = false;
+      if (e instanceof SifreHatasi) { onbellekSil(); try { localStorage.removeItem('panelSifre'); } catch (x) {} return giris(e.message); }
+      guncellemeHatasi = 'güncellenemedi, ↻ Yenile ile tekrar dene'; notYaz();
+    }
+  }
+  function notYaz() {
+    const el = $('zamanNotu'); if (!el) return;
+    const saat = alinma ? alinma.toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' }) : '';
+    el.innerHTML = `${KAYITLAR.length} sonuç · ${saat} itibarıyla${guncelleniyor ? ' · <b>⟳ güncelleniyor…</b>' : ''}${guncellemeHatasi ? ` · <b style="color:var(--red)">⚠ ${guncellemeHatasi}</b>` : ''}`;
   }
 
   const sinifFiltre = k => !durum.sinif || k.sinif === durum.sinif;
@@ -478,7 +530,11 @@
   let kayitli = '';
   try { kayitli = localStorage.getItem('panelSifre') || ''; } catch (e) {}
   if (new URLSearchParams(location.search).has('ornek')) { durum.ornek = true; veriYukle(ornekVeri()); ciz(); }
-  else { giris(); if (kayitli) getir(kayitli, true); }
+  else if (kayitli && onbellekOku()) {
+    // Hatırlanan sonuçlar hemen gösterilir, güncelleri arka planda gelir.
+    oturum = kayitli; hatirlaniyor = true;
+    veriYukle(onbellekOku()); ciz(); getirSessiz();
+  } else { giris(); if (kayitli) getir(kayitli, true); }
 })();
 </script>
 </body>
