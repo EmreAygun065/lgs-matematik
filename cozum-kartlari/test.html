@@ -37,7 +37,7 @@
 </style>
 </head>
 <body>
-<script src="ortak/ayarlar.js?v=20261006b"></script>
+<script src="ortak/ayarlar.js?v=20261008b"></script>
 <script src="ortak/yardimci.js?v=20261006b"></script>
 <script src="veri/benzer-cikmis.js?v=20261006b"></script>
 <script src="veri/benzer-ornek-1.js?v=20261006b"></script>
@@ -89,7 +89,7 @@
         <label class="alan" for="ad">Ad Soyad</label>
         <input type="text" id="ad" autocomplete="name" maxlength="60" value="${kacis(kayitli.ad || '')}">
         <label class="alan" for="sinif">Sınıf / Şube</label>
-        <input type="text" id="sinif" maxlength="20" placeholder="Örn. 8-A" value="${kacis(kayitli.sinif || '')}">
+        <select class="test-sec" id="sinif"><option value="">Sınıfını seç</option>${window.SINIFLAR.map(s => `<option ${s === kayitli.sinif ? 'selected' : ''}>${s}</option>`).join('')}</select>
         <label class="alan" for="test">Test</label>
         <select class="test-sec" id="test">${[...new Set(TESTLER.map(t => t.unite))].map(u => `<optgroup label="${u}">${TESTLER.filter(t => t.unite === u).map(t => `<option value="${t.id}" ${test && test.id === t.id ? 'selected' : ''}>${t.ad} (${t.sorular().length} soru · ${String(t.sorular().length * SORU_SURESI / 60).replace('.', ',')} dk)</option>`).join('')}</optgroup>`).join('')}</select>
         <p class="durum" style="margin-top:.8rem">⏱ Her soru için ortalama 2,5 dakika süren var. Süre bitince test kendiliğinden biter ve işaretlediğin cevaplar gönderilir. Test bitene kadar bu sayfada kal: başka sekmeye ya da uygulamaya geçersen öğretmenine bildirilir.</p>
@@ -97,9 +97,10 @@
         <div class="hata" id="hata"></div>
       </div></div>`;
     $('basla').onclick = () => {
-      const ad = $('ad').value.trim().replace(/\s+/g, ' '), sinif = $('sinif').value.trim();
-      if (ad.split(' ').length < 2) { $('hata').textContent = 'Lütfen adını ve soyadını yaz.'; return; }
-      if (!sinif) { $('hata').textContent = 'Lütfen sınıfını yaz.'; return; }
+      const ad = $('ad').value.trim().replace(/\s+/g, ' '), sinif = $('sinif').value;
+      const hata = adHatasi(ad);
+      if (hata) { $('hata').textContent = hata; return; }
+      if (!window.SINIFLAR.includes(sinif)) { $('hata').textContent = 'Lütfen sınıfını listeden seç.'; return; }
       ogrenci = { ad, sinif };
       try { localStorage.setItem('ogrenci', JSON.stringify(ogrenci)); } catch (e) {}
       test = TESTLER.find(t => t.id === $('test').value);

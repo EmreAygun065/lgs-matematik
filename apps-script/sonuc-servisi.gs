@@ -7,14 +7,25 @@
 // ↓↓↓ Panel şifreni tırnakların arasına yaz (en az 6 karakter). Boş kalırsa panel açılmaz, sonuçlar yine kaydedilir.
 const PANEL_SIFRE = '';
 
+// Sonuç gönderebilecek sınıflar. Yeni şube açılırsa buraya ve sitedeki ortak/ayarlar.js dosyasına ekle.
+const SINIFLAR = ['8-A', '8-B', '8-C', '8-D', '8-E'];
+
 const TEST_SAYFASI = 'Sonuçlar';
+const RED_SAYFASI = 'Reddedilenler';
 const DENEME_SAYFASI = 'Denemeler';
 const TEST_BASLIKLAR = ['Tarih', 'Ad Soyad', 'Sınıf', 'Test', 'Doğru', 'Yanlış', 'Boş', 'Puan', 'Soru Sayısı', 'Cevaplar', 'Süre', 'Süre Doldu', 'Sayfadan Çıkma', 'Dışarıda Geçen Süre', 'Test Kodu'];
 const DENEME_BASLIKLAR = ['Tarih', 'Ad Soyad', 'Sınıf', 'Deneme', 'Doğru', 'Yanlış', 'Boş', 'Net', 'Çarpanlar ve Katlar Neti', 'Üslü İfadeler Neti',
   'Puan', 'Soru Sayısı', 'Süre', 'Süre Doldu', 'Sayfadan Çıkma', 'Dışarıda Geçen Süre', 'Cevaplar', 'Soru Süreleri', 'Deneme Kodu'];
 
 function doPost(e) {
-  const v = JSON.parse(e.postData.contents);
+  let v;
+  try { v = JSON.parse(e.postData.contents); } catch (x) { return ContentService.createTextOutput('reddedildi'); }
+  // Siteden gelmeyen ya da tutarsız sonuçlar tabloya yazılmaz; ayrı bir sayfaya kısa bir not düşülür.
+  const sebep = dogrula(v);
+  if (sebep) {
+    reddedileniYaz(v, sebep);
+    return ContentService.createTextOutput('reddedildi');
+  }
   const deneme = /^deneme-/.test(String(v.testId || ''));
   const satir = {
     'Tarih': new Date(),
@@ -63,6 +74,71 @@ function doGet(e) {
     return json({ hata: 'Şifre yanlış.' });
   }
   return json({ testler: oku(TEST_SAYFASI), denemeler: oku(DENEME_SAYFASI), zaman: new Date().toISOString() });
+}
+
+// ---------- Gelen sonucun denetimi ----------
+// Sitenin gönderdiği gerçek bir sonuç bu kontrollerin hepsinden geçer; elle uydurulmuş kayıtlar takılır.
+const KOTU_KELIMELER = ['amk', 'aq', 'oç', 'oc', 'sik', 'sikik', 'sikerim', 'siktir', 'yarak', 'yarrak', 'piç', 'pic', 'orospu', 'göt', 'got', 'gavat',
+  'pezevenk', 'kahpe', 'ibne', 'annen', 'anan', 'ananı', 'salak', 'aptal', 'gerizekalı', 'mal', 'test', 'xss', 'asd', 'asdf', 'qwe', 'deneme', 'admin', 'script'];
+
+function adHatasi(ad) {
+  const a = String(ad || '').trim();
+  if (a.length < 5 || a.length > 40) return 'ad uzunluğu';
+  if (!/^[A-Za-zÇĞİÖŞÜÂÎÛçğıöşüâîû' ]+$/.test(a)) return 'adda harf dışı karakter';
+  const kelimeler = a.split(/\s+/);
+  if (kelimeler.length < 2 || kelimeler.length > 4 || kelimeler.some(k => k.length < 2)) return 'ad soyad biçimi';
+  if (kelimeler.some(k => /(.)\1\1/i.test(k))) return 'aynı harf tekrarı';
+  const kucuk = kelimeler.map(k => k.toLocaleLowerCase('tr'));
+  if (kucuk.some(k => KOTU_KELIMELER.indexOf(k) >= 0)) return 'uygunsuz kelime';
+  return '';
+}
+
+function dogrula(v) {
+  if (!v || typeof v !== 'object') return 'veri yok';
+  const h = adHatasi(v.ad); if (h) return h;
+  if (SINIFLAR.length && SINIFLAR.indexOf(String(v.sinif)) < 0) return 'listede olmayan sınıf';
+  const kod = String(v.testId || '');
+  if (!/^[a-z0-9-]{2,30}$/.test(kod)) return 'sınav kodu';
+  const n = Number(v.soruSayisi), d = Number(v.dogru), y = Number(v.yanlis), b = Number(v.bos);
+  if (![n, d, y, b].every(x => Number.isInteger(x) && x >= 0) || n < 5 || n > 40 || d + y + b !== n) return 'doğru/yanlış/boş tutmuyor';
+  if (Number(v.puan) !== Math.round(d / n * 100)) return 'puan tutmuyor';
+  // Cevap listesi: "1:C✓ 2:A✗(B) 3:-" biçiminde, soru sayısı kadar ve sayılarla uyumlu olmalı
+  const parca = String(v.cevaplar || '').split(' ');
+  if (parca.length !== n) return 'cevap sayısı';
+  let dd = 0, bb = 0;
+  for (let i = 0; i < n; i++) {
+    const m = /^(\d+):([A-D]✓|[A-D]✗\([A-D]\)|-)$/.exec(parca[i]);
+    if (!m || Number(m[1]) !== i + 1) return 'cevap biçimi';
+    if (m[2] === '-') bb++; else if (m[2].indexOf('✓') > 0) dd++;
+  }
+  if (dd !== d || bb !== b) return 'cevaplar sayılarla tutmuyor';
+  if (!/^\d{1,3}:\d{2} \/ \d{1,3}:\d{2}$/.test(String(v.sure || ''))) return 'süre biçimi';
+  if (['Evet', 'Hayır'].indexOf(v.sureDoldu) < 0) return 'süre doldu alanı';
+  if (/^deneme-/.test(kod)) {
+    if (Math.abs(Number(v.net) - (d - y / 3)) > 0.02) return 'net tutmuyor';
+    const sureler = String(v.soruSureleri || '').split(' ');
+    if (sureler.length !== n || sureler.some((x, i) => !new RegExp('^' + (i + 1) + ':\\d{1,3}:\\d{2}$').test(x))) return 'soru süreleri';
+    const netler = v.uniteNetleri || {};
+    if (typeof netler !== 'object' || Object.keys(netler).some(k => !/^[A-Za-zÇĞİÖŞÜçğıöşü ]{3,40}$/.test(k) || !(Math.abs(Number(netler[k])) <= 40))) return 'ünite netleri';
+  }
+  const ek = v.ekBilgi || {};
+  if (typeof ek !== 'object' || Object.keys(ek).some(k => !/^[A-Za-zÇĞİÖŞÜçğıöşü ]{3,30}$/.test(k) || !(typeof ek[k] === 'number' ? Math.abs(ek[k]) < 100000 : /^\d{1,4}:\d{2}$/.test(String(ek[k]))))) return 'ek bilgi';
+  return '';
+}
+
+// Reddedilen gönderimler: zamanı, sebebi ve yazılan ad/sınıf (kısaltılmış). Sayfa en çok 1000 satır tutar.
+function reddedileniYaz(v, sebep) {
+  try {
+    const kilit = LockService.getScriptLock();
+    kilit.waitLock(10000);
+    try {
+      const sayfa = sayfaGetir(RED_SAYFASI, ['Tarih', 'Sebep', 'Ad Soyad', 'Sınıf', 'Sınav Kodu']);
+      if (sayfa.getLastRow() > 1000) return;
+      satirEkle(sayfa, { 'Tarih': new Date(), 'Sebep': sebep, 'Ad Soyad': temiz(v && v.ad, 60), 'Sınıf': temiz(v && v.sinif, 20), 'Sınav Kodu': temiz(v && v.testId, 40) });
+    } finally {
+      kilit.releaseLock();
+    }
+  } catch (x) {}
 }
 
 function sayfaGetir(ad, basliklar) {

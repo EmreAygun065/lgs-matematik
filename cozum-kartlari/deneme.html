@@ -66,7 +66,7 @@
 </style>
 </head>
 <body>
-<script src="ortak/ayarlar.js?v=20261006b"></script>
+<script src="ortak/ayarlar.js?v=20261008b"></script>
 <script src="ortak/yardimci.js?v=20261006b"></script>
 <script src="veri/carpan-benzer-cikmis.js?v=20261006b"></script>
 <script src="veri/carpan-benzer-ornek-1.js?v=20261006b"></script>
@@ -117,16 +117,17 @@
         <label class="alan" for="ad">Ad Soyad</label>
         <input type="text" id="ad" autocomplete="name" maxlength="60" value="${kacis(kayitli.ad || '')}">
         <label class="alan" for="sinif">Sınıf / Şube</label>
-        <input type="text" id="sinif" maxlength="20" placeholder="Örn. 8-A" value="${kacis(kayitli.sinif || '')}">
+        <select class="sec" id="sinif"><option value="">Sınıfını seç</option>${window.SINIFLAR.map(s => `<option ${s === kayitli.sinif ? 'selected' : ''}>${s}</option>`).join('')}</select>
         <label class="alan" for="deneme">Deneme</label>
         <select class="sec" id="deneme">${DENEMELER.map(d => `<option value="${d.id}" ${d.id === istenen ? 'selected' : ''}>${d.ad}: ${d.kapsam} (20 soru · 40 dk)</option>`).join('')}</select>
         <p style="margin-top:1.2rem"><button class="dugme" id="basla">Denemeye başla →</button></p>
         <div class="hata" id="hata"></div>
       </div></div>`;
     $('basla').onclick = () => {
-      const ad = $('ad').value.trim().replace(/\s+/g, ' '), sinif = $('sinif').value.trim();
-      if (ad.split(' ').length < 2) { $('hata').textContent = 'Lütfen adını ve soyadını yaz.'; return; }
-      if (!sinif) { $('hata').textContent = 'Lütfen sınıfını yaz.'; return; }
+      const ad = $('ad').value.trim().replace(/\s+/g, ' '), sinif = $('sinif').value;
+      const hata = adHatasi(ad);
+      if (hata) { $('hata').textContent = hata; return; }
+      if (!window.SINIFLAR.includes(sinif)) { $('hata').textContent = 'Lütfen sınıfını listeden seç.'; return; }
       try { localStorage.setItem('ogrenci', JSON.stringify({ ad, sinif })); } catch (e) {}
       deneme = DENEMELER.find(d => d.id === $('deneme').value);
       const n = deneme.sorular.length;
