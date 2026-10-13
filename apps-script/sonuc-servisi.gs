@@ -169,17 +169,24 @@ function sayfaGetir(ad, basliklar) {
   const tablo = SpreadsheetApp.getActiveSpreadsheet();
   const sayfa = tablo.getSheetByName(ad) || tablo.insertSheet(ad);
   let mevcut = sayfa.getLastColumn() ? sayfa.getRange(1, 1, 1, sayfa.getLastColumn()).getValues()[0].map(String) : [];
-  // Başlık satırı yerinde değilse (ör. sayfa sıralanırken başlık da aşağı kaydıysa) en üste yeni bir başlık satırı eklenir.
-  // Böylece sonuçlar yanlış sütunlara dağılmaz.
+  // Başlık satırı yerinde değilse (ör. sayfa sıralanırken başlık da aşağı kaydıysa) aşağıdaki başlık satırı aynen en üste taşınır.
+  // Yeni bir başlık yazılmaz: sütun sırası eski satırlarla aynı kalmalı, yoksa eski sonuçlar yanlış sütunlarla okunur.
   if (mevcut.length && mevcut.indexOf(basliklar[0]) < 0) {
+    const veri = sayfa.getDataRange().getValues();
+    const i = veri.findIndex(baslikSatiriMi);
     sayfa.insertRowBefore(1);
-    mevcut = [];
+    if (i >= 0) {
+      sayfa.getRange(1, 1, 1, veri[i].length).setValues([veri[i]]).setFontWeight('bold');
+      sayfa.deleteRow(i + 2);
+      mevcut = veri[i].map(String);
+    } else {
+      mevcut = [];
+    }
   }
   const eksik = basliklar.filter(b => mevcut.indexOf(b) < 0);
-  if (eksik.length) {
-    sayfa.getRange(1, mevcut.length + 1, 1, eksik.length).setValues([eksik]).setFontWeight('bold');
-    sayfa.setFrozenRows(1);
-  }
+  if (eksik.length) sayfa.getRange(1, mevcut.length + 1, 1, eksik.length).setValues([eksik]).setFontWeight('bold');
+  // Başlık satırı sabitlenir: Google E-Tablo'da sıralama yapılınca başlık yerinde kalır.
+  if (sayfa.getFrozenRows() < 1) sayfa.setFrozenRows(1);
   return sayfa;
 }
 
@@ -197,19 +204,59 @@ function satirEkle(sayfa, satir) {
   sayfa.getRange(sayfa.getLastRow() + 1, 1, 1, degerler.length).setNumberFormats([bicimler]).setValues([degerler]);
 }
 
+const baslikSatiriMi = r => r.indexOf('Tarih') >= 0 && r.indexOf('Ad Soyad') >= 0;
+
+// Bir sayfada sütun sırası farklı birden çok başlık satırı olabilir (sıralamayla aşağı kaymış eski başlık + sonradan eklenen yenisi).
+// Her sonuç satırı, onu tutarlı okuyan başlıkla okunur: sınav kodu bir kod gibi, cevaplar "1:C✓ 2:-" gibi görünmeli.
+function satirUygun(baslik, r) {
+  const al = ad => { const i = baslik.indexOf(ad); return i < 0 ? '' : String(r[i]); };
+  const kod = al('Deneme Kodu') || al('Test Kodu');
+  return (kod === '' || /^[a-z0-9-]{2,30}$/.test(kod)) && /^1:([A-D]|-)/.test(al('Cevaplar'));
+}
+
+// Sayfadaki sonuç satırlarını { başlık: değer } nesnelerine çevirir; her satır kendi başlık düzeniyle okunur.
+function satirlariOku(veri) {
+  const basliklar = veri.filter(baslikSatiriMi).map(r => r.map(String));
+  if (!basliklar.length) return [];
+  return veri.filter(r => !baslikSatiriMi(r) && r.some(x => x !== '')).map(r => {
+    const b = basliklar.find(h => satirUygun(h, r)) || basliklar[0];
+    const o = {};
+    b.forEach((ad, i) => { if (ad && !(ad in o)) o[ad] = r[i]; });
+    return o;
+  });
+}
+
 function oku(ad) {
   const sayfa = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(ad);
   if (!sayfa || sayfa.getLastRow() < 2) return [];
-  const veri = sayfa.getDataRange().getValues();
-  const basliklar = veri[0].map(String);
-  return veri.slice(1)
-    .filter(r => r.some(x => x !== ''))
-    .filter(r => !(r.indexOf('Tarih') >= 0 && r.indexOf('Ad Soyad') >= 0))   // sıralamayla aşağı kaymış eski başlık satırı
-    .map(r => {
-      const o = {};
-      basliklar.forEach((b, i) => { if (b) o[b] = r[i] instanceof Date ? r[i].toISOString() : r[i]; });
-      return o;
-    });
+  return satirlariOku(sayfa.getDataRange().getValues()).map(o => {
+    Object.keys(o).forEach(k => { if (o[k] instanceof Date) o[k] = o[k].toISOString(); });
+    return o;
+  });
+}
+
+// ---------- Tabloyu bir kez düzeltme (isteğe bağlı) ----------
+// Apps Script düzenleyicisinde üstteki listeden "tabloyuDuzelt" seçilip ▶ Çalıştır'a basılırsa:
+// "Sonuçlar" ve "Denemeler" sayfalarındaki bütün satırlar tek bir başlık altında, doğru sütunlarda ve tarih sırasıyla yeniden yazılır.
+// Panel bu düzeltme olmadan da doğru okur; bu yalnızca E-Tablo'nun kendisini düzenli göstermek içindir.
+// Önce Dosya → Kopya oluştur ile tablonun bir kopyasını almak iyi olur.
+function tabloyuDuzelt() {
+  [[TEST_SAYFASI, TEST_BASLIKLAR], [DENEME_SAYFASI, DENEME_BASLIKLAR]].forEach(([ad, varsayilan]) => {
+    const sayfa = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(ad);
+    if (!sayfa || sayfa.getLastRow() < 2) return;
+    const veri = sayfa.getDataRange().getValues();
+    const satirlar = satirlariOku(veri);
+    const ilk = veri.find(baslikSatiriMi) || varsayilan;
+    const baslik = ilk.map(String).filter(Boolean);
+    varsayilan.concat(...satirlar.map(Object.keys)).forEach(b => { if (b && baslik.indexOf(b) < 0) baslik.push(b); });
+    satirlar.sort((a, b) => new Date(a['Tarih']) - new Date(b['Tarih']));
+    const degerler = satirlar.map(o => baslik.map(b => (b in o ? o[b] : '')));
+    const bicimler = degerler.map(r => r.map(d => d instanceof Date ? 'dd.mm.yyyy hh:mm' : typeof d === 'number' ? (Number.isInteger(d) ? '0' : '0.00') : '@'));
+    sayfa.clear();
+    sayfa.getRange(1, 1, 1, baslik.length).setValues([baslik]).setFontWeight('bold');
+    if (degerler.length) sayfa.getRange(2, 1, degerler.length, baslik.length).setNumberFormats(bicimler).setValues(degerler);
+    sayfa.setFrozenRows(1);
+  });
 }
 
 function json(o) {
