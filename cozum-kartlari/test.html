@@ -87,11 +87,17 @@
 
   const ust = baslik => `<div class="ust"><a class="home" href="${anaSayfa(seviye)}" title="Ana sayfa">⌂</a><h1>${baslik}</h1><span class="marka">Emre Hoca</span></div>`;
 
-  // 1) Giriş ekranı
-  function giris() {
+  // 1) Giriş ekranı. yarim: başka bir testin linkiyle gelindiyse bu cihazda yarım kalmış test (aktifTest kaydı)
+  function giris(yarim) {
     let kayitli = {};
     try { kayitli = JSON.parse(localStorage.getItem('ogrenci') || '{}'); } catch (e) {}
+    const yarimTest = yarim && TESTLER.find(t => t.id === yarim.testId);
     document.body.innerHTML = `<div class="sayfa">${ust('Online Test')}
+      ${yarimTest ? `<div class="kutu" style="border-color:var(--yellow-line);background:var(--yellow-soft)">
+        <p style="margin-top:0"><b>Yarım kalmış bir testin var:</b> ${kacis(yarimTest.unite + ' · ' + yarimTest.ad)} (${kacis(yarim.ogrenci.ad)}, kalan süre ${dakika(Math.max(0, Math.ceil((yarim.bitis - Date.now()) / 1000)))}).</p>
+        <p>Aşağıdan yeni bir teste başlarsan yarım kalan test şimdiki cevaplarınla bitirilir ve öğretmenine gönderilir.</p>
+        <button class="dugme ikincil" id="devam" style="margin-top:.2rem">Yarım kalan teste devam et</button>
+      </div>` : ''}
       <div class="kutu">
         <p>Testi çözmeye başlamadan önce bilgilerini yaz. Sonucun öğretmenine gönderilecek.</p>
         <label class="alan" for="ad">Ad Soyad</label>
@@ -104,11 +110,13 @@
         <button class="dugme" id="basla">Teste başla →</button>
         <div class="hata" id="hata"></div>
       </div></div>`;
+    if (yarimTest) $('devam').onclick = () => { devamEt(yarim, yarimTest); };
     $('basla').onclick = () => {
       const ad = $('ad').value.trim().replace(/\s+/g, ' '), sinif = $('sinif').value;
       const hata = adHatasi(ad);
       if (hata) { $('hata').textContent = hata; return; }
       if (!seviyeSiniflari(seviye).includes(sinif)) { $('hata').textContent = 'Lütfen sınıfını listeden seç.'; return; }
+      if (yarimTest) yarimiBitir(yarim, yarimTest);
       ogrenci = { ad, sinif };
       try { localStorage.setItem('ogrenci', JSON.stringify(ogrenci)); } catch (e) {}
       test = TESTLER.find(t => t.id === $('test').value);
@@ -171,11 +179,8 @@
     $('sayac').textContent = `${n} / ${sorular.length} soru işaretlendi`;
   }
 
-  // 3) Sonuç ekranı + gönderim
-  function sonuc(sureDoldu) {
-    clearInterval(zamanlayici);
-    const cikis = gozetimBitir ? gozetimBitir() : { sayi: 0, sn: 0 };
-    temizle();
+  // Sonuç kaydı (öğretmene gönderilen) + bu cihazdaki geçmişe ekleme; o anki test, öğrenci ve cevaplar kullanılır.
+  function kayitHazirla(sureDoldu, cikis) {
     const harcanan = Math.min(sureSn, Math.round((Date.now() - (bitis - sureSn * 1000)) / 1000));
     const dogru = cevaplar.filter((c, i) => c === sorular[i].ans).length;
     const bos = cevaplar.filter(c => c === null).length;
@@ -188,8 +193,37 @@
       ekBilgi: { 'Sayfadan Çıkma': cikis.sayi, 'Dışarıda Geçen Süre': dakika(cikis.sn) },
       cevaplar: cevaplar.map((c, i) => `${i + 1}:${c === null ? '-' : L[c]}${c === null ? '' : c === sorular[i].ans ? '✓' : '✗(' + L[sorular[i].ans] + ')'}`).join(' ')
     };
-
     gecmiseEkle({ kod: test.id, tur: 'test', baslik: test.unite + ' · ' + test.ad, ogrenci: ogrenci.ad, tarih: new Date().toISOString(), cevaplar: [...cevaplar], sira: soruSirasi(), dogru, yanlis, bos, puan });
+    return { kayit, harcanan, dogru, yanlis, bos, puan };
+  }
+
+  // Yarım kalmış testi kaldığı yerden açar.
+  function devamEt(a, t) {
+    test = t; seviye = test.seviye; ogrenci = a.ogrenci; bitis = a.bitis; cevaplar = a.cevaplar;
+    D = { sira: a.sira, soruSirasi: a.soruSirasi, cikis: a.cikis, sonGorulme: a.sonGorulme };
+    sorular = test.sorular(); sureSn = sorular.length * SORU_SURESI;
+    coz();
+  }
+
+  // Öğrenci yarım kalmış bir test varken yeni bir teste başlarsa yarım test o anki cevaplarla bitirilip gönderilir.
+  // Testten ayrı kalınan süre, sayfadan ayrılma olarak sayılır (gozetim.js'teki gibi).
+  function yarimiBitir(a, t) {
+    test = t; ogrenci = a.ogrenci; bitis = a.bitis; cevaplar = a.cevaplar; D = { sira: a.sira, soruSirasi: a.soruSirasi };
+    sorular = test.sorular(); sureSn = sorular.length * SORU_SURESI;
+    const c = a.cikis || { sayi: 0, sn: 0 }, cikis = { sayi: c.sayi || 0, sn: c.sn || 0 };
+    const disarida = Math.round((Date.now() - (c.acik || a.sonGorulme || Date.now())) / 1000);
+    if (disarida >= 3) { cikis.sayi++; cikis.sn = Math.min(cikis.sn + disarida, 9999 * 60); }
+    const { kayit } = kayitHazirla(Date.now() >= bitis, cikis);
+    temizle();
+    if (window.SONUC_ADRESI) fetch(window.SONUC_ADRESI, { method: 'POST', mode: 'no-cors', keepalive: true, headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(kayit) }).catch(() => {});
+  }
+
+  // 3) Sonuç ekranı + gönderim
+  function sonuc(sureDoldu) {
+    clearInterval(zamanlayici);
+    const cikis = gozetimBitir ? gozetimBitir() : { sayi: 0, sn: 0 };
+    temizle();
+    const { kayit, harcanan, dogru, yanlis, bos, puan } = kayitHazirla(sureDoldu, cikis);
     document.body.innerHTML = `<div class="sayfa">${ust(test.unite + ' · ' + test.ad + ' · Sonuç')}
       <div class="kutu">
         <p><b>${kacis(ogrenci.ad)}</b> · ${kacis(ogrenci.sinif)} · ⏱ ${dakika(harcanan)} / ${dakika(sureSn)}</p>
@@ -236,14 +270,13 @@
   function kacis(s) { return String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
 
   // Yarım kalmış test varsa (sayfa yenilendiyse) kaldığı yerden devam et.
+  // Başka bir testin linkiyle gelindiyse o testin giriş ekranı açılır; yarım kalan test için uyarı ve "devam et" düğmesi gösterilir.
   let aktif = null;
   try { aktif = JSON.parse(localStorage.getItem('aktifTest') || 'null'); } catch (e) {}
   const aktifTest = aktif && TESTLER.find(t => t.id === aktif.testId);
   if (aktifTest && aktif.ogrenci && aktif.bitis && aktif.cevaplar && aktif.cevaplar.length === aktifTest.sorular().length) {
-    test = aktifTest; seviye = test.seviye; ogrenci = aktif.ogrenci; bitis = aktif.bitis; cevaplar = aktif.cevaplar;
-    D = { sira: aktif.sira, soruSirasi: aktif.soruSirasi, cikis: aktif.cikis, sonGorulme: aktif.sonGorulme };
-    sorular = test.sorular(); sureSn = sorular.length * SORU_SURESI;
-    coz();
+    if (test && test.id !== aktifTest.id) giris(aktif);
+    else devamEt(aktif, aktifTest);
   } else {
     temizle();
     giris();
