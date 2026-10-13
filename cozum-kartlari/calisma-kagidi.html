@@ -34,7 +34,7 @@
 </head>
 <body>
 <script>
-  // ?set=ck-cikmis | ck-ornek | ck-benzer-cikmis | ck-benzer-ornek (Çarpanlar) · cikmis | ornek | benzer-cikmis | benzer-ornek (Üslü) · kk-cikmis | kk-ornek | kk-benzer-cikmis | kk-benzer-ornek (Karekök) · yedi-tanima (7. sınıf)   ve isteğe bağlı &konu=...
+  // ?set=ck-cikmis | ck-ornek | ck-benzer-cikmis | ck-benzer-ornek (Çarpanlar) · cikmis | ornek | benzer-cikmis | benzer-ornek (Üslü) · kk-cikmis | kk-ornek | kk-benzer-cikmis | kk-benzer-ornek (Karekök) · yedi-tanima | yedi-test-1 … 3 (7. sınıf)   ve isteğe bağlı &konu=...
   const CARPAN = 'Çarpanlar ve Katlar', USLU = 'Üslü İfadeler', KAREKOK = 'Kareköklü İfadeler', YEDI = '7. Sınıf · Tam Sayılar ve Rasyonel Sayılar';
   const ck = n => [1, 2, 3, 4].map(i => `veri/carpan-${n}-${i}.js`);
   const kk = n => [1, 2, 3, 4].map(i => `veri/karekok-${n}-${i}.js`);
@@ -51,7 +51,8 @@
     'kk-ornek': { unite: KAREKOK, ad: 'MEB Örnek Sorular', js: ['ortak/yardimci.js', ...kk('ornek')], al: () => KK_ORNEK },
     'kk-benzer-cikmis': { unite: KAREKOK, ad: 'Çıkmış Sorulara Benzer Yeni Sorular', js: ['ortak/yardimci.js', 'veri/karekok-benzer-cikmis.js'], al: () => KK_BENZER_CIKMIS },
     'kk-benzer-ornek': { unite: KAREKOK, ad: 'MEB Sorularına Benzer Yeni Sorular', js: ['ortak/yardimci.js', ...kk('benzer-ornek')], al: () => KK_BENZER_ORNEK },
-    'yedi-tanima': { unite: YEDI, ad: 'Tanı Testi', js: ['ortak/yardimci.js', 'veri/yedi-tanima.js'], al: () => YEDI_TANIMA }
+    'yedi-tanima': { unite: YEDI, ad: 'Tanı Testi', js: ['ortak/yardimci.js', 'veri/yedi-tanima.js'], al: () => YEDI_TANIMA },
+    ...Object.fromEntries([1, 2, 3].map(n => ['yedi-test-' + n, { unite: YEDI, ad: 'Karma Test ' + n, js: ['ortak/yardimci.js', 'veri/yedi-sekil.js', 'veri/yedi-test-' + n + '.js'], al: () => YEDI_TESTLER['yedi-test-' + n] }]))
   };
   const params = new URLSearchParams(location.search);
   const SET_ADI = SETLER[params.get('set')] ? params.get('set') : 'benzer-cikmis';

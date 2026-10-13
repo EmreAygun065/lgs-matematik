@@ -48,6 +48,10 @@
   ];
   // 7. sınıf: her beceri bir kez doğrudan, bir kez soru cümlesiyle sorulur (panel ikisini karşılaştırır).
   if (window.YEDI_TANIMA) window.TESTLER.push(test('yedi-tanima', YEDI, 'Tanı testi: doğrudan mı, soru cümlesiyle mi?', () => window.YEDI_TANIMA));
+  // 7. sınıf karma testleri (veri/yedi-test-N.js, şekiller veri/yedi-sekil.js)
+  const yediTestler = window.YEDI_TESTLER || {};
+  Object.keys(yediTestler).sort((a, b) => a.localeCompare(b, 'tr', { numeric: true }))
+    .forEach(id => window.TESTLER.push(test(id, YEDI, 'Karma test ' + id.split('-').pop(), () => yediTestler[id])));
 
   // Her deneme: her üniteden 5 çıkmış-benzeri + 5 MEB-benzeri soru. Denemeler birbirinden farklı sorulardan oluşur.
   // Sorular karışık sıradadır; sıra her deneme için sabittir (bütün öğrenciler aynı sırayı görür).
