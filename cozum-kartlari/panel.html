@@ -104,8 +104,8 @@
 <script src="veri/deneme-4.js?v=20261013a"></script>
 <script src="veri/deneme-5.js?v=20261013a"></script>
 <script src="veri/deneme-6.js?v=20261013a"></script>
-<script src="veri/yedi-tani.js?v=20261013b"></script>
-<script src="ortak/sinavlar.js?v=20261013c"></script>
+<script src="veri/yedi-tanima.js?v=20261013d"></script>
+<script src="ortak/sinavlar.js?v=20261013d"></script>
 <script>
 (function () {
   const L = 'ABCD';
@@ -401,8 +401,8 @@
     $('konular').innerHTML = konuListesi(sinav ? ilkler.flatMap(k => k.cevaplar.map((c, i) => ({ c, q: sinav.sorular[i] }))) : []);
   }
 
-  // Tanı testi: her beceri bir kez işlem (bicim: 'islem'), bir kez soru cümlesiyle (bicim: 'sozel') sorulur.
-  // İşlemi doğru yapıp aynı becerinin sözel sorusunu kaçıran öğrenci, hesapta değil soruyu işleme çevirmede zorlanıyordur.
+  // Tanı testi: her beceri bir kez doğrudan (bicim: 'islem'), bir kez soru cümlesiyle (bicim: 'sozel') sorulur.
+  // Doğrudan soruyu doğru yapıp aynı becerinin sözel sorusunu kaçıran öğrenci, hesapta değil soruyu işleme çevirmede zorlanıyordur.
   function ikiliKutu(sinav, ilkler) {
     const beceriler = new Map();
     sinav.sorular.forEach((q, i) => { if (!q.bicim) return; const b = beceriler.get(q.beceri) || {}; b[q.bicim] = i; beceriler.set(q.beceri, b); });
@@ -419,10 +419,10 @@
     const tumu = bicim => { const c = ilkler.flatMap(k => sinav.sorular.map((q, i) => q.bicim === bicim ? k.cevaplar[i] : null)).filter(Boolean); return c.length ? c.filter(x => x.durum === 'd').length / c.length : null; };
     const zorlanan = [...kopanlar].filter(([, n]) => n >= 3).sort((a, b) => b[1] - a[1]);
     return `<div class="kutu">
-        <h2>İşlem mi, soru cümlesi mi?</h2>
-        <p class="bilgi">Her beceri bir kez çıplak işlem, bir kez soru cümlesiyle soruldu. İşlem sorularında doğru oranı <b>${yuzde(tumu('islem'))}</b>, sözel sorularda <b>${yuzde(tumu('sozel'))}</b>. Son sütun, işlem sorusunu doğru yapıp aynı becerinin sözel sorusunu kaçıranların sayısı (üstüne gelince adlar görünür).</p>
-        <div class="tablo-kap"><table class="liste"><tr><th class="sol">Beceri</th><th>İşlem</th><th>Sözel</th><th>İşlemde doğru, sözelde yanlış/boş</th></tr>${satirlar.join('')}</table></div>
-        ${zorlanan.length ? `<p class="isimler" style="margin-top:.8rem"><b>En az 3 beceride işlemi yapıp sözel soruyu kaçıranlar:</b> ${zorlanan.map(([ad, n]) => `${kacis(ad)} (${n})`).join(', ')}</p>` : ''}
+        <h2>Doğrudan mı, soru cümlesiyle mi?</h2>
+        <p class="bilgi">Her beceri bir kez doğrudan, bir kez soru cümlesiyle soruldu. Doğrudan sorularda doğru oranı <b>${yuzde(tumu('islem'))}</b>, sözel sorularda <b>${yuzde(tumu('sozel'))}</b>. Son sütun, doğrudan soruyu doğru yapıp aynı becerinin sözel sorusunu kaçıranların sayısı (üstüne gelince adlar görünür).</p>
+        <div class="tablo-kap"><table class="liste"><tr><th class="sol">Beceri</th><th>Doğrudan</th><th>Sözel</th><th>Doğrudanda doğru, sözelde yanlış/boş</th></tr>${satirlar.join('')}</table></div>
+        ${zorlanan.length ? `<p class="isimler" style="margin-top:.8rem"><b>En az 3 beceride doğrudan soruyu yapıp sözel soruyu kaçıranlar:</b> ${zorlanan.map(([ad, n]) => `${kacis(ad)} (${n})`).join(', ')}</p>` : ''}
       </div>`;
   }
 
@@ -554,8 +554,8 @@
       if (i % 4 === 1) { const tt = window.TESTLER[6]; testler.push(satir(o, tt.id, tt.sorular(), 9)); }
     });
     denemeler.push(satir(ogr[4], d1.id, d1.sorular, 6));
-    // 7. sınıf tanı testi: aynı öğrenciler 7-A ve 7-B olarak; sözel sorular işlem sorularından zor.
-    const yt = window.TESTLER.find(t => t.id === 'yedi-tani');
+    // 7. sınıf tanı testi: aynı öğrenciler 7-A ve 7-B olarak; sözel sorular doğrudan sorulardan zor.
+    const yt = window.TESTLER.find(t => t.id === 'yedi-tanima');
     if (yt) ogr.forEach((o, i) => testler.push(satir({ ...o, sinif: i % 2 ? '7-B' : '7-A', guc: o.guc + .2 }, yt.id, yt.sorular(), 13)));
     return { testler, denemeler, zaman: new Date().toISOString() };
   }
