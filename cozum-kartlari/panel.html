@@ -143,7 +143,31 @@
     String(s || '').split(/\s+/).forEach(p => { const m = /^(\d+):(\d+):(\d{2})$/.exec(p); if (m) dizi[+m[1] - 1] = +m[2] * 60 + +m[3]; });
     return dizi;
   };
+  // Eski sonuç tablosunda "Sayfadan Çıkma" ve "Dışarıda Geçen Süre" sütunları en sondaydı; tablo sıralanıp en üste farklı sıralı
+  // bir başlık yazılınca bu satırlar kaymış okunuyordu (ör. dışarıda geçen süre deneme kodunun yerine geçiyordu).
+  // Bu beş alanın değerleri biçimlerine bakılarak doğru yerlerine konur. Apps Script güncel değilse ya da cihazda eski veri saklıysa da çalışır.
+  const KAYAN = ['Cevaplar', 'Soru Süreleri', 'Deneme Kodu', 'Test Kodu', 'Sayfadan Çıkma', 'Dışarıda Geçen Süre'];
+  const BICIM = {
+    'Cevaplar': v => /^1:([A-D]|-)/.test(v),
+    'Soru Süreleri': v => /^1:\d+:\d{2}(\s|$)/.test(v),
+    'Kod': v => /^[a-z][a-z0-9-]{1,29}$/.test(v),
+    'Dışarıda Geçen Süre': v => /^\d{1,4}:\d{2}$/.test(v),
+    'Sayfadan Çıkma': v => /^\d{1,4}$/.test(v)
+  };
+  function satirOnar(r, tur) {
+    const kodAdi = tur === 'deneme' ? 'Deneme Kodu' : 'Test Kodu';
+    const kod = String(r[kodAdi] == null ? '' : r[kodAdi]);
+    if (BICIM['Cevaplar'](String(r['Cevaplar'] || '')) && (kod === '' || BICIM['Kod'](kod))) return r;
+    const degerler = KAYAN.filter(k => k in r).map(k => String(r[k] == null ? '' : r[k]));
+    const bul = f => { const m = degerler.filter(f); return m.length === 1 ? m[0] : null; };
+    const cevap = bul(BICIM['Cevaplar']);
+    if (!cevap) return r;   // tanınmayan bir durum: olduğu gibi bırak
+    const o = { ...r, 'Cevaplar': cevap, [kodAdi]: bul(BICIM['Kod']) || '', 'Sayfadan Çıkma': bul(BICIM['Sayfadan Çıkma']) || 0, 'Dışarıda Geçen Süre': bul(BICIM['Dışarıda Geçen Süre']) || '' };
+    if (tur === 'deneme') o['Soru Süreleri'] = bul(BICIM['Soru Süreleri']) || '';
+    return o;
+  }
   function kayitYap(r, tur) {
+    r = satirOnar(r, tur);
     const baslik = String(r[tur === 'deneme' ? 'Deneme' : 'Test'] || '');
     let kod = String(r[tur === 'deneme' ? 'Deneme Kodu' : 'Test Kodu'] || '');
     if (!kod && tur === 'test') { const t = window.TESTLER.find(t => `${t.unite} · ${t.ad}` === baslik); if (t) kod = t.id; }
