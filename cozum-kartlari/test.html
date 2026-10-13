@@ -37,7 +37,7 @@
 </style>
 </head>
 <body>
-<script src="ortak/ayarlar.js?v=20261013b"></script>
+<script src="ortak/ayarlar.js?v=20261013c"></script>
 <script src="ortak/yardimci.js?v=20261006b"></script>
 <script src="veri/benzer-cikmis.js?v=20261006b"></script>
 <script src="veri/benzer-ornek-1.js?v=20261006b"></script>
@@ -55,7 +55,7 @@
 <script src="veri/karekok-benzer-ornek-3.js?v=20261006b"></script>
 <script src="veri/karekok-benzer-ornek-4.js?v=20261006b"></script>
 <script src="veri/yedi-tani.js?v=20261013b"></script>
-<script src="ortak/sinavlar.js?v=20261013b"></script>
+<script src="ortak/sinavlar.js?v=20261013c"></script>
 <script src="ortak/gozetim.js?v=20261008a"></script>
 <script src="ortak/gecmis.js?v=20261006b"></script>
 <script>
@@ -66,6 +66,9 @@
   const $ = id => document.getElementById(id);
   const params = new URLSearchParams(location.search);
   let test = TESTLER.find(t => t.id === params.get('test'));
+  // 7. ve 8. sınıflar yalnızca kendi seviyelerinin testlerini ve şubelerini görür.
+  let seviye = test ? test.seviye : params.get('seviye') === '7' ? '7' : '8';
+  const seviyeTestleri = () => TESTLER.filter(t => t.seviye === seviye);
   let ogrenci = null, sorular = [], cevaplar = [], bitis = 0, sureSn = 0, zamanlayici = null;
   let D = {}, gozetimBitir = null;
   // Sorular her öğrencide farklı sıradadır; cevaplar asıl soru numarasıyla tutulur.
@@ -78,7 +81,7 @@
 
   try { const t = localStorage.getItem('tema'); if (t) document.documentElement.dataset.theme = t; } catch (e) {}
 
-  const ust = baslik => `<div class="ust"><a class="home" href="../index.html" title="Ana sayfa">⌂</a><h1>${baslik}</h1><span class="marka">Emre Hoca</span></div>`;
+  const ust = baslik => `<div class="ust"><a class="home" href="${anaSayfa(seviye)}" title="Ana sayfa">⌂</a><h1>${baslik}</h1><span class="marka">Emre Hoca</span></div>`;
 
   // 1) Giriş ekranı
   function giris() {
@@ -90,9 +93,9 @@
         <label class="alan" for="ad">Ad Soyad</label>
         <input type="text" id="ad" autocomplete="name" maxlength="60" value="${kacis(kayitli.ad || '')}">
         <label class="alan" for="sinif">Sınıf / Şube</label>
-        <select class="test-sec" id="sinif"><option value="">Sınıfını seç</option>${window.SINIFLAR.map(s => `<option ${s === kayitli.sinif ? 'selected' : ''}>${s}</option>`).join('')}</select>
+        <select class="test-sec" id="sinif"><option value="">Sınıfını seç</option>${seviyeSiniflari(seviye).map(s => `<option ${s === kayitli.sinif ? 'selected' : ''}>${s}</option>`).join('')}</select>
         <label class="alan" for="test">Test</label>
-        <select class="test-sec" id="test">${[...new Set(TESTLER.map(t => t.unite))].map(u => `<optgroup label="${u}">${TESTLER.filter(t => t.unite === u).map(t => `<option value="${t.id}" ${test && test.id === t.id ? 'selected' : ''}>${t.ad} (${t.sorular().length} soru · ${String(t.sorular().length * SORU_SURESI / 60).replace('.', ',')} dk)</option>`).join('')}</optgroup>`).join('')}</select>
+        <select class="test-sec" id="test">${[...new Set(seviyeTestleri().map(t => t.unite))].map(u => `<optgroup label="${u}">${seviyeTestleri().filter(t => t.unite === u).map(t => `<option value="${t.id}" ${test && test.id === t.id ? 'selected' : ''}>${t.ad} (${t.sorular().length} soru · ${String(t.sorular().length * SORU_SURESI / 60).replace('.', ',')} dk)</option>`).join('')}</optgroup>`).join('')}</select>
         <p class="durum" style="margin-top:.8rem">⏱ Her soru için ortalama 2,5 dakika süren var. Süre bitince test kendiliğinden biter ve işaretlediğin cevaplar gönderilir. Test bitene kadar bu sayfada kal: başka sekmeye ya da uygulamaya geçersen öğretmenine bildirilir.</p>
         <button class="dugme" id="basla">Teste başla →</button>
         <div class="hata" id="hata"></div>
@@ -101,7 +104,7 @@
       const ad = $('ad').value.trim().replace(/\s+/g, ' '), sinif = $('sinif').value;
       const hata = adHatasi(ad);
       if (hata) { $('hata').textContent = hata; return; }
-      if (!window.SINIFLAR.includes(sinif)) { $('hata').textContent = 'Lütfen sınıfını listeden seç.'; return; }
+      if (!seviyeSiniflari(seviye).includes(sinif)) { $('hata').textContent = 'Lütfen sınıfını listeden seç.'; return; }
       ogrenci = { ad, sinif };
       try { localStorage.setItem('ogrenci', JSON.stringify(ogrenci)); } catch (e) {}
       test = TESTLER.find(t => t.id === $('test').value);
@@ -204,7 +207,7 @@
           <details class="cozum"><summary>Çözümü göster</summary><ol>${q.steps.map(s => `<li>${s}</li>`).join('')}</ol><p class="answer">${q.answer}</p></details>
         </div>`;
       }).join('')}
-      <p style="display:flex;gap:.6rem;flex-wrap:wrap"><button class="dugme" onclick="location.reload()">Başka bir test çöz</button><a class="dugme ikincil" href="yanlislarim.html" style="text-decoration:none;margin-top:1.2rem">📒 Yanlışlarım ve Boşlarım</a></p>
+      <p style="display:flex;gap:.6rem;flex-wrap:wrap"><button class="dugme" onclick="location.reload()">Başka bir test çöz</button><a class="dugme ikincil" href="yanlislarim.html${seviye === '7' ? '?seviye=7' : ''}" style="text-decoration:none;margin-top:1.2rem">📒 Yanlışlarım ve Boşlarım</a></p>
       <p style="color:var(--muted);font-size:.9rem">Yanlış yaptığın ve boş bıraktığın sorular bu cihazda saklanır; “Yanlışlarım ve Boşlarım” sayfasından istediğin zaman tekrar çözebilirsin.</p>
     </div>`;
     window.scrollTo(0, 0);
@@ -233,7 +236,7 @@
   try { aktif = JSON.parse(localStorage.getItem('aktifTest') || 'null'); } catch (e) {}
   const aktifTest = aktif && TESTLER.find(t => t.id === aktif.testId);
   if (aktifTest && aktif.ogrenci && aktif.bitis && aktif.cevaplar && aktif.cevaplar.length === aktifTest.sorular().length) {
-    test = aktifTest; ogrenci = aktif.ogrenci; bitis = aktif.bitis; cevaplar = aktif.cevaplar;
+    test = aktifTest; seviye = test.seviye; ogrenci = aktif.ogrenci; bitis = aktif.bitis; cevaplar = aktif.cevaplar;
     D = { sira: aktif.sira, soruSirasi: aktif.soruSirasi, cikis: aktif.cikis, sonGorulme: aktif.sonGorulme };
     sorular = test.sorular(); sureSn = sorular.length * SORU_SURESI;
     coz();

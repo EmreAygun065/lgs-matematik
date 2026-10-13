@@ -8,7 +8,7 @@
 const PANEL_SIFRE = '';
 
 // Sonuç gönderebilecek sınıflar. Yeni şube açılırsa buraya ve sitedeki ortak/ayarlar.js dosyasına ekle.
-const SINIFLAR = ['7-A', '7-B', '7-C', '7-D', '7-E', '8-A', '8-B', '8-C', '8-D', '8-E'];
+const SINIFLAR = ['7-A', '7-B', '8-A', '8-B', '8-C', '8-D', '8-E'];
 
 // Tabloya yazılabilecek ek bilgiler ve ünite adları: sadece bu listedekiler kabul edilir, dışarıdan yeni sütun açılamaz.
 const EK_BILGILER = ['Sayfadan Çıkma', 'Dışarıda Geçen Süre'];
@@ -117,6 +117,8 @@ function dogrula(v) {
   if (SINIFLAR.length && SINIFLAR.indexOf(String(v.sinif)) < 0) return 'listede olmayan sınıf';
   const kod = String(v.testId || '');
   if (!/^[a-z0-9-]{2,30}$/.test(kod)) return 'sınav kodu';
+  // 7. sınıf sınavlarının kodu "yedi-" ile başlar; her öğrenci yalnızca kendi seviyesinin sınavını gönderebilir.
+  if (String(v.sinif).charAt(0) !== (/^yedi-/.test(kod) ? '7' : '8')) return 'sınıf seviyesi ile sınav uyuşmuyor';
   const n = Number(v.soruSayisi), d = Number(v.dogru), y = Number(v.yanlis), b = Number(v.bos);
   if (![n, d, y, b].every(x => Number.isInteger(x) && x >= 0) || n < 5 || n > 40 || d + y + b !== n) return 'doğru/yanlış/boş tutmuyor';
   if (Number(v.puan) !== Math.round(d / n * 100)) return 'puan tutmuyor';

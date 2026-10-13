@@ -60,6 +60,7 @@
 <script>
 (function () {
   const set = SETLER[SET_ADI];
+  const yedi = set.unite === YEDI;   // 7. sınıf kâğıtlarında yalnızca 7. sınıf setleri listelenir
   const tum = set.al();
   const konu = params.get('konu') || '';
   const sorular = tum.filter(q => !konu || q.konu === konu);
@@ -70,9 +71,9 @@
   document.title = 'Çalışma Kâğıdı · ' + set.unite + ' · ' + set.ad + ' · Emre Hoca';
   document.body.innerHTML = `
   <div class="bar">
-    <a class="home" href="../index.html" title="Ana sayfa">⌂</a>
+    <a class="home" href="${yedi ? '../7-sinif/index.html' : '../index.html'}" title="Ana sayfa">⌂</a>
     <h1>Çalışma Kâğıdı · <span class="marka">Emre Hoca</span></h1>
-    <select id="set">${[CARPAN, USLU, KAREKOK, YEDI].map(u => `<optgroup label="${u}">${Object.entries(SETLER).filter(([, v]) => v.unite === u).map(([k, v]) => `<option value="${k}" ${k === SET_ADI ? 'selected' : ''}>${v.ad}</option>`).join('')}</optgroup>`).join('')}</select>
+    <select id="set">${(yedi ? [YEDI] : [CARPAN, USLU, KAREKOK]).map(u => `<optgroup label="${u}">${Object.entries(SETLER).filter(([, v]) => v.unite === u).map(([k, v]) => `<option value="${k}" ${k === SET_ADI ? 'selected' : ''}>${v.ad}</option>`).join('')}</optgroup>`).join('')}</select>
     ${konular.length > 1 ? `<select id="konu"><option value="">Tüm konular</option>${konular.map(k => `<option ${k === konu ? 'selected' : ''}>${k}</option>`).join('')}</select>` : ''}
     <label><input type="checkbox" id="coz" ${cozumAcik ? 'checked' : ''}> Çözümleri de ekle</label>
     <button class="primary" onclick="print()">🖨 Yazdır / PDF</button>

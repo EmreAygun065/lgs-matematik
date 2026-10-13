@@ -17,3 +17,4 @@ Site GitHub Pages ile `main` dalından yayınlanır. Değişiklikler önce öniz
 - Soru verisi: `cozum-kartlari/veri/*.js`; test ve deneme listeleri: `cozum-kartlari/ortak/sinavlar.js`.
 - Sonuçlar Google Apps Script'e gider (`apps-script/sonuc-servisi.gs`); öğretmen paneli `cozum-kartlari/panel.html`.
 - Sınav gözetimi (sayfadan ayrılma, şık karıştırma): `cozum-kartlari/ortak/gozetim.js`.
+- 7. sınıf ayrı girer: ana sayfası `7-sinif/index.html`, şubeleri yalnızca 7-A ve 7-B. Ortak sayfalar (test, yanlışlarım, çalışma kâğıdı) 7. sınıf içeriğini 8'lere, 8. sınıf içeriğini 7'lere göstermez. 7. sınıf test kodları **`yedi-`** ile başlar; site ve Apps Script seviyeyi bu önekten anlar (7'li öğrenci 8. sınıf sınavı, 8'li öğrenci 7. sınıf sınavı gönderemez).

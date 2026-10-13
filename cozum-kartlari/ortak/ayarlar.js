@@ -2,9 +2,14 @@
 // Boş bırakılırsa öğrenci puanını görür ama sonuç öğretmene gönderilmez.
 window.SONUC_ADRESI = 'https://script.google.com/macros/s/AKfycbwPY-1trXWVWZOwpjPU2BUsqzniUhPTMiImY_ohoeY80oKYP9FHXN1NAhe1xvxA4roy/exec';
 
-// Sonuç gönderebilecek sınıflar: öğrenci girişte bu listeden seçer.
+// Sonuç gönderebilecek sınıflar: öğrenci girişte bu listeden seçer (yalnızca kendi seviyesinin şubelerini görür).
 // Yeni şube açılırsa buraya ve Apps Script kodundaki SINIFLAR satırına ekle.
-window.SINIFLAR = ['7-A', '7-B', '7-C', '7-D', '7-E', '8-A', '8-B', '8-C', '8-D', '8-E'];
+window.SINIFLAR = ['7-A', '7-B', '8-A', '8-B', '8-C', '8-D', '8-E'];
+
+// 7. ve 8. sınıflar ayrı ana sayfalardan girer: 8'ler index.html, 7'ler 7-sinif/index.html.
+// Ortak sayfalar (test, yanlışlarım, çalışma kâğıdı) seviyeyi testin kendisinden ya da ?seviye=7 parametresinden anlar.
+window.seviyeSiniflari = sv => window.SINIFLAR.filter(s => s.startsWith(sv + '-'));
+window.anaSayfa = sv => (String(sv) === '7' ? '../7-sinif/index.html' : '../index.html');
 
 // Ad soyad denetimi (Apps Script'teki denetimle aynı kurallar). Sorun yoksa boş metin döner.
 window.adHatasi = function (ad) {

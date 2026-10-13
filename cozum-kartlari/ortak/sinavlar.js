@@ -23,7 +23,8 @@
   const ckEbob = ckKonu('EBOB ve EKOK');
 
   // Her test sorusuna ünitesi eklenir (öğretmen panelindeki ünite/konu analizi için).
-  const test = (id, unite, ad, sorular) => ({ id, unite, ad, sorular: () => sorular().map(q => ({ ...q, unite })) });
+  // seviye: testi hangi sınıf seviyesinin göreceği (7. sınıf test kodları "yedi-" ile başlar).
+  const test = (id, unite, ad, sorular) => ({ id, unite, ad, seviye: /^yedi-/.test(id) ? '7' : '8', sorular: () => sorular().map(q => ({ ...q, unite })) });
   window.TESTLER = [
     test('ck-karma', CARPAN, 'LGS tarzı karma test', () => CKC),
     test('ck-carpan', CARPAN, 'Bir doğal sayının çarpanları', () => ckKonu('Bir doğal sayının çarpanları')),
