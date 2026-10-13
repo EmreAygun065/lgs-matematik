@@ -63,4 +63,12 @@
     const uslu = [...BC.slice(k * 5, k * 5 + 5), ...sec(BO, 5, k * 5 + 3, 16)].map(q => etiketle(q, USLU));
     return { id: 'deneme-' + n, ad: `Deneme ${n}`, kapsam: `${CARPAN} + ${USLU}`, sorular: karistir([...carpan, ...uslu], 2026 + n * 97) };
   }) : [];
+
+  // Deneme 4 ve sonrası: denemeye özel, sitenin başka hiçbir yerinde olmayan sorular (veri/deneme-N.js).
+  // Sorular dosyadaki sırayla tutulur; öğrenciye karışık sırada gösterilir.
+  const ozel = window.DENEME_SORULARI || {};
+  Object.keys(ozel).sort((a, b) => a.localeCompare(b, 'tr', { numeric: true })).forEach(id => {
+    const sorular = ozel[id], uniteler = [...new Set(sorular.map(q => q.unite))];
+    window.DENEMELER.push({ id, ad: 'Deneme ' + id.split('-')[1], kapsam: uniteler.join(' + '), sorular });
+  });
 })();
