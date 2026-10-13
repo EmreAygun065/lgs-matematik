@@ -2,9 +2,9 @@
 // test.html, deneme.html ve panel.html aynı listeyi kullanır; öğretmen paneli gelen cevapları bu sıraya göre sorulara eşler.
 // Not: Yayındaki bir testin/denemenin sorularını ya da sırasını değiştirmek eski sonuçların panelde yanlış soruya eşlenmesine yol açar;
 // değişiklik gerekirse yeni bir id ile yeni test/deneme ekleyin.
-// Önce veri dosyaları (benzer-*, carpan-benzer-*, karekok-benzer-*) yüklenmiş olmalı.
+// Önce veri dosyaları (benzer-*, carpan-benzer-*, karekok-benzer-*, yedi-tani) yüklenmiş olmalı.
 (function () {
-  const CARPAN = 'Çarpanlar ve Katlar', USLU = 'Üslü İfadeler', KAREKOK = 'Kareköklü İfadeler';
+  const CARPAN = 'Çarpanlar ve Katlar', USLU = 'Üslü İfadeler', KAREKOK = 'Kareköklü İfadeler', YEDI = '7. Sınıf · Tam Sayılar ve Rasyonel Sayılar';
   const varsa = ad => window[ad] || [];
   const BO = varsa('BENZER_ORNEK');
   // Üslü İfadeler çıkmış-benzeri sorularının konuları (öğretmen panelindeki konu analizi için).
@@ -45,6 +45,8 @@
     test('kk-carpma', KAREKOK, 'Çarpma ve bölme', () => kkKonu('Çarpma ve bölme')),
     test('kk-toplama', KAREKOK, 'Toplama ve çıkarma', () => kkKonu('Toplama ve çıkarma'))
   ];
+  // 7. sınıf: her beceri bir kez işlem, bir kez soru cümlesiyle sorulur (panel ikisini karşılaştırır).
+  if (window.YEDI_TANI) window.TESTLER.push(test('yedi-tani', YEDI, 'Tanı testi: işlem mi, soru cümlesi mi?', () => window.YEDI_TANI));
 
   // Her deneme: her üniteden 5 çıkmış-benzeri + 5 MEB-benzeri soru. Denemeler birbirinden farklı sorulardan oluşur.
   // Sorular karışık sıradadır; sıra her deneme için sabittir (bütün öğrenciler aynı sırayı görür).

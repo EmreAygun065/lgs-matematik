@@ -4,7 +4,7 @@ window.SONUC_ADRESI = 'https://script.google.com/macros/s/AKfycbwPY-1trXWVWZOwpj
 
 // Sonuç gönderebilecek sınıflar: öğrenci girişte bu listeden seçer.
 // Yeni şube açılırsa buraya ve Apps Script kodundaki SINIFLAR satırına ekle.
-window.SINIFLAR = ['8-A', '8-B', '8-C', '8-D', '8-E'];
+window.SINIFLAR = ['7-A', '7-B', '7-C', '7-D', '7-E', '8-A', '8-B', '8-C', '8-D', '8-E'];
 
 // Ad soyad denetimi (Apps Script'teki denetimle aynı kurallar). Sorun yoksa boş metin döner.
 window.adHatasi = function (ad) {

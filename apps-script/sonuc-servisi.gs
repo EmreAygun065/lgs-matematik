@@ -8,7 +8,7 @@
 const PANEL_SIFRE = '';
 
 // Sonuç gönderebilecek sınıflar. Yeni şube açılırsa buraya ve sitedeki ortak/ayarlar.js dosyasına ekle.
-const SINIFLAR = ['8-A', '8-B', '8-C', '8-D', '8-E'];
+const SINIFLAR = ['7-A', '7-B', '7-C', '7-D', '7-E', '8-A', '8-B', '8-C', '8-D', '8-E'];
 
 // Tabloya yazılabilecek ek bilgiler ve ünite adları: sadece bu listedekiler kabul edilir, dışarıdan yeni sütun açılamaz.
 const EK_BILGILER = ['Sayfadan Çıkma', 'Dışarıda Geçen Süre'];
