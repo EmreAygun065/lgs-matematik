@@ -67,6 +67,7 @@ Site herkese açıktır; bu dosya da sitede görünür. Bu yüzden buraya şifre
   - `gecmis.js`: öğrencinin cihazındaki çözüm geçmişi (Yanlışlarım sayfası ve ana sayfadaki ilerleme çubukları okur).
   - `giris.css` + `ilerleme.js`: 8. ve 7. sınıf ana sayfalarının tasarımı (kareli defter başlığı, başlık yazı tipi Google Fonts'tan Bricolage Grotesque) ve ünite karolarındaki ilerleme çubukları.
     - İlerleme, `data-ilerleme="kod1,kod2,…"` ile yazılan test kodlarından hesaplanır. **Yeni test ya da deneme eklenince ana sayfadaki bu listeye de kodu eklenir.**
+  - **Ünite renkleri** (`stil.css`, `--u-carpan` mavi, `--u-uslu` deniz yeşili, `--u-karekok` mor, `--u-yedi` hardal; açık ve koyu tema): ana sayfadaki ünite karoları ve bölümleri (`.u-carpan` … sınıfları) ile çözüm kartı, test ve çalışma kâğıdı başlıkları (`<html data-unite="…">`; motor.js, test.html ve calisma-kagidi.html ayarlar) bu rengi alır. Turuncu yalnızca marka ve ana düğmeler içindir. Yeni ünite eklenince renk de eklenir.
   - `stil.css` içinde telefon düzeni (`max-width: 640px`): sayfa başlığı sabit değil, marka konu seçimli sayfalarda gizli, geniş tablolar yana kayar.
 - `apps-script/sonuc-servisi.gs`: Google E-Tablo'ya yapıştırılan sonuç servisi kodu.
 - `araclar/deneme-uretici/`: deneme sorularını hesapla doğrulayıp veri dosyası üreten araç (aşağıda).

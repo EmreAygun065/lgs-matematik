@@ -21,20 +21,23 @@ a:focus-visible, button:focus-visible { outline: 3px solid var(--blue); outline-
 .defter h1 { font-size: clamp(2.1rem, 5.2vw, 3.6rem); line-height: 1.02; letter-spacing: -.02em; margin: 0 0 .5rem; font-weight: 800; }
 .defter .alt { color: var(--muted); font-size: 1.05rem; margin: 0 0 1.6rem; max-width: 46ch; }
 
+/* Ünite rengi --u stil.css'teki .u-carpan … sınıflarından gelir; deneme ve genel bölümler nötr. */
+.u-deneme { --u: var(--ink); --u-soft: var(--bg); }
+
 /* Ünite karoları: ünite simgesi + bu cihazdaki ilerleme */
 .karolar { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: .75rem; }
 a.karo {
   display: grid; grid-template-columns: auto 1fr; grid-template-rows: auto auto; column-gap: .8rem; row-gap: .45rem; align-items: center;
   text-decoration: none; color: var(--ink); background: var(--card); border: 1.5px solid var(--line); border-radius: 14px; padding: .85rem 1rem;
 }
-a.karo:hover { border-color: var(--accent); }
-.karo .simge { grid-row: 1; font-family: "Bricolage Grotesque", Georgia, serif; font-weight: 700; font-size: 2rem; line-height: 1; color: var(--accent); min-width: 2.2rem; text-align: center; }
+a.karo:hover { border-color: var(--u); background: var(--u-soft); }
+.karo .simge { grid-row: 1; font-family: "Bricolage Grotesque", Georgia, serif; font-weight: 700; font-size: 2rem; line-height: 1; color: var(--u); min-width: 2.2rem; text-align: center; }
 .karo b { font-size: 1rem; line-height: 1.25; }
 .karo .ilerleme { grid-column: 1 / -1; }
 
 .ilerleme { display: grid; gap: .3rem; font-size: .82rem; color: var(--muted); }
 .cubuk { display: block; height: .45rem; border-radius: 999px; background: var(--bg); border: 1px solid var(--line); overflow: hidden; }
-.cubuk i { display: block; height: 100%; width: 0; background: var(--green); border-radius: 999px; }
+.cubuk i { display: block; height: 100%; width: 0; background: var(--u); border-radius: 999px; }
 .ilerleme b { color: var(--ink); font-variant-numeric: tabular-nums; }
 .not { color: var(--muted); font-size: .8rem; margin: .9rem 0 0; }
 
@@ -45,17 +48,17 @@ a.karo:hover { border-color: var(--accent); }
 .yol li { counter-increment: adim; position: relative; padding: .2rem 0 0 2.6rem; }
 .yol li::before {
   content: counter(adim); position: absolute; left: 0; top: 0; width: 1.9rem; height: 1.9rem; border-radius: 50%;
-  border: 2px solid var(--accent); color: var(--accent); font-weight: 800; display: grid; place-items: center; font-size: .95rem;
+  border: 2px solid var(--ink); color: var(--ink); font-weight: 800; display: grid; place-items: center; font-size: .95rem;
 }
 .yol li b { display: block; }
 .yol li span { color: var(--muted); font-size: .9rem; }
-.yol li a { color: var(--accent); font-weight: 600; }
+.yol li a { color: var(--ink); font-weight: 600; }
 
 /* Ünite bölümleri */
 .unite { margin-top: 2.6rem; scroll-margin-top: 1rem; }
-.unite-ust { display: flex; align-items: center; flex-wrap: wrap; gap: .6rem 1rem; padding-bottom: .7rem; margin-bottom: 1rem; border-bottom: 2px solid var(--ink); }
+.unite-ust { display: flex; align-items: center; flex-wrap: wrap; gap: .6rem 1rem; padding-bottom: .7rem; margin-bottom: 1rem; border-bottom: 3px solid var(--u); }
 .unite-ust h2 { margin: 0; flex: 1; display: flex; align-items: baseline; gap: .7rem; }
-.unite-ust h2 .simge { color: var(--accent); font-weight: 700; min-width: 1.6rem; }
+.unite-ust h2 .simge { color: var(--u); font-weight: 700; min-width: 1.6rem; }
 a.dugme-ana { text-decoration: none; background: var(--accent); color: #fff; font-weight: 700; border-radius: 10px; padding: .5rem 1rem; white-space: nowrap; }
 a.dugme-ana:hover { filter: brightness(1.08); }
 a.dugme-ana small { font-weight: 500; opacity: .85; }
@@ -75,11 +78,11 @@ a.dugme-ana small { font-weight: 500; opacity: .85; }
   transition: border-color .15s, background-color .15s;
 }
 .sutun li a::after { content: "›"; color: var(--muted); font-size: 1.35rem; line-height: 1; font-weight: 400; }
-.sutun li a:hover { border-color: var(--accent); background: var(--accent-soft); }
-.sutun li a:hover::after { color: var(--accent); }
+.sutun li a:hover { border-color: var(--u); background: var(--u-soft); }
+.sutun li a:hover::after { color: var(--u); }
 .sutun li a:active { transform: translateY(1px); }
 .sutun li a span { flex: 1; min-width: 0; }
-.sutun li a em { font-style: normal; font-variant-numeric: tabular-nums; font-weight: 700; font-size: .8rem; color: var(--muted); background: var(--bg); border-radius: 999px; padding: .1rem .55rem; white-space: nowrap; }
+.sutun li a em { font-style: normal; font-variant-numeric: tabular-nums; font-weight: 700; font-size: .8rem; color: var(--u); background: var(--u-soft); border-radius: 999px; padding: .1rem .55rem; white-space: nowrap; }
 .sutun li a em::after { content: " soru"; font-weight: 500; }
 
 .ipucu { margin-top: 2.5rem; color: var(--muted); font-size: .88rem; border-left: 3px solid var(--line); padding-left: .8rem; }

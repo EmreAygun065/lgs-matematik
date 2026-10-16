@@ -18,6 +18,9 @@
   --fig-red: #ee7357;
   --fig-yellow: #f6ec7c;
   --fig-stroke: #1f2328;
+  /* Ünite renkleri (ana sayfa, çözüm kartı, test ve çalışma kâğıdı başlıkları). Turuncu marka ve ana düğmeler içindir. */
+  --u-carpan: #2563a8; --u-carpan-soft: #e6eef8; --u-uslu: #0e7c7b; --u-uslu-soft: #dff1f0; --u-karekok: #7048b8; --u-karekok-soft: #efe9fa; --u-yedi: #9a5b00; --u-yedi-soft: #fbeedb;
+  --u: var(--accent); --u-soft: var(--accent-soft);
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
@@ -25,6 +28,7 @@
     --accent: #ff7a5c; --accent-soft: #3a2621; --blue: #6fb3ea; --blue-soft: #1d2b38;
     --green: #5cc58a; --green-soft: #1b3326; --red: #ff7d70; --red-soft: #3b2220;
     --yellow-soft: #3a3418; --yellow-line: #c9a93a; --fig-stroke: #ecebe7;
+    --u-carpan: #7fb2ec; --u-carpan-soft: #1c2a3a; --u-uslu: #4fc4c0; --u-uslu-soft: #15302f; --u-karekok: #b39af0; --u-karekok-soft: #2a2340; --u-yedi: #e0a54a; --u-yedi-soft: #3a2c16;
   }
 }
 :root[data-theme="dark"] {
@@ -32,6 +36,7 @@
   --accent: #ff7a5c; --accent-soft: #3a2621; --blue: #6fb3ea; --blue-soft: #1d2b38;
   --green: #5cc58a; --green-soft: #1b3326; --red: #ff7d70; --red-soft: #3b2220;
   --yellow-soft: #3a3418; --yellow-line: #c9a93a; --fig-stroke: #ecebe7;
+  --u-carpan: #7fb2ec; --u-carpan-soft: #1c2a3a; --u-uslu: #4fc4c0; --u-uslu-soft: #15302f; --u-karekok: #b39af0; --u-karekok-soft: #2a2340; --u-yedi: #e0a54a; --u-yedi-soft: #3a2c16;
 }
 * { box-sizing: border-box; }
 html { font-size: clamp(16px, 1.25vw, 22px); }
@@ -187,3 +192,15 @@ table.grid.small td.x { width: auto; padding: 0 .3rem; color: var(--muted); }
   .ekran { flex-wrap: wrap; max-width: 100%; }
   .fig { max-width: 100%; overflow-x: auto; }
 }
+
+/* Ünite rengi: sayfa <html data-unite="carpan | uslu | karekok | yedi"> ya da bir öğe .u-carpan … sınıfı alınca --u o ünitenin rengi olur. */
+.u-carpan, [data-unite="carpan"] { --u: var(--u-carpan); --u-soft: var(--u-carpan-soft); }
+.u-uslu, [data-unite="uslu"] { --u: var(--u-uslu); --u-soft: var(--u-uslu-soft); }
+.u-karekok, [data-unite="karekok"] { --u: var(--u-karekok); --u-soft: var(--u-karekok-soft); }
+.u-yedi, [data-unite="yedi"] { --u: var(--u-yedi); --u-soft: var(--u-yedi-soft); }
+[data-unite] header, [data-unite] .bar { border-bottom: 3px solid var(--u); }
+[data-unite] header h1 span { color: var(--u); }
+[data-unite] nav button.active { background: var(--u); border-color: var(--u); color: var(--card); }
+[data-unite] nav button.active small { color: inherit; opacity: .8; }
+[data-unite] .ust { border-bottom: 3px solid var(--u); padding-bottom: .7rem; }
+[data-unite] .ust h1 { color: var(--u); }

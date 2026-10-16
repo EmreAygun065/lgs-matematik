@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Online Test · Emre Hoca</title>
-<link rel="stylesheet" href="ortak/stil.css?v=20261016a">
+<link rel="stylesheet" href="ortak/stil.css?v=20261016b">
 <style>
   .sayfa { max-width: 860px; margin: 0 auto; padding: 1rem 1rem 4rem; }
   .ust { display: flex; align-items: center; gap: .8rem; flex-wrap: wrap; margin-bottom: 1rem; }
@@ -85,6 +85,8 @@
 
   try { const t = localStorage.getItem('tema'); if (t) document.documentElement.dataset.theme = t; } catch (e) {}
 
+  // Başlık ünitenin renginde görünür (stil.css → data-unite); giriş ekranında renk yok.
+  const uniteRengi = t => { const k = t && ({ 'Çarpanlar ve Katlar': 'carpan', 'Üslü İfadeler': 'uslu', 'Kareköklü İfadeler': 'karekok' }[t.unite] || (t.seviye === '7' ? 'yedi' : '')); if (k) document.documentElement.dataset.unite = k; else delete document.documentElement.dataset.unite; };
   const ust = baslik => `<div class="ust"><a class="home" href="${anaSayfa(seviye)}" title="Ana sayfa">⌂</a><h1>${baslik}</h1><span class="marka">Emre Hoca</span></div>`;
 
   // 1) Giriş ekranı. yarim: başka bir testin linkiyle gelindiyse bu cihazda yarım kalmış test (aktifTest kaydı)
@@ -132,6 +134,7 @@
 
   // 2) Soru çözme ekranı
   function coz() {
+    uniteRengi(test);
     document.body.innerHTML = `<div class="sayfa">${ust(test.unite + ' · ' + test.ad)}
       <p class="durum">${kacis(ogrenci.ad)} · ${kacis(ogrenci.sinif)} — İşaretlediğin şıkkı değiştirebilirsin. Bitince en alttaki “Testi bitir” düğmesine bas.</p>
       <div id="uyari"></div>
@@ -221,6 +224,7 @@
   // 3) Sonuç ekranı + gönderim
   function sonuc(sureDoldu) {
     clearInterval(zamanlayici);
+    uniteRengi(test);
     const cikis = gozetimBitir ? gozetimBitir() : { sayi: 0, sn: 0 };
     temizle();
     const { kayit, harcanan, dogru, yanlis, bos, puan } = kayitHazirla(sureDoldu, cikis);

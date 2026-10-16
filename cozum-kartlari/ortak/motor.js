@@ -8,6 +8,9 @@
   const konular = [...new Set(QUESTIONS.map(q => q.konu).filter(Boolean))];
 
   document.title = SET.baslik + ' ' + SET.vurgu + ' · Emre Hoca';
+  // Başlık ünitenin renginde görünür (stil.css → data-unite)
+  const UNITE_KODU = { 'Çarpanlar ve Katlar': 'carpan', 'Üslü İfadeler': 'uslu', 'Kareköklü İfadeler': 'karekok' };
+  if (UNITE_KODU[SET.baslik]) document.documentElement.dataset.unite = UNITE_KODU[SET.baslik];
   document.body.innerHTML = `
 <header>
   <a class="home" href="../index.html" title="Ana sayfa">⌂</a>

@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Çalışma Kâğıdı</title>
-<link rel="stylesheet" href="ortak/stil.css?v=20261016a">
+<link rel="stylesheet" href="ortak/stil.css?v=20261016b">
 <style>
   body { background: var(--bg); }
   .bar { position: sticky; top: 0; z-index: 5; display: flex; flex-wrap: wrap; gap: .6rem 1rem; align-items: center; padding: .7rem 1.25rem; background: var(--card); border-bottom: 1px solid var(--line); }
@@ -75,6 +75,7 @@
   const L = 'ABCD';
   const cozumAcik = params.get('cozum') === '1';
 
+  document.documentElement.dataset.unite = { [CARPAN]: 'carpan', [USLU]: 'uslu', [KAREKOK]: 'karekok', [YEDI]: 'yedi' }[set.unite];
   document.title = 'Çalışma Kâğıdı · ' + set.unite + ' · ' + set.ad + ' · Emre Hoca';
   document.body.innerHTML = `
   <div class="bar">
