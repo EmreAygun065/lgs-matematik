@@ -4,51 +4,73 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Emre Hoca · 7. Sınıf Matematik</title>
-<link rel="stylesheet" href="../cozum-kartlari/ortak/stil.css?v=20261006b">
-<style>
-  .sayfa { max-width: 1100px; margin: 0 auto; padding: 1.5rem 1.25rem 3rem; }
-  .sayfa > h1 { font-size: 1.6rem; margin: .5rem 0 .2rem; }
-  .sayfa > h1 span { color: var(--accent); }
-  .alt { color: var(--muted); margin: 0 0 1.5rem; }
-  .izgara { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 1rem; }
-  a.kart { display: block; text-decoration: none; color: var(--ink); background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 1.1rem 1.2rem; transition: border-color .15s, transform .15s; }
-  a.kart:hover { border-color: var(--accent); transform: translateY(-2px); }
-  a.kart b { display: block; font-size: 1.05rem; margin-bottom: .3rem; }
-  a.kart span { color: var(--muted); font-size: .9rem; }
-  a.kart .sayi { float: right; background: var(--accent-soft); color: var(--accent); font-weight: 700; border-radius: 999px; padding: 0 .6rem; font-size: .85rem; }
-  .unite { margin-top: 2.2rem; }
-  .unite-baslik { font-size: 1.35rem; margin: 0 0 .2rem; padding-bottom: .4rem; border-bottom: 2px solid var(--accent); }
-  h3 { font-size: 1rem; margin: 1.4rem 0 .7rem; color: var(--muted); }
-</style>
+<script>try { const t = localStorage.getItem('tema'); if (t) document.documentElement.dataset.theme = t; } catch (e) {}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600..800&display=swap">
+<link rel="stylesheet" href="../cozum-kartlari/ortak/stil.css?v=20261016a">
+<link rel="stylesheet" href="../cozum-kartlari/ortak/giris.css?v=20261016a">
 </head>
 <body>
 <div class="sayfa">
-  <p class="marka buyuk">Emre Hoca</p>
-  <h1>7. Sınıf Matematik · <span>Tam Sayılar ve Rasyonel Sayılar</span></h1>
-  <p class="alt">Süreli online testler ve yazdırılabilir çalışma kâğıtları. Sonuçların öğretmenine gider.</p>
+  <div class="ust-cubuk">
+    <span class="marka">Emre Hoca</span>
+    <button class="theme-btn" id="themeBtn" title="Açık / koyu tema">◐ Tema</button>
+  </div>
 
-  <section class="unite">
-  <h2 class="unite-baslik">📝 Online test</h2>
-  <div class="izgara">
-    <a class="kart" href="../cozum-kartlari/test.html?test=yedi-tanima"><em class="sayi">12</em><b>Tanı testi</b><span>12 soru · 30 dakika · sonuç öğretmene gider</span></a>
-    <a class="kart" href="../cozum-kartlari/test.html?test=yedi-test-1"><em class="sayi">12</em><b>Karma test 1</b><span>Termometre, bina katları, sayı kümeleri, sayı doğrusu · 30 dakika</span></a>
-    <a class="kart" href="../cozum-kartlari/test.html?test=yedi-test-2"><em class="sayi">12</em><b>Karma test 2</b><span>Ondalık ve devirli gösterim, şerit ve yüzlük kare modelleri · 30 dakika</span></a>
-    <a class="kart" href="../cozum-kartlari/test.html?test=yedi-test-3"><em class="sayi">12</em><b>Karma test 3</b><span>Karışık ve daha zor sorular · 30 dakika</span></a>
-    <a class="kart" href="../cozum-kartlari/yanlislarim.html?seviye=7"><b>📒 Yanlışlarım ve Boşlarım</b><span>Testlerde yanlış yaptığın ve boş bıraktığın soruları tekrar çöz, çözümlerine bak</span></a>
-  </div>
-  <h3>🖨 Yazdırılabilir</h3>
-  <div class="izgara">
-    <a class="kart" href="../cozum-kartlari/calisma-kagidi.html?set=yedi-tanima"><b>Tanı testi (kâğıt)</b><span>12 soru + cevap anahtarı</span></a>
-    <a class="kart" href="../cozum-kartlari/calisma-kagidi.html?set=yedi-test-1"><b>Karma test 1 (kâğıt)</b><span>12 soru + cevap anahtarı</span></a>
-    <a class="kart" href="../cozum-kartlari/calisma-kagidi.html?set=yedi-test-2"><b>Karma test 2 (kâğıt)</b><span>12 soru + cevap anahtarı</span></a>
-    <a class="kart" href="../cozum-kartlari/calisma-kagidi.html?set=yedi-test-3"><b>Karma test 3 (kâğıt)</b><span>12 soru + cevap anahtarı</span></a>
-  </div>
+  <section class="defter" aria-labelledby="baslik">
+    <h1 id="baslik" class="baslik-font">7. Sınıf Matematik<br>Tam Sayılar ve Rasyonel Sayılar</h1>
+    <p class="alt">Süreli online testler ve yazdırılabilir çalışma kâğıtları. Sonuçların öğretmenine gider.</p>
+    <nav class="karolar" aria-label="Bölümler">
+      <a class="karo" href="#testler"><span class="simge" aria-hidden="true">±</span><b>Online testler</b>
+        <span class="ilerleme" data-ilerleme="yedi-tanima,yedi-test-1,yedi-test-2,yedi-test-3"></span></a>
+      <a class="karo" href="../cozum-kartlari/yanlislarim.html?seviye=7"><span class="simge" aria-hidden="true">✗</span><b>Yanlışlarım ve Boşlarım</b>
+        <span class="ilerleme" style="display:block">Yanlış yaptığın soruları tekrar çöz</span></a>
+    </nav>
+    <p class="not">İlerlemen yalnızca bu cihazda tutulur. Başka bir cihazda çözdüğün testler burada görünmez.</p>
   </section>
 
-  <p class="imza">Hazırlayan: <span class="marka">Emre Hoca</span> · <a href="../cozum-kartlari/panel.html" style="color:var(--muted);font-size:.9rem">Öğretmen paneli</a></p>
+  <section class="yol" aria-labelledby="yol-baslik">
+    <h2 id="yol-baslik" class="baslik-font">Nasıl çalışmalıyım?</h2>
+    <ol>
+      <li><b>Tanı testi</b><span>Önce tanı testini çöz. Hangi konuda zorlandığını öğretmenin görür.</span></li>
+      <li><b>Karma testler</b><span>Sonra karma testleri sırayla çöz. Üçüncü test en zorudur.</span></li>
+      <li><b>Tekrar et</b><span><a href="../cozum-kartlari/yanlislarim.html?seviye=7">Yanlışlarım</a> sayfasında hatalarını yeniden çöz ve çözümlerine bak.</span></li>
+    </ol>
+  </section>
+
+  <section class="unite" id="testler">
+    <div class="unite-ust">
+      <h2 class="baslik-font"><span class="simge" aria-hidden="true">±</span>Tam Sayılar ve Rasyonel Sayılar</h2>
+      <a class="dugme-ana" href="../cozum-kartlari/test.html?test=yedi-tanima">Tanı testine başla <small>· 30 dk</small></a>
+    </div>
+    <div class="sutunlar">
+      <div class="sutun">
+        <h3>📝 Online testler</h3>
+        <p class="aciklama">Her test 12 soru, 30 dakika. Sonuç öğretmene gider.</p>
+        <ul>
+          <li><a href="../cozum-kartlari/test.html?test=yedi-tanima"><span>Tanı testi</span><em>12</em></a></li>
+          <li><a href="../cozum-kartlari/test.html?test=yedi-test-1"><span>Karma test 1: termometre, bina katları, sayı kümeleri, sayı doğrusu</span><em>12</em></a></li>
+          <li><a href="../cozum-kartlari/test.html?test=yedi-test-2"><span>Karma test 2: ondalık ve devirli gösterim, şerit ve yüzlük kare modelleri</span><em>12</em></a></li>
+          <li><a href="../cozum-kartlari/test.html?test=yedi-test-3"><span>Karma test 3: karışık ve daha zor sorular</span><em>12</em></a></li>
+        </ul>
+      </div>
+      <div class="sutun">
+        <h3>🖨 Çalışma kâğıtları</h3>
+        <p class="aciklama">Aynı testlerin yazdırılabilir hâli, cevap anahtarıyla.</p>
+        <ul>
+          <li><a href="../cozum-kartlari/calisma-kagidi.html?set=yedi-tanima"><span>Tanı testi (kâğıt)</span><em>12</em></a></li>
+          <li><a href="../cozum-kartlari/calisma-kagidi.html?set=yedi-test-1"><span>Karma test 1 (kâğıt)</span><em>12</em></a></li>
+          <li><a href="../cozum-kartlari/calisma-kagidi.html?set=yedi-test-2"><span>Karma test 2 (kâğıt)</span><em>12</em></a></li>
+          <li><a href="../cozum-kartlari/calisma-kagidi.html?set=yedi-test-3"><span>Karma test 3 (kâğıt)</span><em>12</em></a></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <p class="imza">Hazırlayan: <span class="marka">Emre Hoca</span> · <a class="alt-baglanti" href="../cozum-kartlari/panel.html">Öğretmen paneli</a></p>
 </div>
-<script>
-  try { const t = localStorage.getItem('tema'); if (t) document.documentElement.dataset.theme = t; } catch (e) {}
-</script>
+<script src="../cozum-kartlari/ortak/gecmis.js?v=20261006b"></script>
+<script src="../cozum-kartlari/ortak/ilerleme.js?v=20261016a"></script>
 </body>
 </html>
