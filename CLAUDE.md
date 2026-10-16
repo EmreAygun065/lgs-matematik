@@ -1,19 +1,158 @@
-# Emre Hoca · LGS Matematik sitesi — çalışma notları
+# Emre Hoca · LGS Matematik — proje defteri
 
-Site GitHub Pages ile `main` dalından yayınlanır. Değişiklikler önce önizletilir; `main`'e ancak Emre Hoca "Yayınla" dedikten sonra gönderilir.
+Bu dosya, siteyle ilgili yeni bir sohbette kaldığımız yerden devam edebilmek için tutulan çalışma defteridir.
+Site herkese açıktır; bu dosya da sitede görünür. Bu yüzden buraya şifre, öğrenci adı ya da kişisel bilgi **yazılmaz**.
+
+## Kim, ne, nerede
+
+- **Emre Hoca**: özel bir dershanede 8. sınıf (LGS) matematik öğretmeni. Türkçe, samimi ve sade konuşulur ("hocam").
+  Teknik ayrıntıyı değil, ne yapması gerektiğini adım adım ister.
+- **Site:** https://emreaygun065.github.io/lgs-matematik/ (GitHub Pages, `main` dalından yayınlanır).
+- **Depo:** `EmreAygun065/lgs-matematik`. Çalışma dalı: `claude/epic-goldberg-152s3j`.
+
+## Çalışma düzeni (önemli)
+
+1. Değişiklik çalışma dalında yapılır, denenir, gönderilir (push).
+2. Emre Hoca'ya önizleme gösterilir.
+3. `main`'e **yalnızca Emre Hoca "Yayınla" dedikten sonra** gönderilir (hızlı ileri: `git push origin HEAD:main`).
+4. Commit kimliği: `-c user.name="Emre Aygün" -c user.email=<Emre Hoca'nın e-postası>`.
+5. **Önbellek:** Ortak bir JS/CSS dosyası değişince, onu yükleyen bütün HTML'lerde `?v=` numarası yenilenir.
+   Yoksa tarayıcılar eski dosyayı kullanır ve sayfa bozulur (karekök sayfalarında bu bir kez yaşandı).
+6. Ağ notu: Bulut ortamından github.io'ya ve script.google.com'a erişilemiyor. Bu yüzden testler dosyalar `file://` ile açılarak yapılır:
+   - Playwright, Chromium yolu `/opt/pw-browsers/chromium`.
+   - Google sonuç servisi Node'da sahte bir E-Tablo ile taklit edilerek denenir.
+
+## Sitenin içeriği
+
+| Bölüm | Neler var |
+|---|---|
+| **Çarpanlar ve Katlar** | 15 çıkmış, 78 MEB örnek; her ikisinin benzerleri; çalışma kâğıtları; 6 online test |
+| **Üslü İfadeler** | 21 çıkmış, 80 MEB örnek; benzerler; çalışma kâğıtları; 6 online test |
+| **Kareköklü İfadeler** | 31 çıkmış, 83 MEB örnek; benzerler; çalışma kâğıtları; 7 online test |
+| **Deneme sınavı** | 6 deneme, her biri 20 soru / 40 dk (10 Çarpanlar ve Katlar + 10 Üslü İfadeler) |
+| **Yanlışlarım ve Boşlarım** | Öğrencinin yanlış ve boş sorularını tekrar çözdüğü sayfa (`yanlislarim.html`) |
+| **Öğretmen paneli** | `panel.html`; şifreyle açılır; ana sayfanın altındaki küçük bağlantıdan girilir |
+
+- **Online testler:** soru başına 2,5 dk. **Denemeler:** LGS gibi 40 dk; net = D − Y ÷ 3.
+- **Çıkmış ve MEB örnek soruların cevapları:**
+  - Kendi çözümlerimizle girildi.
+  - Çarpanlar ve Katlar cevapları Emre Hoca'nın gönderdiği resmî anahtarla karşılaştırıldı, hepsi tuttu.
+- **Deneme 1–3:** Sitedeki benzer soru setlerinden derlendi; bu sorular sitede açıkta durur.
+- **Deneme 4–6:** Denemeye özel, sitenin başka yerinde olmayan 60 soru (`veri/deneme-4/5/6.js`). LGS düzeyine çıkarıldı, Türkçesi bağımsız bir dil incelemesinden geçti.
+
+## Dosya yapısı
+
+- `index.html`: ana sayfa.
+- `cozum-kartlari/*.html`: sayfalar (çözüm kartları, `calisma-kagidi`, `test`, `deneme`, `panel`, `yanlislarim`).
+- `cozum-kartlari/veri/*.js`: soru verisi.
+  - Soru biçimi: `{no, konu, q, opts[4], ans, long?, hints?, steps[], answer, trap?, unite?}`.
+- `cozum-kartlari/ortak/`
+  - `yardimci.js`: F (kesir), R (kök), tablo, svg yardımcıları.
+  - `motor.js`: çözüm kartı motoru. `stil.css`: tema.
+  - `ayarlar.js`:
+    - `SONUC_ADRESI`: Google Apps Script adresi.
+    - `SINIFLAR`: 8-A … 8-E.
+    - `adHatasi()`: ad soyad denetimi.
+  - `sinavlar.js`: `TESTLER` ve `DENEMELER` listeleri. Deneme 4 ve sonrası `window.DENEME_SORULARI`'ndan eklenir.
+  - `gozetim.js`: sayfadan ayrılma takibi, şık sırası ve soru sırası karıştırma.
+  - `gecmis.js`: öğrencinin cihazındaki çözüm geçmişi (Yanlışlarım sayfası okur).
+- `apps-script/sonuc-servisi.gs`: Google E-Tablo'ya yapıştırılan sonuç servisi kodu.
+- `araclar/deneme-uretici/`: deneme sorularını hesapla doğrulayıp veri dosyası üreten araç (aşağıda).
+
+## Sonuç sistemi (Google E-Tablo + Apps Script)
+
+**Akış**
+- Test ve deneme bitince sonuç `SONUC_ADRESI`'ne POST edilir.
+- Testler **Sonuçlar**, denemeler **Denemeler** sayfasına yazılır.
+- Denetimden geçmeyenler **Reddedilenler** sayfasına not düşülür: saat, sebep, ad, sınıf.
+
+**Panel**
+- Sonuçları GET ile okur, `?sifre=` ile.
+- Şifre yalnızca Emre Hoca'nın Apps Script'indeki `PANEL_SIFRE` satırındadır, **depoda yoktur**.
+
+**Kodu güncelleme** (Emre Hoca yapar)
+1. GitHub'da `apps-script/sonuc-servisi.gs` → "Copy raw file".
+2. Apps Script'e yapıştır, `PANEL_SIFRE` satırını yeniden doldur.
+3. Dağıt → Dağıtımları yönet → kalem → **Yeni sürüm** → Dağıt. Adres değişmez.
+4. Kurulduğunu kontrol: Apps Script'te `sadelestir` ve `sinifDuzelt` aranır.
+
+**Kodun yaptığı denetimler**
+- Ad: harf dışı karakter, sesli harfsiz kelime, uygunsuz kelime ve kök listesi (Türkçe harfsiz yazımlar da yakalanır).
+- Sınıf: `SINIFLAR` listesinde olmalı. "8 A", "8a", "8/A" gibi yazımlar 8-A'ya çevrilir.
+- Sayıların tutarlılığı: D + Y + B = soru sayısı; puan, net ve cevap listesi birbirini tutmalı.
+- Süre: cevaplanan soru başına 8 saniyeden kısa süreler reddedilir.
+- `EK_BILGILER` ve `UNITELER` sabit listedir; dışarıdan yeni sütun açılamaz.
+- Başlık satırı kaymışsa (ör. sayfa sıralanınca) en üste yeniden eklenir.
+
+**Değişiklik yaparken**
+- Yeni şube açılırsa iki yere eklenir:
+  - `ayarlar.js` → `SINIFLAR` (biz ekleriz),
+  - Apps Script → `SINIFLAR` (Emre Hoca ekler).
+- Site ile Google kodunun sırası: önce site yayınlanır, sonra Google kodu güncellenir.
+
+## Gözetim ve kopya önlemleri
+
+- **Sayfadan ayrılma:** Başka sekmeye ya da uygulamaya geçiş ve sayfayı kapatıp açma sayılır (3 sn altı sayılmaz). Öğrenci uyarılır; sayı ve süre sonuçla gider.
+- **Karıştırma:** Sorular ve şıklar her öğrencide farklı sıradadır. Cevaplar, süreler ve panel analizi **asıl sıraya** göre tutulur.
+- **Panelde "Dikkat" sütunu:**
+  - ⚠ sayfadan çıktı.
+  - ⚡ çok hızlı: soru başına 30 sn altında çözüp %70 ve üstü doğru yapmak, ya da cevapladığı soru başına 20 sn altında kalmak.
+- **Saldırı geçmişi (Ekim 2026):** Yazılım bilen biri Google adresine elle sahte kayıtlar gönderdi (XSS denemeleri, formül, argo isimler, "TestPayload/evil" sütunları).
+  - Panel ve tablo hiçbir zaman ele geçirilmedi.
+  - Yukarıdaki denetimler bu olaydan sonra eklendi.
+  - **Hâlâ açık:** gerçekçi görünen sahte bir kayıt girilebilir. Kalıcı çözüm olarak önerilen ama henüz yapılmayan işler aşağıda.
 
 ## Deneme hazırlama kuralı (Emre Hoca'nın isteği)
 
 "Deneme hazırla" dendiğinde:
-- Sorular **denemeye özel ve yeni** yazılır. Çıkmış sorular, MEB örnek soruları ya da sitedeki benzer soru setlerindeki (veri/*-benzer-*.js) sorular **birebir kullanılmaz**.
-- "Benzer" demek **mantığı benzer** demektir: aynı kazanım, aynı çözüm fikri ve LGS tarzı; ama farklı bağlam, farklı sayılar, farklı soru kökü. Sorular sitede başka bir yerde görünmemeli ki öğrenci cevaplarını bulamasın.
-- Deneme soruları ayrı veri dosyalarında tutulur (ör. `veri/deneme-N.js`) ve çözüm kartı / çalışma kâğıdı sayfalarına eklenmez.
-- Biçim: LGS gibi 20 soru, 40 dakika; üniteler karışık sırada; her soruda `konu`, `unite`, 4 şık, `ans`, `steps`, `answer` bulunur. Cevap harfleri dengeli dağıtılır; her soru elle çözülerek doğrulanır.
-- Sorular ve şıklar her öğrencide farklı sırada gösterilir (ortak/gozetim.js); cevaplar, süreler ve panel analizi her zaman denemenin **asıl sırasına** göre tutulur.
-- Yayındaki bir denemenin sorularını ya da sırasını değiştirme (panel eski sonuçları bu sıraya göre eşler); değişiklik gerekirse yeni id ile yeni deneme ekle.
 
-## Yapı
+**Sorular**
+- Sorular **denemeye özel ve yeni** yazılır. Çıkmış sorular, MEB örnek soruları ya da sitedeki benzer soru setlerindeki (`veri/*-benzer-*.js`) sorular **birebir kullanılmaz**.
+- "Benzer" demek **mantığı benzer** demektir: aynı kazanım, aynı çözüm fikri, LGS tarzı. Bağlam, sayılar ve soru kökü farklı olur.
+- Sorular sitede başka bir yerde görünmemeli ki öğrenci cevaplarını bulamasın.
+- "Örnek sorular olsun" denirse: MEB örneklerinin mantığıyla yazılmış yeni sorular + özgün sorular.
 
-- Soru verisi: `cozum-kartlari/veri/*.js`; test ve deneme listeleri: `cozum-kartlari/ortak/sinavlar.js`.
-- Sonuçlar Google Apps Script'e gider (`apps-script/sonuc-servisi.gs`); öğretmen paneli `cozum-kartlari/panel.html`.
-- Sınav gözetimi (sayfadan ayrılma, şık karıştırma): `cozum-kartlari/ortak/gozetim.js`.
+**Düzey ve dil (Emre Hoca'nın geri bildirimi)**
+- Tek adımlı kolay sorular istenmiyor: LGS düzeyinde, çok adımlı, koşullu, bağlamlı sorular.
+- Dil tam cümleli ve anlaşılır olmalı: "… olacaktır. Buna göre … kaçtır?"
+- Telgraf üslubu ve iki anlama gelen ifadeler olmamalı (ör. "basamak atlayarak" yerine "basamakları ikişer ikişer çıkıyor").
+- Yazdıktan sonra bağımsız bir dil incelemesi yaptırılır.
+
+**Biçim**
+- LGS gibi 20 soru, 40 dakika; üniteler karışık.
+- Her soruda `konu`, `unite`, 4 şık, `ans`, `steps`, `answer` bulunur; varsa `trap` (tuzak notu).
+- Konu dağılımı:
+  - Çarpanlar ve Katlar: 3 çarpanlar, 5 EBOB-EKOK, 2 aralarında asal.
+  - Üslü İfadeler: 2 tam sayı kuvvetleri, 4 temel kurallar, 1 ondalık çözümleme, 1 10'un kuvvetleri, 2 bilimsel gösterim.
+- Cevap harfleri dengeli olur (her harf 5).
+- Deneme soruları `veri/deneme-N.js` dosyalarında tutulur. Çözüm kartı ve çalışma kâğıdı sayfalarına eklenmez.
+- Dosya `deneme.html`, `panel.html` ve `yanlislarim.html`'e `<script>` olarak eklenir; ana sayfadaki deneme sayısı güncellenir.
+
+**Doğrulama: `araclar/deneme-uretici/`**
+- Her soru, cevabı bağımsız hesaplayan bir `cevap()` fonksiyonuyla yazılır.
+- `node uret.js <soru-dosyası>` denetler. `… yaz` denetimden geçerse veri dosyalarını üretir.
+- Sayısal şıklar küçükten büyüğe dizilir. Harf dengesi yanlış şıklar seçilerek sağlanır.
+- Örnek ve yayındaki hâl: `deneme-4-5-6.js`.
+
+**Yayındaki denemeler**
+- Yayındaki bir denemenin sorularını ya da sırasını **değiştirme**; panel eski sonuçları bu sıraya göre eşler.
+- Hata bulunursa düzeltilmiş hâli yeni id ile yeni deneme olarak eklenir.
+
+## Bekleyen işler ve fikirler (Emre Hoca'ya önerildi, karar bekliyor)
+
+- **Öğrenci kodu:**
+  - Her öğrenciye 5 haneli kod verilir; ad yazma kutusu kalkar.
+  - "Öğrenciler" sayfası ve tek tuşla kod üretme olur; her denemeye tek sonuç kabul edilir; süre Google'da tutulur.
+  - Sahte kayıtları tamamen keser. Emre Hoca "şimdilik silerek devam" dedi.
+- **Kayıtları sil düğmesi:** Yanlışlarım sayfasına "Bu cihazdaki kayıtlarımı sil" düğmesi (ortak bilgisayarlar için).
+- **Kendi alan adı:** Örneğin emrehoca.com; GitHub Pages'e bağlanır. Adında "meb" geçmemeli. İsterse ücretsiz kısa adres için depo `emreaygun065.github.io` olarak yeniden adlandırılabilir.
+- **Kaynak ve gizlilik notları:**
+  - MEB soruları sayfalarına kaynak notu: "MEB'e aittir, ücretsiz ve eğitim amaçlı, kaynak gösterilerek kullanılmıştır".
+  - Giriş ekranına KVKK bilgilendirme cümlesi.
+- **Gelir ve tanıtım fikirleri:**
+  - YouTube çözüm videoları; video düzenleme ffmpeg ile yapılabilir.
+  - Dershanesine panel ve deneme sistemini tanıtan bir sayfa.
+  - Diğer öğretmenlere kendi sorularından deneme paketleri.
+  - Çalıştığı dershanenin sözleşmesi kontrol edilmeli.
+- **Yeni üniteler:** Sıradaki ünitelerin PDF'leri bekleniyor. Karekök için deneme henüz yok.
+- **Kayıp sonuç:** Sınıf listesinden önce açılmış bir denemenin sonucu "8 A" yazımı yüzünden reddedildi; o öğrencinin sonucunun Emre Hoca tarafından elle girilmesi önerildi. Kod artık bu yazımları kabul ediyor.
