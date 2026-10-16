@@ -9,6 +9,8 @@ Site herkese açıktır; bu dosya da sitede görünür. Bu yüzden buraya şifre
   Teknik ayrıntıyı değil, ne yapması gerektiğini adım adım ister.
 - **Site:** https://emreaygun065.github.io/lgs-matematik/ (GitHub Pages, `main` dalından yayınlanır).
 - **Depo:** `EmreAygun065/lgs-matematik`. Çalışma dalı: `claude/epic-goldberg-152s3j`.
+- **Birden çok Claude oturumu** bu depoda çalışıyor (ör. 7. sınıf bölümü ayrı bir oturumda yapıldı).
+  İşe başlamadan önce `git fetch origin main` ile ana daldaki yenilikler alınır ve çalışma dalına **birleştirilir** (merge; rebase/force yok).
 
 ## Çalışma düzeni (önemli)
 
@@ -32,6 +34,13 @@ Site herkese açıktır; bu dosya da sitede görünür. Bu yüzden buraya şifre
 | **Deneme sınavı** | 6 deneme, her biri 20 soru / 40 dk (10 Çarpanlar ve Katlar + 10 Üslü İfadeler) |
 | **Yanlışlarım ve Boşlarım** | Öğrencinin yanlış ve boş sorularını tekrar çözdüğü sayfa (`yanlislarim.html`) |
 | **Öğretmen paneli** | `panel.html`; şifreyle açılır; ana sayfanın altındaki küçük bağlantıdan girilir |
+| **7. sınıf** (ayrı giriş: `7-sinif/index.html`) | Tam Sayılar ve Rasyonel Sayılar: tanı testi (`yedi-tanima`, 12 soru · 30 dk, yalnızca tanıma düzeyi) ve görselli 3 karma test (`yedi-test-1..3`, 12'şer soru · 30 dk); online ve yazdırılabilir |
+
+- **7. ve 8. sınıf birbirinden ayrı:**
+  - 7. sınıfın şubeleri yalnızca 7-A ve 7-B.
+  - Ortak sayfalar (test, yanlışlarım, çalışma kâğıdı) her öğrenciye yalnızca kendi seviyesinin içeriğini gösterir. Seviyeyi testin kodundan ya da `?seviye=7` parametresinden anlar.
+  - 7. sınıf test kodları **`yedi-`** ile başlar. Apps Script de seviyeyi bu önekten anlar; 7'li öğrenci 8. sınıf sınavı, 8'li öğrenci 7. sınıf sınavı gönderemez.
+  - 7. sınıf şekilleri `veri/yedi-sekil.js` dosyasındadır (termometre, sayı doğrusu vb.; açık ve koyu tema).
 
 - **Online testler:** soru başına 2,5 dk. **Denemeler:** LGS gibi 40 dk; net = D − Y ÷ 3.
 - **Çıkmış ve MEB örnek soruların cevapları:**
@@ -42,7 +51,7 @@ Site herkese açıktır; bu dosya da sitede görünür. Bu yüzden buraya şifre
 
 ## Dosya yapısı
 
-- `index.html`: ana sayfa.
+- `index.html`: 8. sınıf ana sayfası. `7-sinif/index.html`: 7. sınıf ana sayfası.
 - `cozum-kartlari/*.html`: sayfalar (çözüm kartları, `calisma-kagidi`, `test`, `deneme`, `panel`, `yanlislarim`).
 - `cozum-kartlari/veri/*.js`: soru verisi.
   - Soru biçimi: `{no, konu, q, opts[4], ans, long?, hints?, steps[], answer, trap?, unite?}`.
@@ -51,7 +60,7 @@ Site herkese açıktır; bu dosya da sitede görünür. Bu yüzden buraya şifre
   - `motor.js`: çözüm kartı motoru. `stil.css`: tema.
   - `ayarlar.js`:
     - `SONUC_ADRESI`: Google Apps Script adresi.
-    - `SINIFLAR`: 8-A … 8-E.
+    - `SINIFLAR`: 7-A, 7-B, 8-A … 8-E. `seviyeSiniflari(7)` bir seviyenin şubelerini verir.
     - `adHatasi()`: ad soyad denetimi.
   - `sinavlar.js`: `TESTLER` ve `DENEMELER` listeleri. Deneme 4 ve sonrası `window.DENEME_SORULARI`'ndan eklenir.
   - `gozetim.js`: sayfadan ayrılma takibi, şık sırası ve soru sırası karıştırma.
@@ -74,7 +83,7 @@ Site herkese açıktır; bu dosya da sitede görünür. Bu yüzden buraya şifre
 1. GitHub'da `apps-script/sonuc-servisi.gs` → "Copy raw file".
 2. Apps Script'e yapıştır, `PANEL_SIFRE` satırını yeniden doldur.
 3. Dağıt → Dağıtımları yönet → kalem → **Yeni sürüm** → Dağıt. Adres değişmez.
-4. Kurulduğunu kontrol: Apps Script'te `sadelestir` ve `sinifDuzelt` aranır.
+4. Kurulduğunu kontrol: Apps Script'te `sadelestir`, `sinifDuzelt` ve `satirlariOku` aranır.
 
 **Kodun yaptığı denetimler**
 - Ad: harf dışı karakter, sesli harfsiz kelime, uygunsuz kelime ve kök listesi (Türkçe harfsiz yazımlar da yakalanır).
@@ -82,10 +91,16 @@ Site herkese açıktır; bu dosya da sitede görünür. Bu yüzden buraya şifre
 - Sayıların tutarlılığı: D + Y + B = soru sayısı; puan, net ve cevap listesi birbirini tutmalı.
 - Süre: cevaplanan soru başına 8 saniyeden kısa süreler reddedilir.
 - `EK_BILGILER` ve `UNITELER` sabit listedir; dışarıdan yeni sütun açılamaz.
-- Başlık satırı kaymışsa (ör. sayfa sıralanınca) en üste yeniden eklenir.
+- Sınıf seviyesi ile sınav uyuşmalı: `yedi-` sınavları yalnızca 7'lerden, diğerleri yalnızca 8'lerden kabul edilir.
+- **Başlık satırı:**
+  - Başlık satırı kaymışsa (ör. sayfa sıralanınca) aşağıdaki eski başlık satırı **aynen** en üste taşınır; yeni başlık yazılmaz, böylece sütun sırası bozulmaz.
+  - Başlık satırı sabitlenir.
+  - Okurken her sonuç satırı, onu tutarlı okuyan başlıkla eşlenir (`satirlariOku`).
+  - `tabloyuDuzelt()`: Emre Hoca isterse Apps Script'ten bir kez çalıştırıp tabloyu tek başlık altında yeniden düzenleyebilir.
+- Panel de eski, kaymış okunmuş satırları biçimlerine bakarak doğru alanlara yerleştirir.
 
 **Değişiklik yaparken**
-- Yeni şube açılırsa iki yere eklenir:
+- Yeni şube açılırsa iki yere eklenir (7. sınıf şubeleri `7-` ile başlamalı):
   - `ayarlar.js` → `SINIFLAR` (biz ekleriz),
   - Apps Script → `SINIFLAR` (Emre Hoca ekler).
 - Site ile Google kodunun sırası: önce site yayınlanır, sonra Google kodu güncellenir.
@@ -154,5 +169,5 @@ Site herkese açıktır; bu dosya da sitede görünür. Bu yüzden buraya şifre
   - Dershanesine panel ve deneme sistemini tanıtan bir sayfa.
   - Diğer öğretmenlere kendi sorularından deneme paketleri.
   - Çalıştığı dershanenin sözleşmesi kontrol edilmeli.
-- **Yeni üniteler:** Sıradaki ünitelerin PDF'leri bekleniyor. Karekök için deneme henüz yok.
+- **Yeni üniteler:** 8. sınıfın sıradaki ünitelerinin PDF'leri bekleniyor. Karekök için deneme henüz yok. 7. sınıfta yalnızca 1. temanın tanıma bölümü var; sonraki konular bekleniyor.
 - **Kayıp sonuç:** Sınıf listesinden önce açılmış bir denemenin sonucu "8 A" yazımı yüzünden reddedildi; o öğrencinin sonucunun Emre Hoca tarafından elle girilmesi önerildi. Kod artık bu yazımları kabul ediyor.

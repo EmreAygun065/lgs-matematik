@@ -34,8 +34,8 @@
 </head>
 <body>
 <script>
-  // ?set=ck-cikmis | ck-ornek | ck-benzer-cikmis | ck-benzer-ornek (Çarpanlar) · cikmis | ornek | benzer-cikmis | benzer-ornek (Üslü) · kk-cikmis | kk-ornek | kk-benzer-cikmis | kk-benzer-ornek (Karekök)   ve isteğe bağlı &konu=...
-  const CARPAN = 'Çarpanlar ve Katlar', USLU = 'Üslü İfadeler', KAREKOK = 'Kareköklü İfadeler';
+  // ?set=ck-cikmis | ck-ornek | ck-benzer-cikmis | ck-benzer-ornek (Çarpanlar) · cikmis | ornek | benzer-cikmis | benzer-ornek (Üslü) · kk-cikmis | kk-ornek | kk-benzer-cikmis | kk-benzer-ornek (Karekök) · yedi-tanima | yedi-test-1 … 3 (7. sınıf)   ve isteğe bağlı &konu=...
+  const CARPAN = 'Çarpanlar ve Katlar', USLU = 'Üslü İfadeler', KAREKOK = 'Kareköklü İfadeler', YEDI = '7. Sınıf · Tam Sayılar ve Rasyonel Sayılar';
   const ck = n => [1, 2, 3, 4].map(i => `veri/carpan-${n}-${i}.js`);
   const kk = n => [1, 2, 3, 4].map(i => `veri/karekok-${n}-${i}.js`);
   const SETLER = {
@@ -50,7 +50,9 @@
     'kk-cikmis': { unite: KAREKOK, ad: 'LGS Çıkmış Sorular (2018–2026)', js: ['ortak/yardimci.js', 'veri/karekok-cikmis.js'], al: () => KK_CIKMIS },
     'kk-ornek': { unite: KAREKOK, ad: 'MEB Örnek Sorular', js: ['ortak/yardimci.js', ...kk('ornek')], al: () => KK_ORNEK },
     'kk-benzer-cikmis': { unite: KAREKOK, ad: 'Çıkmış Sorulara Benzer Yeni Sorular', js: ['ortak/yardimci.js', 'veri/karekok-benzer-cikmis.js'], al: () => KK_BENZER_CIKMIS },
-    'kk-benzer-ornek': { unite: KAREKOK, ad: 'MEB Sorularına Benzer Yeni Sorular', js: ['ortak/yardimci.js', ...kk('benzer-ornek')], al: () => KK_BENZER_ORNEK }
+    'kk-benzer-ornek': { unite: KAREKOK, ad: 'MEB Sorularına Benzer Yeni Sorular', js: ['ortak/yardimci.js', ...kk('benzer-ornek')], al: () => KK_BENZER_ORNEK },
+    'yedi-tanima': { unite: YEDI, ad: 'Tanı Testi', js: ['ortak/yardimci.js', 'veri/yedi-tanima.js'], al: () => YEDI_TANIMA },
+    ...Object.fromEntries([1, 2, 3].map(n => ['yedi-test-' + n, { unite: YEDI, ad: 'Karma Test ' + n, js: ['ortak/yardimci.js', 'veri/yedi-sekil.js', 'veri/yedi-test-' + n + '.js'], al: () => YEDI_TESTLER['yedi-test-' + n] }]))
   };
   const params = new URLSearchParams(location.search);
   const SET_ADI = SETLER[params.get('set')] ? params.get('set') : 'benzer-cikmis';
@@ -59,6 +61,7 @@
 <script>
 (function () {
   const set = SETLER[SET_ADI];
+  const yedi = set.unite === YEDI;   // 7. sınıf kâğıtlarında yalnızca 7. sınıf setleri listelenir
   const tum = set.al();
   const konu = params.get('konu') || '';
   const sorular = tum.filter(q => !konu || q.konu === konu);
@@ -69,9 +72,9 @@
   document.title = 'Çalışma Kâğıdı · ' + set.unite + ' · ' + set.ad + ' · Emre Hoca';
   document.body.innerHTML = `
   <div class="bar">
-    <a class="home" href="../index.html" title="Ana sayfa">⌂</a>
+    <a class="home" href="${yedi ? '../7-sinif/index.html' : '../index.html'}" title="Ana sayfa">⌂</a>
     <h1>Çalışma Kâğıdı · <span class="marka">Emre Hoca</span></h1>
-    <select id="set">${[CARPAN, USLU, KAREKOK].map(u => `<optgroup label="${u}">${Object.entries(SETLER).filter(([, v]) => v.unite === u).map(([k, v]) => `<option value="${k}" ${k === SET_ADI ? 'selected' : ''}>${v.ad}</option>`).join('')}</optgroup>`).join('')}</select>
+    <select id="set">${(yedi ? [YEDI] : [CARPAN, USLU, KAREKOK]).map(u => `<optgroup label="${u}">${Object.entries(SETLER).filter(([, v]) => v.unite === u).map(([k, v]) => `<option value="${k}" ${k === SET_ADI ? 'selected' : ''}>${v.ad}</option>`).join('')}</optgroup>`).join('')}</select>
     ${konular.length > 1 ? `<select id="konu"><option value="">Tüm konular</option>${konular.map(k => `<option ${k === konu ? 'selected' : ''}>${k}</option>`).join('')}</select>` : ''}
     <label><input type="checkbox" id="coz" ${cozumAcik ? 'checked' : ''}> Çözümleri de ekle</label>
     <button class="primary" onclick="print()">🖨 Yazdır / PDF</button>

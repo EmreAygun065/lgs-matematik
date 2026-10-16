@@ -4,6 +4,8 @@
 
 Siteyi açmak için: https://emreaygun065.github.io/lgs-matematik/
 
+7. sınıflar (7-A, 7-B) için ayrı giriş: https://emreaygun065.github.io/lgs-matematik/7-sinif/
+
 ## Sonuçlar ve öğretmen paneli
 
 - Online test ve deneme sonuçları Google E-Tablo'ya gider. Tablonun Apps Script kodu: [`apps-script/sonuc-servisi.gs`](apps-script/sonuc-servisi.gs). Testler "Sonuçlar", denemeler "Denemeler" sayfasına yazılır.

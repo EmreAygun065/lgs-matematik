@@ -53,7 +53,7 @@
 </style>
 </head>
 <body>
-<script src="ortak/ayarlar.js?v=20261009a"></script>
+<script src="ortak/ayarlar.js?v=20261013c"></script>
 <script src="ortak/yardimci.js?v=20261006b"></script>
 <script src="veri/benzer-cikmis.js?v=20261006b"></script>
 <script src="veri/benzer-ornek-1.js?v=20261006b"></script>
@@ -73,7 +73,12 @@
 <script src="veri/deneme-4.js?v=20261013a"></script>
 <script src="veri/deneme-5.js?v=20261013a"></script>
 <script src="veri/deneme-6.js?v=20261013a"></script>
-<script src="ortak/sinavlar.js?v=20261013a"></script>
+<script src="veri/yedi-tanima.js?v=20261013d"></script>
+<script src="veri/yedi-sekil.js?v=20261014a"></script>
+<script src="veri/yedi-test-1.js?v=20261014a"></script>
+<script src="veri/yedi-test-2.js?v=20261014a"></script>
+<script src="veri/yedi-test-3.js?v=20261014a"></script>
+<script src="ortak/sinavlar.js?v=20261014a"></script>
 <script src="ortak/gecmis.js?v=20261006b"></script>
 <script>
 (function () {
@@ -85,6 +90,7 @@
 
   // Sınav kodu → sorular (testler ve denemeler)
   const SINAVLAR = new Map();
+  const seviye = new URLSearchParams(location.search).get('seviye') === '7' ? '7' : '8';
   window.DENEMELER.forEach(d => SINAVLAR.set(d.id, d.sorular));
   window.TESTLER.forEach(t => SINAVLAR.set(t.id, t.sorular()));
 
@@ -109,12 +115,12 @@
   }
 
   function ciz() {
-    const ust = `<div class="ust"><a class="home" href="../index.html" title="Ana sayfa">⌂</a><h1>📒 Yanlışlarım ve Boşlarım</h1><span class="marka">Emre Hoca</span></div>`;
+    const ust = `<div class="ust"><a class="home" href="${anaSayfa(seviye)}" title="Ana sayfa">⌂</a><h1>📒 Yanlışlarım ve Boşlarım</h1><span class="marka">Emre Hoca</span></div>`;
     if (!gecmis.length) {
       document.body.innerHTML = `<div class="sayfa">${ust}<div class="kutu bos-durum">
         <p><b>Bu cihazda henüz çözülmüş bir test ya da deneme yok.</b></p>
         <p>Bir online test ya da deneme bitirdiğinde yanlış yaptığın ve boş bıraktığın sorular burada toplanır. Sonra onları tekrar çözebilir, çözümlerine bakabilirsin.</p>
-        <p><a class="dugme" href="deneme.html">Deneme çöz</a> <a class="dugme ikincil" href="test.html">Online test çöz</a></p></div></div>`;
+        <p>${seviye === '7' ? '<a class="dugme" href="test.html?seviye=7">Online test çöz</a>' : '<a class="dugme" href="deneme.html">Deneme çöz</a> <a class="dugme ikincil" href="test.html">Online test çöz</a>'}</p></div></div>`;
       return;
     }
     const ogrenilen = ogrenilenler();
