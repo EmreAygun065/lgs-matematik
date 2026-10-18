@@ -102,7 +102,24 @@
         <p>Çözdüğün testlere göre en çok şu ${zayiflar.length === 1 ? 'konuya' : 'konulara'} çalışmalısın:</p>
         <ul class="oneri-liste">${zayiflar.map(satir).join('')}</ul></div>`;
 
+  // 4) Haftanın meydan okuması (yalnızca 8. sınıf): bu haftanın sorularını çözdüyse sonucu, çözmediyse "Çöz" düğmesi
+  const simdi = new Date();
+  const bu = seviye === '8' ? (window.TESTLER || []).find(t => t.meydan && t.meydan.baslangic <= simdi && simdi < t.meydan.bitis) : null;
+  let meydanHtml = '';
+  if (bu) {
+    const k = [...benim].reverse().find(x => x.kod === bu.id);
+    const soruSay = bu.sorular().length, dk = Math.round(soruSay * (bu.soruSuresi || 150) / 60);
+    const yeni = bu.meydan.bitis.toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', weekday: 'long' });
+    meydanHtml = `<div class="senin-kart meydan-kart"><p class="kart-baslik">🏆 Haftanın meydan okuması</p>
+      <p><b>${bu.meydan.hafta}. hafta</b> · ${soruSay} zor soru · ${dk} dakika</p>
+      ${k ? `<p>✓ Bu haftanın sorularını çözdün: <b>${k.dogru}/${soruSay}</b> doğru.</p>
+        <p class="kucuk">Yeni sorular ${yeni} geliyor. Yanlış yaptığın soruların çözümleri Yanlışlarım sayfasında.</p>`
+      : `<p class="kucuk">LGS'nin en zor soru tiplerinden 5 soru. Sonucun hocana gider. Yeni sorular ${yeni} geliyor.</p>
+        <a class="dugme-ana" href="${KOK}test.html?test=${encodeURIComponent(bu.id)}">Meydan okumayı çöz</a>`}</div>`;
+  }
+
   const kap = document.getElementById('oneriler');
-  if (kap) kap.innerHTML = oneriHtml + tekrarHtml;
+  const yan = meydanHtml + tekrarHtml;
+  if (kap) kap.innerHTML = oneriHtml + (yan ? `<div class="senin-yan">${yan}</div>` : '');
   kutu.hidden = false;
 })();

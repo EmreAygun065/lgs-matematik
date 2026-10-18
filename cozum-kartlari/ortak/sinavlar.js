@@ -78,4 +78,18 @@
     const sorular = ozel[id], uniteler = [...new Set(sorular.map(q => q.unite))];
     window.DENEMELER.push({ id, ad: 'Deneme ' + id.split('-')[1], kapsam: uniteler.join(' + '), sorular });
   });
+
+  // Haftanın meydan okuması (veri/meydan-N.js): her hafta 5 zor soru, soru başına 3 dakika. 8. sınıf içindir.
+  // N. hafta, MEYDAN_BASLANGIC tarihinden (N − 1) · 7 gün sonra açılır ve 7 gün sürer; başlamamış haftalar listelenmez.
+  // Sorular kendi ünitelerini taşır (panelin konu analizi için); testin ünitesi yalnızca listede grup adıdır.
+  const meydan = window.MEYDAN_SORULARI || {};
+  const ilkGun = (window.MEYDAN_BASLANGIC || '2026-10-18').split('-').map(Number);
+  const gunu = n => new Date(ilkGun[0], ilkGun[1] - 1, ilkGun[2] + n);
+  const ay = d => d.toLocaleDateString('tr-TR', { day: 'numeric', month: 'long' });
+  Object.keys(meydan).sort((a, b) => a.localeCompare(b, 'tr', { numeric: true })).forEach(id => {
+    const n = +id.split('-')[1], bas = gunu((n - 1) * 7), son = gunu(n * 7 - 1), bitis = gunu(n * 7);
+    if (bas > new Date()) return;
+    window.TESTLER.push({ id, unite: 'Haftanın Meydan Okuması', ad: `${n}. hafta (${ay(bas)} – ${ay(son)})`, seviye: '8', soruSuresi: 180,
+      meydan: { hafta: n, baslangic: bas, bitis }, sorular: () => meydan[id] });
+  });
 })();

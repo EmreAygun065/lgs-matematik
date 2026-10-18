@@ -168,7 +168,7 @@
           bilgi: [
             'Tam kare olmayan bir sayının karekökü, ardışık iki doğal sayı arasındadır.',
             `Sayının hangi iki tam kare arasında olduğunu bul: 49 < 50 < 64 → ${R(49)} < ${R(50)} < ${R(64)} → 7 < ${R(50)} < 8`,
-            `Sayı hangi tam kareye daha yakınsa karekökü de o doğal sayıya daha yakındır: 50, 49\'a daha yakın olduğu için ${R(50)} 7\'ye daha yakındır.`
+            `Bir doğal sayı hangi tam kareye daha yakınsa karekökü de o doğal sayıya daha yakındır: 50, 49\'a daha yakın olduğu için ${R(50)} 7\'ye daha yakındır.`
           ],
           ornek: {
             soru: `${R(90)} hangi ardışık iki doğal sayı arasındadır ve hangisine daha yakındır?`,

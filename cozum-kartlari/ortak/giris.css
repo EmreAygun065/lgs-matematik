@@ -152,3 +152,5 @@ a.dugme-ikincil:hover { border-color: var(--u); background: var(--u-soft); }
   .unite-ust a.dugme-ikincil { flex: 1; text-align: center; }
 }
 @media (max-width: 640px) { .unite-ust h2 { flex-basis: 100%; } }
+.senin-yan { display: grid; gap: .9rem; align-content: start; }
+.meydan-kart { border-color: var(--accent); background: linear-gradient(var(--accent-soft), var(--accent-soft)) top / 100% .35rem no-repeat, var(--card); }

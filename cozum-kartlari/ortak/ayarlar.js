@@ -13,6 +13,9 @@ window.seviyeSiniflari = sv => window.SINIFLAR.filter(s => s.startsWith(sv + '-'
 window.LGS_TARIHI = '2027-06-06';
 window.LGS_TARIHI_KESIN = false;
 
+// Haftanın meydan okumasının 1. haftasının ilk günü. Her hafta 7 gün sonra açılır (veri/meydan-N.js).
+window.MEYDAN_BASLANGIC = '2026-10-18';
+
 window.anaSayfa = sv => (String(sv) === '7' ? '../7-sinif/index.html' : '../index.html');
 
 // Ad soyad denetimi (Apps Script'teki denetimle aynı kurallar). Sorun yoksa boş metin döner.

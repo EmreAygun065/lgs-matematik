@@ -37,7 +37,7 @@
 </style>
 </head>
 <body>
-<script src="ortak/ayarlar.js?v=20261018a"></script>
+<script src="ortak/ayarlar.js?v=20261018b"></script>
 <script src="ortak/yardimci.js?v=20261006b"></script>
 <script src="veri/benzer-cikmis.js?v=20261006b"></script>
 <script src="veri/benzer-ornek-1.js?v=20261006b"></script>
@@ -59,13 +59,18 @@
 <script src="veri/yedi-test-1.js?v=20261014a"></script>
 <script src="veri/yedi-test-2.js?v=20261014a"></script>
 <script src="veri/yedi-test-3.js?v=20261014a"></script>
-<script src="ortak/sinavlar.js?v=20261014a"></script>
+<script src="veri/meydan-1.js?v=20261018a"></script>
+<script src="veri/meydan-2.js?v=20261018a"></script>
+<script src="veri/meydan-3.js?v=20261018a"></script>
+<script src="veri/meydan-4.js?v=20261018a"></script>
+<script src="ortak/sinavlar.js?v=20261018a"></script>
 <script src="ortak/gozetim.js?v=20261008a"></script>
 <script src="ortak/gecmis.js?v=20261006b"></script>
 <script>
 (function () {
   const TESTLER = window.TESTLER;
-  const SORU_SURESI = 150;   // soru başına saniye (2,5 dakika)
+  const SORU_SURESI = 150;   // soru başına saniye (2,5 dakika); bir test kendi süresini soruSuresi ile verebilir (meydan okuma: 3 dk)
+  const soruSuresi = t => (t && t.soruSuresi) || SORU_SURESI;
   const L = 'ABCD';
   const $ = id => document.getElementById(id);
   const params = new URLSearchParams(location.search);
@@ -107,8 +112,8 @@
         <label class="alan" for="sinif">Sınıf / Şube</label>
         <select class="test-sec" id="sinif"><option value="">Sınıfını seç</option>${seviyeSiniflari(seviye).map(s => `<option ${s === kayitli.sinif ? 'selected' : ''}>${s}</option>`).join('')}</select>
         <label class="alan" for="test">Test</label>
-        <select class="test-sec" id="test">${[...new Set(seviyeTestleri().map(t => t.unite))].map(u => `<optgroup label="${u}">${seviyeTestleri().filter(t => t.unite === u).map(t => `<option value="${t.id}" ${test && test.id === t.id ? 'selected' : ''}>${t.ad} (${t.sorular().length} soru · ${String(t.sorular().length * SORU_SURESI / 60).replace('.', ',')} dk)</option>`).join('')}</optgroup>`).join('')}</select>
-        <p class="durum" style="margin-top:.8rem">⏱ Her soru için ortalama 2,5 dakika süren var. Süre bitince test kendiliğinden biter ve işaretlediğin cevaplar gönderilir. Test bitene kadar bu sayfada kal: başka sekmeye ya da uygulamaya geçersen öğretmenine bildirilir.</p>
+        <select class="test-sec" id="test">${[...new Set(seviyeTestleri().map(t => t.unite))].map(u => `<optgroup label="${u}">${seviyeTestleri().filter(t => t.unite === u).map(t => `<option value="${t.id}" ${test && test.id === t.id ? 'selected' : ''}>${t.ad} (${t.sorular().length} soru · ${String(t.sorular().length * soruSuresi(t) / 60).replace('.', ',')} dk)</option>`).join('')}</optgroup>`).join('')}</select>
+        <p class="durum" style="margin-top:.8rem">⏱ Testin süresi yukarıdaki listede yazar (soru başına ortalama 2,5 dakika; meydan okumada 3 dakika). Süre bitince test kendiliğinden biter ve işaretlediğin cevaplar gönderilir. Test bitene kadar bu sayfada kal: başka sekmeye ya da uygulamaya geçersen öğretmenine bildirilir.</p>
         <button class="dugme" id="basla">Teste başla →</button>
         <div class="hata" id="hata"></div>
       </div></div>`;
@@ -125,7 +130,7 @@
       sorular = test.sorular();
       cevaplar = sorular.map(() => null);
       D = { sira: sikSirasiYap(sorular), soruSirasi: soruSirasiYap(sorular.length) };
-      sureSn = sorular.length * SORU_SURESI;
+      sureSn = sorular.length * soruSuresi(test);
       bitis = Date.now() + sureSn * 1000;
       kaydet();
       coz();
@@ -204,7 +209,7 @@
   function devamEt(a, t) {
     test = t; seviye = test.seviye; ogrenci = a.ogrenci; bitis = a.bitis; cevaplar = a.cevaplar;
     D = { sira: a.sira, soruSirasi: a.soruSirasi, cikis: a.cikis, sonGorulme: a.sonGorulme };
-    sorular = test.sorular(); sureSn = sorular.length * SORU_SURESI;
+    sorular = test.sorular(); sureSn = sorular.length * soruSuresi(test);
     coz();
   }
 
@@ -212,7 +217,7 @@
   // Testten ayrı kalınan süre, sayfadan ayrılma olarak sayılır (gozetim.js'teki gibi).
   function yarimiBitir(a, t) {
     test = t; ogrenci = a.ogrenci; bitis = a.bitis; cevaplar = a.cevaplar; D = { sira: a.sira, soruSirasi: a.soruSirasi };
-    sorular = test.sorular(); sureSn = sorular.length * SORU_SURESI;
+    sorular = test.sorular(); sureSn = sorular.length * soruSuresi(test);
     const c = a.cikis || { sayi: 0, sn: 0 }, cikis = { sayi: c.sayi || 0, sn: c.sn || 0 };
     const disarida = Math.round((Date.now() - (c.acik || a.sonGorulme || Date.now())) / 1000);
     if (disarida >= 3) { cikis.sayi++; cikis.sn = Math.min(cikis.sn + disarida, 9999 * 60); }

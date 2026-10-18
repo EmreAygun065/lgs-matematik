@@ -34,6 +34,7 @@ Site herkese açıktır; bu dosya da sitede görünür. Bu yüzden buraya şifre
 | **Deneme sınavı** | 6 deneme, her biri 20 soru / 40 dk (10 Çarpanlar ve Katlar + 10 Üslü İfadeler) |
 | **Yanlışlarım ve Boşlarım** | Öğrencinin yanlış ve boş sorularını tekrar çözdüğü sayfa (`yanlislarim.html`). **Aralıklı tekrar:** her yanlış soru 1, 3 ve 7 gün sonra "Bugün tekrar et" listesine düşer; üçünde de doğru yapılırsa öğrenildi sayılır |
 | **Konu özetleri** | `ozet.html?unite=carpan / uslu / karekok / yedi`: her konu için bilgiler, çözümlü örnek, sık yapılan hata; tahta modu ve yazdırma. İçerik `veri/ozet.js` |
+| **Haftanın meydan okuması** (8. sınıf) | Her hafta 5 zor soru, soru başına 3 dk (`veri/meydan-N.js`, test kodu `meydan-N`). 1. hafta 18 Ekim 2026'da açıldı (`ayarlar.js` → `MEYDAN_BASLANGIC`); her pazar yeni hafta açılır, başlamamış haftalar listelenmez. Ana sayfadaki "Senin için"de kart; sonuçlar normal test gibi panele gelir. **Hazır olan: 4 hafta (8 Kasım–14 Kasım'a kadar).** |
 | **Senin için** (ana sayfalar) | LGS geri sayımı (yalnızca 8. sınıf), bugün tekrar edilecek soru sayısı ve en zayıf 2 konu için öneri (özet, kart, test, yanlışlarım bağlantıları) |
 | **Öğretmen paneli** | `panel.html`; şifreyle açılır; ana sayfanın altındaki küçük bağlantıdan girilir |
 | **7. sınıf** (ayrı giriş: `7-sinif/index.html`) | Tam Sayılar ve Rasyonel Sayılar: tanı testi (`yedi-tanima`, 12 soru · 30 dk, yalnızca tanıma düzeyi) ve görselli 3 karma test (`yedi-test-1..3`, 12'şer soru · 30 dk); online ve yazdırılabilir |
@@ -153,6 +154,8 @@ Site herkese açıktır; bu dosya da sitede görünür. Bu yüzden buraya şifre
 - Cevap harfleri dengeli olur (her harf 5).
 - Deneme soruları `veri/deneme-N.js` dosyalarında tutulur. Çözüm kartı ve çalışma kâğıdı sayfalarına eklenmez.
 - Dosya `deneme.html`, `panel.html` ve `yanlislarim.html`'e `<script>` olarak eklenir; ana sayfadaki deneme sayısı güncellenir.
+
+**Haftanın meydan okuması da aynı araçla yazılır:** kimliği `meydan-N` olan setler `veri/meydan-N.js` dosyasına yazılır (`meydan-1-4.js`). Kurallar denemeyle aynı (yeni, LGS düzeyinde, çok adımlı, harf dengesi, bağımsız dil incelemesi); her hafta 5 soru, ünite `C`, `U` ya da `K` (Karekök). Apps Script 5 sorudan kısa sınavları reddettiği için hafta 5 sorudur. Yeni hafta eklenince `meydan-N.js` dosyası test, panel, yanlışlarım ve ana sayfaya `<script>` olarak eklenir.
 
 **Doğrulama: `araclar/deneme-uretici/`**
 - Her soru, cevabı bağımsız hesaplayan bir `cevap()` fonksiyonuyla yazılır.

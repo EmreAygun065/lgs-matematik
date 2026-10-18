@@ -1,10 +1,11 @@
 // Kullanım:  node uret.js <soru-dosyası>          → yalnızca denetler
+//            Kimliği "meydan-N" olan setler haftanın meydan okumasıdır: veri/meydan-N.js'e yazılır (window.MEYDAN_SORULARI).
 //            node uret.js <soru-dosyası> yaz      → denetimden geçerse cozum-kartlari/veri/deneme-N.js dosyalarını yazar
 // Soru dosyası örneği: deneme-4-5-6.js. Her sorunun cevap() fonksiyonu sonucu bağımsız hesaplar;
 // hesap işaretli doğru şıkla uyuşmazsa ya da bir yanlış şık da doğru çıkarsa hiçbir dosya yazılmaz.
 const fs = require('fs'), path = require('path');
 const { D } = require(path.resolve(process.argv[2] || 'deneme-4-5-6.js'));
-const L = 'ABCD', UNITE = { C: 'Çarpanlar ve Katlar', U: 'Üslü İfadeler' };
+const L = 'ABCD', UNITE = { C: 'Çarpanlar ve Katlar', U: 'Üslü İfadeler', K: 'Kareköklü İfadeler' };
 const kesir = s => s.replace(/F\(([^,()]+),([^()]+)\)/g, '<span class="frac"><span>$1</span><span>$2</span></span>');
 const num = s => {
   let t = String(s).replace(/F\((−?[\d,]+),([\d,]+)\)/g, '($1/$2)').replace(/<sup>([^<]+)<\/sup>/g, '**($1)')
@@ -54,11 +55,17 @@ for (const [id, sorular] of Object.entries(D)) {
     if (q.tuzak) o.trap = kesir(q.tuzak);
     cikti.push(o);
   });
-  const ck = sorular.filter(q => q.u === 'C').length;
-  console.log(`${id}: ${sorular.length} soru (Ç ${ck}, Ü ${sorular.length - ck}) | harfler ${JSON.stringify(harf)} | sıra ${sira.join(' ')}`);
+  const say = h => sorular.filter(q => q.u === h).length;
+  console.log(`${id}: ${sorular.length} soru (Ç ${say('C')}, Ü ${say('U')}, K ${say('K')}) | harfler ${JSON.stringify(harf)} | sıra ${sira.join(' ')}`);
   console.log('   konular', JSON.stringify(konu));
   const n = id.split('-')[1];
-  const js = `// Deneme ${n} · denemeye özel sorular (Çarpanlar ve Katlar + Üslü İfadeler).
+  const meydan = id.startsWith('meydan-');
+  const js = meydan ? `// Haftanın meydan okuması · ${n}. hafta · LGS düzeyinde zor sorular (araclar/deneme-uretici ile üretildi).
+// Bu sorular sitenin başka hiçbir sayfasında yer almaz; her sorunun cevabı hesapla doğrulanmıştır.
+// Yayındaki bir haftanın sorularını ya da sırasını değiştirmeyin: öğretmen paneli eski sonuçları bu sıraya göre eşler.
+window.MEYDAN_SORULARI = window.MEYDAN_SORULARI || {};
+window.MEYDAN_SORULARI['${id}'] = ${JSON.stringify(cikti, null, 1)};
+` : `// Deneme ${n} · denemeye özel sorular (Çarpanlar ve Katlar + Üslü İfadeler).
 // Bu sorular sitenin başka hiçbir sayfasında (çözüm kartı, çalışma kâğıdı, test) yer almaz.
 // MEB örnek sorularının mantığıyla yazılmış yeni sorular ve özgün sorulardan oluşur; her sorunun cevabı hesapla doğrulanmıştır.
 // Yayındaki bir denemenin sorularını ya da sırasını değiştirmeyin: öğretmen paneli eski sonuçları bu sıraya göre eşler.
