@@ -136,7 +136,13 @@
     try { localStorage.setItem('tema', root.dataset.theme); } catch (e) {}
   };
 
+  // Adres çubuğundaki ?konu=… ile o konu seçili açılır (ana sayfadaki "Senin için" önerileri kullanır).
+  const istenenKonu = new URLSearchParams(location.search).get('konu');
+  if (istenenKonu && konular.includes(istenenKonu) && $('konu')) {
+    $('konu').value = istenenKonu;
+    list = QUESTIONS.map((_, i) => i).filter(i => QUESTIONS[i].konu === istenenKonu);
+  }
   // Adres çubuğundaki #numara ile o soruyu aç (#13). "?cozum" eklenirse çözüm açık gelir.
-  const fromHash = QUESTIONS.findIndex(q => '#' + q.no === location.hash);
-  go(fromHash >= 0 ? fromHash : 0, { all: location.search.includes('cozum') });
+  const fromHash = QUESTIONS.findIndex(q => '#' + q.no === location.hash && list.includes(QUESTIONS.indexOf(q)));
+  go(fromHash >= 0 ? fromHash : list[0], { all: location.search.includes('cozum') });
 })();

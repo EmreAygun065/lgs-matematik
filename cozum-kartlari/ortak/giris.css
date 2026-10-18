@@ -105,3 +105,49 @@ a.dugme-ana small { font-weight: 500; opacity: .85; }
   .cubuk i { transition: width .6s ease-out; }
 }
 @media print { .ust-cubuk .theme-btn { display: none; } }
+
+/* Ana düğmenin yanındaki ikincil düğme (konu özeti, yanlışlarım) */
+a.dugme-ikincil { text-decoration: none; background: var(--card); color: var(--ink); border: 1.5px solid var(--line); font-weight: 700; border-radius: 10px; padding: .45rem .9rem; white-space: nowrap; }
+a.dugme-ikincil:hover { border-color: var(--u); background: var(--u-soft); }
+
+/* LGS geri sayımı: defter sayfasının sağ üst köşesinde */
+.geri-sayim {
+  position: absolute; top: 1.4rem; right: 1.4rem; display: grid; justify-items: center; text-align: center;
+  background: var(--card); border: 1.5px solid var(--line); border-radius: 14px; padding: .7rem 1.1rem .65rem; min-width: 9.5rem;
+}
+.geri-sayim .sayac-sayi { font-family: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif; font-weight: 800; font-size: 2.6rem; line-height: 1; color: var(--accent); font-variant-numeric: tabular-nums; }
+.geri-sayim .sayac-yazi { font-weight: 700; font-size: .95rem; }
+.geri-sayim .sayac-tarih { color: var(--muted); font-size: .75rem; margin-top: .2rem; }
+.defter:has(.geri-sayim:not([hidden])) h1, .defter:has(.geri-sayim:not([hidden])) .alt { margin-right: 11rem; }
+
+/* Senin için: tekrar zamanı ve kişisel öneri */
+.senin { margin-top: 2.2rem; }
+.senin h2 { font-size: 1.45rem; margin: 0 0 .8rem; letter-spacing: -.01em; }
+.senin-izgara { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); gap: .9rem; align-items: start; }
+.senin-izgara > :only-child { grid-column: 1 / -1; }
+.senin-kart { background: var(--card); border: 1.5px solid var(--line); border-radius: 14px; padding: 1rem 1.1rem; }
+.senin-kart p { margin: 0 0 .6rem; }
+.senin-kart .kart-baslik { font-weight: 800; font-size: 1.05rem; margin-bottom: .5rem; }
+.senin-kart .kucuk { color: var(--muted); font-size: .88rem; }
+.senin-kart .buyuk-sayi { font-size: 1.6rem; color: var(--accent); font-variant-numeric: tabular-nums; }
+.senin-kart a.dugme-ana, .senin-kart a.dugme-ikincil { display: inline-block; margin-top: .2rem; }
+.oneri-liste { list-style: none; margin: .4rem 0 0; padding: 0; display: grid; gap: .7rem; }
+.oneri-liste li { border: 1.5px solid var(--line); border-radius: 12px; padding: .75rem .85rem; display: grid; gap: .45rem; }
+.oneri-ust { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: .2rem .8rem; }
+.oneri-ust b { color: var(--u); font-size: 1.02rem; }
+.oneri-oran { font-weight: 700; font-variant-numeric: tabular-nums; }
+.oneri-oran small { color: var(--muted); font-weight: 500; }
+.oneri-liste .cubuk { height: .5rem; }
+.oneri-baglanti { display: flex; flex-wrap: wrap; gap: .4rem; }
+.oneri-baglanti a { text-decoration: none; color: var(--ink); font-weight: 600; font-size: .88rem; border: 1.5px solid var(--line); border-radius: 8px; padding: .3rem .6rem; background: var(--card); }
+.oneri-baglanti a:hover { border-color: var(--u); background: var(--u-soft); }
+
+@media (max-width: 860px) { .senin-izgara { grid-template-columns: 1fr; } }
+@media (max-width: 640px) {
+  .geri-sayim { position: static; grid-template-columns: auto 1fr; grid-template-rows: auto auto; justify-items: start; text-align: left; column-gap: .7rem; margin: 0 0 .9rem; padding: .55rem .8rem; min-width: 0; }
+  .geri-sayim .sayac-sayi { grid-row: 1 / 3; font-size: 2.1rem; align-self: center; }
+  .geri-sayim .sayac-tarih { margin: 0; }
+  .defter:has(.geri-sayim:not([hidden])) h1, .defter:has(.geri-sayim:not([hidden])) .alt { margin-right: 0; }
+  .unite-ust a.dugme-ikincil { flex: 1; text-align: center; }
+}
+@media (max-width: 640px) { .unite-ust h2 { flex-basis: 100%; } }

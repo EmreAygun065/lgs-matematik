@@ -32,7 +32,9 @@ Site herkese açıktır; bu dosya da sitede görünür. Bu yüzden buraya şifre
 | **Üslü İfadeler** | 21 çıkmış, 80 MEB örnek; benzerler; çalışma kâğıtları; 6 online test |
 | **Kareköklü İfadeler** | 31 çıkmış, 83 MEB örnek; benzerler; çalışma kâğıtları; 7 online test |
 | **Deneme sınavı** | 6 deneme, her biri 20 soru / 40 dk (10 Çarpanlar ve Katlar + 10 Üslü İfadeler) |
-| **Yanlışlarım ve Boşlarım** | Öğrencinin yanlış ve boş sorularını tekrar çözdüğü sayfa (`yanlislarim.html`) |
+| **Yanlışlarım ve Boşlarım** | Öğrencinin yanlış ve boş sorularını tekrar çözdüğü sayfa (`yanlislarim.html`). **Aralıklı tekrar:** her yanlış soru 1, 3 ve 7 gün sonra "Bugün tekrar et" listesine düşer; üçünde de doğru yapılırsa öğrenildi sayılır |
+| **Konu özetleri** | `ozet.html?unite=carpan / uslu / karekok / yedi`: her konu için bilgiler, çözümlü örnek, sık yapılan hata; tahta modu ve yazdırma. İçerik `veri/ozet.js` |
+| **Senin için** (ana sayfalar) | LGS geri sayımı (yalnızca 8. sınıf), bugün tekrar edilecek soru sayısı ve en zayıf 2 konu için öneri (özet, kart, test, yanlışlarım bağlantıları) |
 | **Öğretmen paneli** | `panel.html`; şifreyle açılır; ana sayfanın altındaki küçük bağlantıdan girilir |
 | **7. sınıf** (ayrı giriş: `7-sinif/index.html`) | Tam Sayılar ve Rasyonel Sayılar: tanı testi (`yedi-tanima`, 12 soru · 30 dk, yalnızca tanıma düzeyi) ve görselli 3 karma test (`yedi-test-1..3`, 12'şer soru · 30 dk); online ve yazdırılabilir |
 
@@ -65,6 +67,11 @@ Site herkese açıktır; bu dosya da sitede görünür. Bu yüzden buraya şifre
   - `sinavlar.js`: `TESTLER` ve `DENEMELER` listeleri. Deneme 4 ve sonrası `window.DENEME_SORULARI`'ndan eklenir.
   - `gozetim.js`: sayfadan ayrılma takibi, şık sırası ve soru sırası karıştırma.
   - `gecmis.js`: öğrencinin cihazındaki çözüm geçmişi (Yanlışlarım sayfası ve ana sayfadaki ilerleme çubukları okur).
+  - `tekrar.js`: aralıklı tekrar (localStorage `tekrar`; 1–3–7 gün) ve yanlış soruları toplayan ortak `yanlisSorular()`.
+  - `oneri.js`: ana sayfadaki "Senin için" bölümü. Konu başarısı her sınavın en son çözümünden hesaplanır; en az 4 sorusu çözülmüş ve %70'in altında kalan en zayıf 2 konu önerilir. Bu yüzden ana sayfalar soru verilerini de (sayfa göründükten sonra) yükler.
+  - `ayarlar.js` → `LGS_TARIHI` (şimdilik **2027-06-06, tahmini**; Emre Hoca kesin tarihi söyleyince düzeltilir ve `LGS_TARIHI_KESIN = true` yapılır).
+  - Çözüm kartı sayfaları `?konu=…` ile o konu seçili açılır; Yanlışlarım `?konu=…` ve `?tekrar=1` alır.
+  - `veri/ozet.js`: konu özetleri. Konu adları test sorularındaki `konu` ile aynı olmalı (öneriler bu adla eşleşir). Örnekler testlerdeki sorulardan farklı seçildi; özet bir testin cevabını vermemeli.
   - `giris.css` + `ilerleme.js`: 8. ve 7. sınıf ana sayfalarının tasarımı (kareli defter başlığı, başlık yazı tipi Google Fonts'tan Bricolage Grotesque) ve ünite karolarındaki ilerleme çubukları.
     - İlerleme, `data-ilerleme="kod1,kod2,…"` ile yazılan test kodlarından hesaplanır. **Yeni test ya da deneme eklenince ana sayfadaki bu listeye de kodu eklenir.**
   - **Ünite renkleri** (`stil.css`, `--u-carpan` mavi, `--u-uslu` deniz yeşili, `--u-karekok` mor, `--u-yedi` hardal; açık ve koyu tema): ana sayfadaki ünite karoları ve bölümleri (`.u-carpan` … sınıfları) ile çözüm kartı, test ve çalışma kâğıdı başlıkları (`<html data-unite="…">`; motor.js, test.html ve calisma-kagidi.html ayarlar) bu rengi alır. Turuncu yalnızca marka ve ana düğmeler içindir. Yeni ünite eklenince renk de eklenir.

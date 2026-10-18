@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Konu Özeti · Emre Hoca</title>
+<script>try { const t = localStorage.getItem('tema'); if (t) document.documentElement.dataset.theme = t; if (localStorage.getItem('tahta') === '1') document.documentElement.classList.add('tahta'); } catch (e) {}</script>
+<link rel="stylesheet" href="ortak/stil.css?v=20261016b">
+<style>
+  .sayfa { max-width: 920px; margin: 0 auto; padding: 1rem 1rem 4rem; }
+  .ust { display: flex; align-items: center; gap: .6rem .8rem; flex-wrap: wrap; margin-bottom: 1rem; }
+  .ust h1 { font-size: 1.3rem; margin: 0; flex: 1; min-width: 0; }
+  .ust button { font: inherit; font-size: .9rem; border: 1px solid var(--line); background: var(--card); color: var(--ink); border-radius: 8px; padding: .35rem .7rem; cursor: pointer; }
+  .ust button[aria-pressed="true"] { background: var(--u); border-color: var(--u); color: var(--card); }
+  .giris { color: var(--muted); margin: 0 0 1rem; }
+  .icindekiler { display: flex; flex-wrap: wrap; gap: .4rem; margin: 0 0 1.4rem; padding: 0; list-style: none; }
+  .icindekiler a { display: block; text-decoration: none; color: var(--ink); background: var(--card); border: 1.5px solid var(--line); border-radius: 999px; padding: .3rem .8rem; font-weight: 600; font-size: .9rem; }
+  .icindekiler a:hover { border-color: var(--u); background: var(--u-soft); }
+  .konu { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 1.2rem 1.4rem; margin-bottom: 1.1rem; scroll-margin-top: 1rem; break-inside: avoid; }
+  .konu h2 { margin: 0 0 .7rem; font-size: 1.25rem; display: flex; gap: .6rem; align-items: baseline; }
+  .konu h2 .no { color: var(--u); font-variant-numeric: tabular-nums; }
+  .konu ul.bilgi { margin: 0 0 .9rem; padding-left: 1.2rem; }
+  .konu ul.bilgi li { margin: .35rem 0; }
+  .ornek { background: var(--u-soft); border-radius: 10px; padding: .75rem 1rem; margin: .8rem 0; }
+  .ornek .baslik { font-weight: 700; color: var(--u); margin: 0 0 .3rem; }
+  .ornek ol { margin: .5rem 0 .3rem; padding-left: 1.3rem; }
+  .ornek ol li { margin: .25rem 0; }
+  .ornek .sonuc { font-weight: 700; margin: .4rem 0 0; }
+  .baglantilar { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: .9rem; }
+  .baglantilar a { text-decoration: none; color: var(--ink); background: var(--card); border: 1.5px solid var(--line); border-radius: 10px; padding: .45rem .8rem; font-weight: 600; font-size: .92rem; }
+  .baglantilar a:hover { border-color: var(--u); background: var(--u-soft); }
+  .bos { text-align: center; color: var(--muted); padding: 2rem 1rem; }
+  .konu .trap::before { content: "⚠️ Sık yapılan hata: "; }
+  /* Tahta modu: akıllı tahtada uzaktan okunsun diye yazılar büyür */
+  html.tahta { font-size: clamp(20px, 1.9vw, 32px); }
+  html.tahta .sayfa { max-width: 1400px; }
+  @media (max-width: 640px) { .konu { padding: 1rem; } .ust h1 { flex-basis: calc(100% - 3.2rem); } }
+  @media print {
+    html.tahta { font-size: 12pt; }
+    .ust button, .icindekiler, .baglantilar, .ust .home { display: none !important; }
+    body { background: #fff; }
+    .konu { border-color: #bbb; }
+  }
+</style>
+</head>
+<body>
+<script src="ortak/ayarlar.js?v=20261018a"></script>
+<script src="ortak/yardimci.js?v=20261006b"></script>
+<script src="veri/yedi-sekil.js?v=20261014a"></script>
+<script src="veri/ozet.js?v=20261018a"></script>
+<script>
+(function () {
+  const KODLAR = Object.keys(window.OZETLER);
+  const istenen = new URLSearchParams(location.search).get('unite');
+  const kod = KODLAR.includes(istenen) ? istenen : 'carpan';
+  const u = window.OZETLER[kod];
+  const yedi = u.sinif === 7;
+  document.documentElement.dataset.unite = kod;
+  document.title = u.ad + ' · Konu Özeti · Emre Hoca';
+  const testLinki = k => k.test ? `test.html?test=${encodeURIComponent(k.test)}` : '';
+
+  document.body.innerHTML = `<div class="sayfa">
+    <div class="ust">
+      <a class="home" href="${anaSayfa(yedi ? 7 : 8)}" title="Ana sayfa">⌂</a>
+      <h1>${u.ad} · Konu Özeti</h1>
+      <button id="tahtaBtn" aria-pressed="false" title="Yazıları akıllı tahta için büyütür">🖥 Tahta modu</button>
+      <button id="yazdirBtn">🖨 Yazdır</button>
+      <button id="temaBtn" title="Açık / koyu tema">◐ Tema</button>
+    </div>
+    <p class="giris">${yedi ? '7. sınıf' : '8. sınıf'} · Her konunun bilmen gerekenleri, çözümlü bir örnek ve sık yapılan hata. Konuya dokununca oraya gidersin.</p>
+    <ul class="icindekiler">${u.konular.map((k, i) => `<li><a href="#${k.id}">${i + 1}. ${k.ad}</a></li>`).join('')}</ul>
+    ${u.konular.map((k, i) => `<section class="konu" id="${k.id}">
+      <h2><span class="no">${i + 1}.</span><span>${k.ad}</span></h2>
+      <ul class="bilgi">${k.bilgi.map(b => `<li>${b}</li>`).join('')}</ul>
+      <div class="ornek">
+        <p class="baslik">Örnek</p>
+        <div>${k.ornek.soru}</div>
+        ${k.ornek.sekil ? k.ornek.sekil() : ''}
+        <ol>${k.ornek.cozum.map(c => `<li>${c}</li>`).join('')}</ol>
+        <p class="sonuc">${k.ornek.cevap}</p>
+      </div>
+      <div class="trap">${k.dikkat}</div>
+      <div class="baglantilar">
+        ${k.kart ? `<a href="${k.kart}${k.kart.includes('?') ? '' : '?konu=' + encodeURIComponent(k.ad)}">📘 Bu konunun çözüm kartları</a>` : ''}
+        ${k.test ? `<a href="${testLinki(k)}">📝 ${yedi ? 'Online test çöz' : 'Bu konunun testini çöz'}</a>` : ''}
+        <a href="yanlislarim.html?konu=${encodeURIComponent(k.ad)}${yedi ? '&seviye=7' : ''}">📒 Bu konudaki yanlışlarım</a>
+      </div>
+    </section>`).join('')}
+    <p class="imza">Hazırlayan: <span class="marka">Emre Hoca</span></p>
+  </div><div class="imza-sabit">Emre Hoca · LGS Matematik</div>`;
+
+  const root = document.documentElement, $ = id => document.getElementById(id);
+  const tahtaYaz = () => $('tahtaBtn').setAttribute('aria-pressed', root.classList.contains('tahta'));
+  $('tahtaBtn').onclick = () => { root.classList.toggle('tahta'); tahtaYaz(); try { localStorage.setItem('tahta', root.classList.contains('tahta') ? '1' : '0'); } catch (e) {} };
+  tahtaYaz();
+  $('yazdirBtn').onclick = () => window.print();
+  $('temaBtn').onclick = () => {
+    const koyu = root.dataset.theme ? root.dataset.theme === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
+    root.dataset.theme = koyu ? 'light' : 'dark';
+    try { localStorage.setItem('tema', root.dataset.theme); } catch (e) {}
+  };
+  if (location.hash && $(location.hash.slice(1))) $(location.hash.slice(1)).scrollIntoView();
+})();
+</script>
+</body>
+</html>

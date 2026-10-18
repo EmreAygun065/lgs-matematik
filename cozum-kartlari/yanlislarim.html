@@ -43,6 +43,13 @@
   details.cozum summary { cursor: pointer; color: var(--blue); font-weight: 600; }
   details.cozum ol { margin: .5rem 0 0; padding-left: 1.3rem; }
   .soru.ogrenildi { opacity: .6; }
+  .mod { display: flex; flex-wrap: wrap; gap: .4rem; margin: 0 0 .9rem; }
+  .mod button { font: inherit; font-weight: 600; border: 1.5px solid var(--line); background: var(--bg); color: var(--ink); border-radius: 10px; padding: .45rem .9rem; cursor: pointer; }
+  .mod button b { font-variant-numeric: tabular-nums; margin-left: .3rem; }
+  .mod button.secili { background: var(--ink); border-color: var(--ink); color: var(--card); }
+  .tekrar-not { font-size: .85rem; color: var(--muted); margin: .4rem 0 0; }
+  .tekrar-not b { color: var(--ink); }
+  .tekrar-not.bugun b { color: var(--accent); }
   .bos-durum { color: var(--muted); text-align: center; padding: 2rem 1rem; }
 
   @media print {
@@ -53,7 +60,7 @@
 </style>
 </head>
 <body>
-<script src="ortak/ayarlar.js?v=20261013c"></script>
+<script src="ortak/ayarlar.js?v=20261018a"></script>
 <script src="ortak/yardimci.js?v=20261006b"></script>
 <script src="veri/benzer-cikmis.js?v=20261006b"></script>
 <script src="veri/benzer-ornek-1.js?v=20261006b"></script>
@@ -80,6 +87,7 @@
 <script src="veri/yedi-test-3.js?v=20261014a"></script>
 <script src="ortak/sinavlar.js?v=20261014a"></script>
 <script src="ortak/gecmis.js?v=20261006b"></script>
+<script src="ortak/tekrar.js?v=20261018a"></script>
 <script>
 (function () {
   const L = 'ABCD';
@@ -96,23 +104,12 @@
 
   const gecmis = gecmisOku().filter(k => SINAVLAR.has(k.kod) && Array.isArray(k.cevaplar));
   const ogrenciler = [...new Set(gecmis.map(k => k.ogrenci).filter(Boolean))];
-  let durum = { ogrenci: ogrenciler[ogrenciler.length - 1] || '', konu: '', sinav: '', boslar: true, ogrenilenleriGoster: false };
+  const params = new URLSearchParams(location.search);
+  let durum = { ogrenci: ogrenciler[ogrenciler.length - 1] || '', konu: params.get('konu') || '', sinav: '', boslar: true, ogrenilenleriGoster: false, tekrar: null };
 
-  // Her sınavın yanlış/boş soruları; aynı soru birden çok kez yanlış yapıldıysa en son hali gösterilir.
-  function sorulariTopla() {
-    const harita = new Map();
-    gecmis.filter(k => !durum.ogrenci || k.ogrenci === durum.ogrenci).forEach(k => {
-      const sorular = SINAVLAR.get(k.kod);
-      k.cevaplar.forEach((c, i) => {
-        const q = sorular[i]; if (!q) return;
-        const anahtar = k.kod + '#' + i;
-        if (c === q.ans) { harita.delete(anahtar); return; }   // sonradan doğru yaptıysa listeden düşer
-        const no = Array.isArray(k.sira) && k.sira.includes(i) ? k.sira.indexOf(i) + 1 : i + 1;   // öğrencinin ekranındaki numara
-        harita.set(anahtar, { anahtar, q, i, no, sec: c, kayit: k });
-      });
-    });
-    return [...harita.values()].sort((a, b) => new Date(b.kayit.tarih) - new Date(a.kayit.tarih) || a.no - b.no);
-  }
+  // Her sınavın yanlış/boş soruları (ortak/tekrar.js); en yeni sınav önce.
+  const sorulariTopla = () => yanlisSorular(gecmis, SINAVLAR, durum.ogrenci)
+    .sort((a, b) => new Date(b.kayit.tarih) - new Date(a.kayit.tarih) || a.no - b.no);
 
   function ciz() {
     const ust = `<div class="ust"><a class="home" href="${anaSayfa(seviye)}" title="Ana sayfa">⌂</a><h1>📒 Yanlışlarım ve Boşlarım</h1><span class="marka">Emre Hoca</span></div>`;
@@ -127,7 +124,11 @@
     const hepsi = sorulariTopla();
     const sinavlar = [...new Map(hepsi.map(x => [x.kayit.kod, x.kayit.baslik])).entries()];
     if (durum.sinav && !sinavlar.some(([k]) => k === durum.sinav)) durum.sinav = '';
-    const gorunur = x => (durum.boslar || x.sec !== null) && (durum.ogrenilenleriGoster || !ogrenilen.has(x.anahtar));
+    // Tekrar günü gelen sorular (öğrenilenler hariç). Sayfa ilk açıldığında tekrar zamanı gelen soru varsa onlar gösterilir.
+    const tekrarlik = hepsi.filter(x => !ogrenilen.has(x.anahtar) && tekrarBilgisi(x).bugun);
+    if (durum.tekrar === null) durum.tekrar = params.get('tekrar') === '1' || (tekrarlik.length > 0 && !params.get('konu'));
+    const gorunur = durum.tekrar ? x => tekrarlik.includes(x)
+      : x => (durum.boslar || x.sec !== null) && (durum.ogrenilenleriGoster || !ogrenilen.has(x.anahtar));
     const sinavdaki = hepsi.filter(x => !durum.sinav || x.kayit.kod === durum.sinav).filter(gorunur);
     const konuSay = new Map();
     sinavdaki.forEach(x => konuSay.set(x.q.konu || 'Diğer', (konuSay.get(x.q.konu || 'Diğer') || 0) + 1));
@@ -140,7 +141,8 @@
     document.body.innerHTML = `<div class="sayfa">${ust}
       <div class="kutu">
         ${ogrenciler.length > 1 ? `<p class="yazdir-gizle" style="margin:0 0 .6rem">Öğrenci: <select id="ogrenci">${ogrenciler.map(o => `<option ${o === durum.ogrenci ? 'selected' : ''}>${kacis(o)}</option>`).join('')}</select></p>` : ''}
-        <p class="bilgi">${durum.ogrenci ? `<b>${kacis(durum.ogrenci)}</b> · ` : ''}Bu cihazda çözdüğün test ve denemelerdeki yanlış ve boş soruların. Önce soruyu tekrar çöz, sonra çözüme bak. Doğru yaptığın soruyu “Öğrendim” deyip listeden çıkarabilirsin.</p>
+        <p class="bilgi">${durum.ogrenci ? `<b>${kacis(durum.ogrenci)}</b> · ` : ''}Bu cihazda çözdüğün test ve denemelerdeki yanlış ve boş soruların. Her soru 1 gün, 3 gün ve 7 gün sonra tekrar karşına çıkar; üçünde de doğru yaparsan öğrenilmiş sayılır. Önce soruyu çöz, sonra çözüme bak.</p>
+        <div class="mod yazdir-gizle"><button id="modTekrar" class="${durum.tekrar ? 'secili' : ''}">🔁 Bugün tekrar et<b>${tekrarlik.length}</b></button><button id="modHepsi" class="${durum.tekrar ? '' : 'secili'}">Bütün yanlışlarım<b>${yanlisSay + bosSay}</b></button></div>
         <div class="ozet">
           <div class="y"><b>${yanlisSay}</b><span>yanlış soru</span></div>
           <div><b>${bosSay}</b><span>boş soru</span></div>
@@ -148,25 +150,37 @@
           <div><b>${new Set(gecmis.filter(k => !durum.ogrenci || k.ogrenci === durum.ogrenci).map(k => k.kod + k.tarih)).size}</b><span>çözülen test/deneme</span></div>
         </div>
         <div class="konular">${[['', 'Bütün konular', sinavdaki.length], ...[...konuSay.entries()].sort((a, b) => b[1] - a[1]).map(([k, n]) => [k, k, n])].map(([k, ad, n]) => `<button data-konu="${kacis(k)}" class="${durum.konu === k ? 'secili' : ''}">${kacis(ad)}<b>${n}</b></button>`).join('')}</div>
-        <div class="suzgec">
+        <div class="suzgec" ${durum.tekrar ? 'hidden' : ''}>
           <select id="sinav"><option value="">Bütün test ve denemeler</option>${sinavlar.map(([k, b]) => `<option value="${kacis(k)}" ${k === durum.sinav ? 'selected' : ''}>${kacis(b)}</option>`).join('')}</select>
           <label><input type="checkbox" id="boslar" ${durum.boslar ? 'checked' : ''}> Boş bıraktıklarım da</label>
           <label><input type="checkbox" id="ogrenilenler" ${durum.ogrenilenleriGoster ? 'checked' : ''}> Öğrendiklerimi de göster</label>
           <button class="dugme ikincil kucuk" id="yazdir">🖨 Yazdır</button>
         </div>
       </div>
-      <div id="liste">${liste.length ? liste.map(kart).join('') : `<div class="kutu bos-durum">${hepsi.length ? 'Bu seçimde soru kalmadı. 👏' : 'Hiç yanlışın yok, harikasın! 👏'}</div>`}</div>
+      <div id="liste">${liste.length ? liste.map(kart).join('') : `<div class="kutu bos-durum">${durum.tekrar ? `Bugün tekrar zamanı gelen soru yok. 👏${sonrakiTekrar(hepsi, ogrenilen)}` : hepsi.length ? 'Bu seçimde soru kalmadı. 👏' : 'Hiç yanlışın yok, harikasın! 👏'}</div>`}</div>
     </div>`;
 
     if ($('ogrenci')) $('ogrenci').onchange = e => { durum.ogrenci = e.target.value; durum.konu = ''; durum.sinav = ''; ciz(); };
     document.querySelectorAll('[data-konu]').forEach(b => b.onclick = () => { durum.konu = b.dataset.konu; ciz(); });
     $('sinav').onchange = e => { durum.sinav = e.target.value; durum.konu = ''; ciz(); };
+    $('modTekrar').onclick = () => { durum.tekrar = true; durum.konu = ''; ciz(); };
+    $('modHepsi').onclick = () => { durum.tekrar = false; ciz(); };
     $('boslar').onchange = e => { durum.boslar = e.target.checked; ciz(); };
     $('ogrenilenler').onchange = e => { durum.ogrenilenleriGoster = e.target.checked; ciz(); };
     $('yazdir').onclick = () => { document.querySelectorAll('details.cozum').forEach(d => { d.open = true; }); window.print(); };
     liste.forEach(etkilestir);
   }
 
+  const sonrakiTekrar = (hepsi, ogrenilen) => {
+    const g = hepsi.filter(x => !ogrenilen.has(x.anahtar)).map(x => tekrarBilgisi(x).sonraki).sort()[0];
+    return g ? `<br>Sıradaki tekrar: <b>${gunYaz(g)}</b>.` : '';
+  };
+  const tekrarSatiri = x => {
+    if (ogrenilenler().has(x.anahtar)) return '';
+    const b = tekrarBilgisi(x);
+    return b.bugun ? `<p class="tekrar-not bugun">🔁 <b>Tekrar ${b.kutu + 1}/${TEKRAR_SAYISI}</b> · tekrar zamanı geldi</p>`
+      : `<p class="tekrar-not">🔁 Tekrar ${b.kutu + 1}/${TEKRAR_SAYISI} · sonraki tekrar: <b>${gunYaz(b.sonraki)}</b></p>`;
+  };
   const kartId = x => 'k-' + x.anahtar.replace(/[^a-z0-9]/gi, '_');
   function kart(x) {
     const { q, sec, kayit, anahtar } = x;
@@ -176,6 +190,7 @@
       <div class="qtext">${q.q}</div>
       <div class="opts ${q.long ? 'long' : ''}">${q.opts.map((o, j) => `<button class="opt" data-j="${j}"><b>${L[j]})</b>${o}</button>`).join('')}</div>
       <p class="onceki">${sec === null ? 'O gün bu soruyu boş bırakmıştın.' : `O gün <b>${L[sec]}</b> şıkkını işaretlemiştin (yanlış).`} Şimdi tekrar dene.</p>
+      <div class="tekrar-yer">${tekrarSatiri(x)}</div>
       <p class="sonuc-mesaj"></p>
       <div class="alt-satir">
         <details class="cozum"><summary>Çözümü göster</summary><ol>${q.steps.map(s => `<li>${s}</li>`).join('')}</ol><p class="answer">${q.answer}</p>${q.trap ? `<p class="bilgi">⚠ ${q.trap}</p>` : ''}</details>
@@ -193,7 +208,14 @@
       b.classList.add(dogru ? 'secildi-d' : 'secildi-y');
       const m = el.querySelector('.sonuc-mesaj');
       m.className = 'sonuc-mesaj ' + (dogru ? 'd' : 'y');
-      m.textContent = dogru ? '✓ Doğru! Bu soruyu artık biliyorsan “Öğrendim” diyebilirsin.' : `✗ Yine olmadı; doğru cevap ${L[q.ans]}. Çözüme bakıp adımları takip et.`;
+      const t = ogrenilenler().has(x.anahtar) ? null : tekrarCevap(x, dogru);
+      m.textContent = !dogru ? `✗ Yine olmadı; doğru cevap ${L[q.ans]}. Çözüme bakıp adımları takip et.${t ? ' Bu soru yarın tekrar karşına çıkacak.' : ''}`
+        : !t ? '✓ Doğru!'
+        : t.durum === 'ogrenildi' ? '✓ Doğru! Üç tekrarda da doğru yaptın; bu soru öğrendiklerine taşındı. 🎉'
+        : t.durum === 'ileri' ? `✓ Doğru! Bir sonraki tekrar ${gunYaz(t.sonraki)} günü.`
+        : `✓ Doğru! Bu sorunun tekrar günü ${gunYaz(t.sonraki)}; o gün tekrar sorulacak.`;
+      el.querySelector('.tekrar-yer').innerHTML = t && t.durum !== 'ogrenildi' ? tekrarSatiri(x) : '';
+      if (t && t.durum === 'ogrenildi') { el.classList.add('ogrenildi'); el.querySelector('.ogren').textContent = '↩ Listeye geri al'; }
       if (!dogru) el.querySelector('details.cozum').open = true;
     });
     el.querySelector('.ogren').onclick = () => {

@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600..800&display=swap">
 <link rel="stylesheet" href="../cozum-kartlari/ortak/stil.css?v=20261016b">
-<link rel="stylesheet" href="../cozum-kartlari/ortak/giris.css?v=20261016c">
+<link rel="stylesheet" href="../cozum-kartlari/ortak/giris.css?v=20261018a">
 </head>
 <body>
 <div class="sayfa">
@@ -30,18 +30,24 @@
     <p class="not">İlerlemen yalnızca bu cihazda tutulur. Başka bir cihazda çözdüğün testler burada görünmez.</p>
   </section>
 
+  <section class="senin" id="seninIcin" data-seviye="7" data-kok="../cozum-kartlari/" aria-labelledby="senin-baslik" hidden>
+    <h2 id="senin-baslik" class="baslik-font">Senin için</h2>
+    <div class="senin-izgara" id="oneriler"></div>
+  </section>
+
   <section class="yol" aria-labelledby="yol-baslik">
     <h2 id="yol-baslik" class="baslik-font">Nasıl çalışmalıyım?</h2>
     <ol>
       <li><b>Tanı testi</b><span>Önce tanı testini çöz. Hangi konuda zorlandığını öğretmenin görür.</span></li>
       <li><b>Karma testler</b><span>Sonra karma testleri sırayla çöz. Üçüncü test en zorudur.</span></li>
-      <li><b>Tekrar et</b><span><a href="../cozum-kartlari/yanlislarim.html?seviye=7">Yanlışlarım</a> sayfasında hatalarını yeniden çöz ve çözümlerine bak.</span></li>
+      <li><b>Tekrar et</b><span><a href="../cozum-kartlari/yanlislarim.html?seviye=7">Yanlışlarım</a> sayfasında hatalarını 1, 3 ve 7 gün sonra yeniden çöz, çözümlerine bak.</span></li>
     </ol>
   </section>
 
   <section class="unite u-yedi" id="testler">
     <div class="unite-ust">
       <h2 class="baslik-font"><span class="simge" aria-hidden="true">±</span>Tam Sayılar ve Rasyonel Sayılar</h2>
+      <a class="dugme-ikincil" href="../cozum-kartlari/ozet.html?unite=yedi">📄 Konu özeti</a>
       <a class="dugme-ana" href="../cozum-kartlari/test.html?test=yedi-tanima">Tanı testine başla <small>· 30 dk</small></a>
     </div>
     <div class="sutunlar">
@@ -71,6 +77,18 @@
   <p class="imza">Hazırlayan: <span class="marka">Emre Hoca</span> · <a class="alt-baglanti" href="../cozum-kartlari/panel.html">Öğretmen paneli</a></p>
 </div>
 <script src="../cozum-kartlari/ortak/gecmis.js?v=20261006b"></script>
-<script src="../cozum-kartlari/ortak/ilerleme.js?v=20261016a"></script>
+<script src="../cozum-kartlari/ortak/ilerleme.js?v=20261018a"></script>
+<!-- "Senin için" bölümü: soru verileri sayfa göründükten sonra yüklenir -->
+<script src="../cozum-kartlari/ortak/ayarlar.js?v=20261018a"></script>
+<script src="../cozum-kartlari/ortak/yardimci.js?v=20261006b"></script>
+<script src="../cozum-kartlari/veri/yedi-sekil.js?v=20261014a"></script>
+<script src="../cozum-kartlari/veri/yedi-tanima.js?v=20261013d"></script>
+<script src="../cozum-kartlari/veri/yedi-test-1.js?v=20261014a"></script>
+<script src="../cozum-kartlari/veri/yedi-test-2.js?v=20261014a"></script>
+<script src="../cozum-kartlari/veri/yedi-test-3.js?v=20261014a"></script>
+<script src="../cozum-kartlari/ortak/sinavlar.js?v=20261014a"></script>
+<script src="../cozum-kartlari/ortak/tekrar.js?v=20261018a"></script>
+<script src="../cozum-kartlari/veri/ozet.js?v=20261018a"></script>
+<script src="../cozum-kartlari/ortak/oneri.js?v=20261018a"></script>
 </body>
 </html>

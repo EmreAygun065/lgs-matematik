@@ -9,6 +9,10 @@ window.SINIFLAR = ['7-A', '7-B', '8-A', '8-B', '8-C', '8-D', '8-E'];
 // 7. ve 8. sınıflar ayrı ana sayfalardan girer: 8'ler index.html, 7'ler 7-sinif/index.html.
 // Ortak sayfalar (test, yanlışlarım, çalışma kâğıdı) seviyeyi testin kendisinden ya da ?seviye=7 parametresinden anlar.
 window.seviyeSiniflari = sv => window.SINIFLAR.filter(s => s.startsWith(sv + '-'));
+// LGS geri sayımı (yalnızca 8. sınıf ana sayfası). Tarih kesinleşince KESIN true yapılır; "tahmini" yazısı kalkar.
+window.LGS_TARIHI = '2027-06-06';
+window.LGS_TARIHI_KESIN = false;
+
 window.anaSayfa = sv => (String(sv) === '7' ? '../7-sinif/index.html' : '../index.html');
 
 // Ad soyad denetimi (Apps Script'teki denetimle aynı kurallar). Sorun yoksa boş metin döner.
