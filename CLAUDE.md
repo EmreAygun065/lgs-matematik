@@ -79,6 +79,7 @@ Site herkese açıktır; bu dosya da sitede görünür. Bu yüzden buraya şifre
   - `stil.css` içinde telefon düzeni (`max-width: 640px`): sayfa başlığı sabit değil, marka konu seçimli sayfalarda gizli, geniş tablolar yana kayar.
 - `apps-script/sonuc-servisi.gs`: Google E-Tablo'ya yapıştırılan sonuç servisi kodu.
 - `araclar/deneme-uretici/`: deneme sorularını hesapla doğrulayıp veri dosyası üreten araç (aşağıda).
+- `araclar/video-uretici/`: çözüm videosu üretici (Playwright + ffmpeg). Kareli defter görünümlü sahneler → yatay (1920×1080) ve dikey (1080×1920) **sessiz** mp4, SRT altyazı ve saniyeli seslendirme metni. Sesi Emre Hoca ekler (ya da ses kaydını gönderir, ffmpeg ile birleştirilir). İlk örnek: 2026 LGS kırık mum sorusu (Ekim 2026).
 
 ## Sonuç sistemi (Google E-Tablo + Apps Script)
 

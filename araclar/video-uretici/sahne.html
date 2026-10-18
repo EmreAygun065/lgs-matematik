@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600..800&family=Inter:wght@400;600;700&display=swap">
+<style>
+  :root { --kagit: #fbfaf6; --kare: rgba(47, 127, 193, .14); --kenar: rgba(217, 72, 43, .5); --ink: #1f2328; --muted: #5d636b; --accent: #d9482b; --u: #2563a8; --u-soft: #e6eef8; --red-soft: #fbe4e1; --red: #c0392b; --green: #2e8b57; --green-soft: #e3f4ea; }
+  * { box-sizing: border-box; margin: 0; }
+  html, body { width: 100%; height: 100%; }
+  body {
+    font-family: Inter, "Segoe UI", system-ui, sans-serif; color: var(--ink); background-color: var(--kagit);
+    background-image: linear-gradient(var(--kare) 2px, transparent 2px), linear-gradient(90deg, var(--kare) 2px, transparent 2px);
+    background-size: 48px 48px; position: relative; overflow: hidden;
+  }
+  body::before { content: ""; position: absolute; top: 0; bottom: 0; left: 96px; width: 4px; background: var(--kenar); }
+  .cerceve { position: absolute; inset: 0; padding: 56px 96px 56px 150px; display: flex; flex-direction: column; gap: 36px; }
+  .ust { display: flex; align-items: center; justify-content: space-between; gap: 24px; }
+  .etiket { font-weight: 700; font-size: 34px; color: var(--u); }
+  .marka { background: var(--accent); color: #fff; font-weight: 800; font-size: 34px; border-radius: 999px; padding: 8px 30px; white-space: nowrap; font-family: "Bricolage Grotesque", Inter, sans-serif; }
+  .marka::before { content: "✎ "; font-weight: 400; }
+  .icerik { flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 34px; }
+  .alt { display: flex; justify-content: space-between; align-items: center; font-size: 28px; color: var(--muted); }
+  .adimlar { display: flex; gap: 12px; }
+  .adimlar i { width: 54px; height: 10px; border-radius: 99px; background: #d9d5cb; }
+  .adimlar i.on { background: var(--u); }
+  h1 { font-family: "Bricolage Grotesque", Inter, sans-serif; font-weight: 800; letter-spacing: -.02em; line-height: 1.02; }
+  h2 { font-family: "Bricolage Grotesque", Inter, sans-serif; font-weight: 800; font-size: 64px; line-height: 1.1; color: var(--u); }
+  .s-kapak h1 { font-size: 120px; }
+  .s-kapak p { font-size: 46px; color: var(--muted); }
+  .s-soru p { font-size: 40px; line-height: 1.42; }
+  .s-soru p.ask { font-weight: 700; }
+  .siklar { display: grid; grid-template-columns: repeat(4, 1fr); gap: 22px; }
+  .siklar div { background: #fff; border: 3px solid #d9d5cb; border-radius: 18px; padding: 18px 26px; font-size: 44px; font-weight: 600; }
+  .siklar div b { color: var(--accent); margin-right: 12px; }
+  .siklar div.dogru { border-color: var(--green); background: var(--green-soft); }
+  .satir { font-size: 52px; line-height: 1.35; }
+  .satir.kucuk { font-size: 40px; color: var(--muted); max-width: 30ch; }
+  .vurgu { background: var(--u-soft); border-radius: 18px; padding: 22px 32px; font-size: 60px; font-weight: 700; display: inline-block; }
+  .buyuk { font-family: "Bricolage Grotesque", Inter, sans-serif; font-size: 150px; font-weight: 800; color: var(--accent); line-height: 1; }
+  .paketler { display: flex; flex-direction: column; gap: 26px; }
+  .grup { display: flex; align-items: center; gap: 22px; flex-wrap: wrap; }
+  .grup .ad { font-size: 42px; font-weight: 700; min-width: 330px; }
+  .paket { width: 128px; height: 128px; border-radius: 16px; border: 4px solid var(--ink); display: grid; place-items: center; font-size: 54px; font-weight: 800; background: var(--red-soft); color: var(--red); }
+  .grup .sonuc { font-size: 42px; font-weight: 700; color: var(--u); }
+  .dikkat { background: var(--red-soft); border-left: 14px solid var(--red); border-radius: 18px; padding: 34px 40px; font-size: 50px; line-height: 1.35; }
+  .dikkat b.bas { color: var(--red); display: block; font-size: 58px; margin-bottom: 10px; }
+  .s-dur { text-align: center; align-items: center; }
+  .s-dur .buyuk { font-size: 170px; }
+  .s-dur p { font-size: 54px; }
+  .s-kapanis { text-align: center; align-items: center; }
+  .s-kapanis p { font-size: 48px; }
+  .adres { font-weight: 700; color: var(--u); }
+
+  /* Dikey (1080 × 1920) */
+  body.dikey { background-size: 40px 40px; }
+  body.dikey::before { left: 56px; }
+  .dikey .cerceve { padding: 70px 56px 70px 96px; gap: 40px; }
+  .dikey .ust { flex-direction: column; align-items: flex-start; gap: 18px; }
+  .dikey .etiket { font-size: 36px; }
+  .dikey .s-kapak h1 { font-size: 104px; }
+  .dikey .s-soru p { font-size: 40px; }
+  .dikey .siklar { grid-template-columns: 1fr 1fr; }
+  .dikey h2 { font-size: 66px; }
+  .dikey .satir { font-size: 50px; }
+  .dikey .grup .ad { min-width: 0; width: 100%; }
+  .dikey .paket { width: 120px; height: 120px; }
+  .dikey .buyuk { font-size: 140px; }
+</style>
+</head>
+<body>
+<div class="cerceve">
+  <div class="ust"><span class="etiket">2026 LGS · Çarpanlar ve Katlar</span><span class="marka">Emre Hoca</span></div>
+  <div class="icerik" id="icerik"></div>
+  <div class="alt"><span id="altYazi"></span><span class="adimlar" id="adimlar"></span></div>
+</div>
+<script>
+const SAHNELER = [
+  { tur: 'kapak', html: `<h1>Kırık mum sorusu</h1><p>EBOB ile paketleme · Zorluk: LGS</p>` },
+  { tur: 'soru', html: `<p>Bir imalathanede 168 adet beyaz renkli mum ile 200 adet sarı renkli mum üretilmiştir. Bu mumların tamamı, her bir pakette eşit sayıda ve tek renk mum olacak şekilde paketlenmiştir. Bu iş için <u>en az</u> sayıda paket kullanılmıştır. Paketleme sonrasında yapılan kontrolde, 17 adet beyaz mum ile 11 adet sarı mumun kırık olduğu tespit edilmiştir.</p>
+      <p class="ask">Buna göre, içinde kırık mum bulunmayan paketlerin sayısı <u>en fazla</u> kaçtır?</p>
+      <div class="siklar"><div><b>A)</b>40</div><div><b>B)</b>41</div><div><b>C)</b>42</div><div><b>D)</b>43</div></div>` },
+  { tur: 'dur', html: `<div class="buyuk">⏸</div><p>Videoyu durdur,<br>önce sen çöz!</p>` },
+  { adim: 1, html: `<h2>1. adım · Bir pakette kaç mum?</h2>
+      <div class="satir kucuk">En az paket için bir paketteki mum sayısı en büyük olmalı ve hem 168'i hem 200'ü bölmeli.</div>
+      <div class="satir">168 = 2³ · 3 · 7<br>200 = 2³ · 5²</div>
+      <div><span class="vurgu">EBOB(168, 200) = 2³ = 8</span></div>` },
+  { adim: 2, html: `<h2>2. adım · Kaç paket var?</h2>
+      <div class="satir">Beyaz: 168 ÷ 8 = 21 paket<br>Sarı: 200 ÷ 8 = 25 paket</div>
+      <div><span class="vurgu">Toplam: 21 + 25 = 46 paket</span></div>` },
+  { adim: 3, html: `<h2>3. adım · Kırık mumları az pakete topla</h2>
+      <div class="paketler">
+        <div class="grup"><span class="ad">17 kırık beyaz:</span><span class="paket">8</span><span class="paket">8</span><span class="paket">1</span><span class="sonuc">→ 3 paket</span></div>
+        <div class="grup"><span class="ad">11 kırık sarı:</span><span class="paket">8</span><span class="paket">3</span><span class="sonuc">→ 2 paket</span></div>
+      </div>
+      <div class="satir kucuk">Kırık mumlar ne kadar az pakete toplanırsa o kadar çok paket kırıksız kalır.</div>` },
+  { adim: 4, html: `<h2>4. adım · Sonuç</h2>
+      <div class="satir">Kırık mumlu paket: 3 + 2 = 5</div>
+      <div class="buyuk">46 − 5 = 41</div>
+      <div class="siklar"><div><b>A)</b>40</div><div class="dogru"><b>B)</b>41</div><div><b>C)</b>42</div><div><b>D)</b>43</div></div>` },
+  { tur: 'dikkat', html: `<div class="dikkat"><b class="bas">⚠ Dikkat, tuzak!</b>17 ÷ 8 ≈ 2,1 deyip<br>“2 paket” demek yanlış.<br>17 mum 2 pakete sığmaz: <b>3 paket</b> gerekir.</div>` },
+  { tur: 'kapanis', html: `<h1 style="font-size:96px">Benzer soruları çöz!</h1><p class="adres">emreaygun065.github.io/lgs-matematik</p><p>Çözüm kartları · online testler · denemeler</p>` }
+];
+const p = new URLSearchParams(location.search);
+const s = SAHNELER[+p.get('s') || 0];
+if (p.get('yon') === 'dikey') document.body.classList.add('dikey');
+const ic = document.getElementById('icerik');
+ic.className = 'icerik s-' + (s.tur || 'adim');
+ic.innerHTML = s.html;
+document.getElementById('altYazi').textContent = s.adim ? `Adım ${s.adim} / 4` : '';
+document.getElementById('adimlar').innerHTML = s.adim ? [1, 2, 3, 4].map(i => `<i class="${i <= s.adim ? 'on' : ''}"></i>`).join('') : '';
+window.SAHNE_SAYISI = SAHNELER.length;
+</script>
+</body>
+</html>
