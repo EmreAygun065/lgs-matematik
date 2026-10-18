@@ -55,8 +55,9 @@ a.karo:hover { border-color: var(--u); background: var(--u-soft); }
 .yol li a { color: var(--ink); font-weight: 600; }
 
 /* Ünite bölümleri */
-.unite { margin-top: 2.6rem; scroll-margin-top: 1rem; }
-.unite-ust { display: flex; align-items: center; flex-wrap: wrap; gap: .6rem 1rem; padding-bottom: .7rem; margin-bottom: 1rem; border-bottom: 3px solid var(--u); }
+/* Her bölüm üstündeki ünite renginde çizgiyle başlar; çizgi bölümleri birbirinden ayırır. */
+.unite { margin-top: 2.6rem; padding-top: 1.1rem; border-top: 4px solid var(--u); scroll-margin-top: 1rem; }
+.unite-ust { display: flex; align-items: center; flex-wrap: wrap; gap: .6rem 1rem; margin-bottom: 1.1rem; }
 .unite-ust h2 { margin: 0; flex: 1; display: flex; align-items: baseline; gap: .7rem; }
 .unite-ust h2 .simge { color: var(--u); font-weight: 700; min-width: 1.6rem; }
 a.dugme-ana { text-decoration: none; background: var(--accent); color: #fff; font-weight: 700; border-radius: 10px; padding: .5rem 1rem; white-space: nowrap; }
