@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Konu Anlatım Videoları · Emre Hoca</title>
+<script>try { const t = localStorage.getItem('tema'); if (t) document.documentElement.dataset.theme = t; if (localStorage.getItem('tahta') === '1') document.documentElement.classList.add('tahta'); } catch (e) {}</script>
+<link rel="stylesheet" href="ortak/stil.css?v=20261016b">
+<style>
+  .sayfa { max-width: 920px; margin: 0 auto; padding: 1rem 1rem 4rem; }
+  .ust { display: flex; align-items: center; gap: .6rem .8rem; flex-wrap: wrap; margin-bottom: 1rem; }
+  .ust h1 { font-size: 1.3rem; margin: 0; flex: 1; min-width: 0; }
+  .ust button { font: inherit; font-size: .9rem; border: 1px solid var(--line); background: var(--card); color: var(--ink); border-radius: 8px; padding: .35rem .7rem; cursor: pointer; }
+  .ust button[aria-pressed="true"] { background: var(--u); border-color: var(--u); color: var(--card); }
+  .giris { color: var(--muted); margin: 0 0 .6rem; }
+  .ipucu { background: var(--u-soft); border-radius: 10px; padding: .6rem .9rem; margin: 0 0 1.2rem; font-size: .95rem; }
+  .ipucu b { color: var(--u); }
+  .icindekiler { display: flex; flex-wrap: wrap; gap: .4rem; margin: 0 0 1.4rem; padding: 0; list-style: none; }
+  .icindekiler a { display: block; text-decoration: none; color: var(--ink); background: var(--card); border: 1.5px solid var(--line); border-radius: 999px; padding: .3rem .8rem; font-weight: 600; font-size: .9rem; }
+  .icindekiler a:hover { border-color: var(--u); background: var(--u-soft); }
+  .video-kart { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 1.1rem 1.3rem 1.2rem; margin-bottom: 1.2rem; scroll-margin-top: 1rem; }
+  .video-kart h2 { margin: 0 0 .7rem; font-size: 1.2rem; display: flex; gap: .6rem; align-items: baseline; flex-wrap: wrap; }
+  .video-kart h2 .no { color: var(--u); font-variant-numeric: tabular-nums; }
+  .video-kart h2 .sure { margin-left: auto; font-size: .85rem; font-weight: 600; color: var(--muted); border: 1px solid var(--line); border-radius: 999px; padding: .1rem .55rem; }
+  .video-kart video { display: block; width: 100%; aspect-ratio: 16 / 9; background: #000; border-radius: 10px; }
+  .video-kart p.aciklama { margin: .8rem 0 .5rem; }
+  .etiketler { display: flex; flex-wrap: wrap; gap: .35rem; margin: 0; padding: 0; list-style: none; }
+  .etiketler li { background: var(--u-soft); color: var(--ink); border-radius: 999px; padding: .15rem .65rem; font-size: .88rem; font-weight: 600; }
+  .baglantilar { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: 1.4rem; }
+  .baglantilar a { text-decoration: none; color: var(--ink); background: var(--card); border: 1.5px solid var(--line); border-radius: 10px; padding: .45rem .8rem; font-weight: 600; font-size: .92rem; }
+  .baglantilar a:hover { border-color: var(--u); background: var(--u-soft); }
+  /* Tahta modu: akıllı tahtada uzaktan okunsun diye yazılar ve video büyür */
+  html.tahta { font-size: clamp(20px, 1.9vw, 32px); }
+  html.tahta .sayfa { max-width: 1400px; }
+  @media (max-width: 640px) { .video-kart { padding: .9rem; } .ust h1 { flex-basis: calc(100% - 3.2rem); } }
+</style>
+</head>
+<body>
+<script src="ortak/ayarlar.js?v=20261018b"></script>
+<script src="veri/videolar.js?v=20261019a"></script>
+<script>
+(function () {
+  const KODLAR = Object.keys(window.VIDEOLAR);
+  const istenen = new URLSearchParams(location.search).get('unite');
+  const kod = KODLAR.includes(istenen) ? istenen : 'uslu';
+  const u = window.VIDEOLAR[kod];
+  const yedi = u.sinif === 7;
+  document.documentElement.dataset.unite = kod;
+  document.title = u.ad + ' · Konu Anlatım Videoları · Emre Hoca';
+
+  document.body.innerHTML = `<div class="sayfa">
+    <div class="ust">
+      <a class="home" href="${anaSayfa(yedi ? 7 : 8)}" title="Ana sayfa">⌂</a>
+      <h1>${u.ad} · Konu Anlatım Videoları</h1>
+      <button id="tahtaBtn" aria-pressed="false" title="Yazıları akıllı tahta için büyütür">🖥 Tahta modu</button>
+      <button id="temaBtn" title="Açık / koyu tema">◐ Tema</button>
+    </div>
+    <p class="giris">${yedi ? '7. sınıf' : '8. sınıf'} · Kısa animasyonlu konu anlatımları. Sırayla izlemen önerilir.</p>
+    <p class="ipucu"><b>Nasıl izlemeli?</b> Sarı “Videoyu durdur” kartı çıkınca videoyu durdur, cevabı önce kendin bul.
+      Sondaki “Sıra sende” sorularını defterine çöz.</p>
+    ${u.videolar.length > 1 ? `<ul class="icindekiler">${u.videolar.map((v, i) => `<li><a href="#${v.id}">${i + 1}. ${v.ad}</a></li>`).join('')}</ul>` : ''}
+    ${u.videolar.map((v, i) => `<section class="video-kart" id="${v.id}">
+      <h2><span class="no">${i + 1}.</span><span>${v.ad}</span><span class="sure" title="Süre">⏱ ${v.sure}</span></h2>
+      <video controls preload="none" playsinline poster="${v.kapak}" aria-label="${v.ad}">
+        <source src="${v.dosya}" type="video/mp4">
+        Tarayıcın bu videoyu oynatamıyor. <a href="${v.dosya}">Videoyu indir</a>.
+      </video>
+      <p class="aciklama">${v.aciklama}</p>
+      <ul class="etiketler">${v.konular.map(k => `<li>${k}</li>`).join('')}</ul>
+    </section>`).join('')}
+    <div class="baglantilar">
+      <a href="${u.ozet}">📄 Konu özeti</a>
+      <a href="${u.test}">📝 ${yedi ? 'Tanı testini çöz' : 'Online test çöz'}</a>
+      <a href="yanlislarim.html${yedi ? '?seviye=7' : ''}">📒 Yanlışlarım</a>
+    </div>
+    <p class="imza">Hazırlayan: <span class="marka">Emre Hoca</span></p>
+  </div><div class="imza-sabit">Emre Hoca · LGS Matematik</div>`;
+
+  // Bir video başlayınca diğerleri dursun
+  const videolar = [...document.querySelectorAll('video')];
+  videolar.forEach(v => v.addEventListener('play', () => videolar.forEach(o => { if (o !== v) o.pause(); })));
+
+  const root = document.documentElement, $ = id => document.getElementById(id);
+  const tahtaYaz = () => $('tahtaBtn').setAttribute('aria-pressed', root.classList.contains('tahta'));
+  $('tahtaBtn').onclick = () => { root.classList.toggle('tahta'); tahtaYaz(); try { localStorage.setItem('tahta', root.classList.contains('tahta') ? '1' : '0'); } catch (e) {} };
+  tahtaYaz();
+  $('temaBtn').onclick = () => {
+    const koyu = root.dataset.theme ? root.dataset.theme === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
+    root.dataset.theme = koyu ? 'light' : 'dark';
+    try { localStorage.setItem('tema', root.dataset.theme); } catch (e) {}
+  };
+  if (location.hash && $(location.hash.slice(1))) $(location.hash.slice(1)).scrollIntoView();
+})();
+</script>
+</body>
+</html>

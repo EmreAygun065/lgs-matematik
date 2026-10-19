@@ -85,6 +85,10 @@ a.dugme-ana small { font-weight: 500; opacity: .85; }
 .sutun li a span { flex: 1; min-width: 0; }
 .sutun li a em { font-style: normal; font-variant-numeric: tabular-nums; font-weight: 700; font-size: .8rem; color: var(--u); background: var(--u-soft); border-radius: 999px; padding: .1rem .55rem; white-space: nowrap; }
 .sutun li a em::after { content: " soru"; font-weight: 500; }
+/* Tam genişlikte sütun (konu anlatım videoları): bağlantılar yan yana dizilir; rozet süreyi gösterir */
+.sutun.genis { grid-column: 1 / -1; }
+.sutun.genis ul { grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); }
+.sutun li a em.sure::after { content: none; }
 
 .ipucu { margin-top: 2.5rem; color: var(--muted); font-size: .88rem; border-left: 3px solid var(--line); padding-left: .8rem; }
 .alt-baglanti { color: var(--muted); font-size: .9rem; }
