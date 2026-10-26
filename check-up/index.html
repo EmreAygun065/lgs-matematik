@@ -1,0 +1,502 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>LGS Matematik Check-Up · Emre Hoca</title>
+<meta name="description" content="25 soruluk ücretsiz LGS matematik tanılama testi. 5 beceri alanında nerede güçlü, nerede eksik olduğunu gör.">
+<script>try { const t = localStorage.getItem('tema'); if (t) document.documentElement.dataset.theme = t; } catch (e) {}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Figtree:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: tek sütun sınav akışı — giriş, soru-soru ilerleme (optik şerit), sonuç raporu */
+:root {
+  --bg: #f2f6f5; --surface: #ffffff; --surface2: #e6eeec; --fg: #10292a; --muted: #536b6b; --line: #d3dfdd;
+  --accent: #0f7c74; --accent-ink: #ffffff; --accent-soft: #d8ecea; --mark: #10292a; --mark-ink: #4fd1c1;
+  --good: #1d7a46; --good-soft: #e1f2e7; --bad: #b3261e; --bad-soft: #fbe9e7; --warn: #8a5a00; --warn-soft: #f7ecd4;
+  --f-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-body: "Figtree", "Segoe UI", system-ui, -apple-system, sans-serif;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0c1a1b; --surface: #132627; --surface2: #1b3334; --fg: #e5f0ee; --muted: #95adab; --line: #284142;
+  --accent: #4fd1c1; --accent-ink: #062320; --accent-soft: #173a38; --mark: #e5f0ee; --mark-ink: #0f7c74;
+  --good: #5cc98a; --good-soft: #15321f; --bad: #ff8a80; --bad-soft: #3a1c1a; --warn: #e2b04f; --warn-soft: #3a2e14;
+  color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #0c1a1b; --surface: #132627; --surface2: #1b3334; --fg: #e5f0ee; --muted: #95adab; --line: #284142;
+  --accent: #4fd1c1; --accent-ink: #062320; --accent-soft: #173a38; --mark: #e5f0ee; --mark-ink: #0f7c74;
+  --good: #5cc98a; --good-soft: #15321f; --bad: #ff8a80; --bad-soft: #3a1c1a; --warn: #e2b04f; --warn-soft: #3a2e14;
+  color-scheme: dark }
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; }
+img { max-width: 100%; }
+body { background: var(--bg); color: var(--fg); font: 16px/1.55 var(--f-body); }
+.kap { max-width: 720px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 20px 56px; }
+h1, h2, h3 { font-family: var(--f-display); margin: 0; line-height: 1.12; text-wrap: balance; letter-spacing: -.01em; }
+h1 { font-size: clamp(1.9rem, 6vw, 2.6rem); font-weight: 800; }
+h2 { font-size: 1.35rem; font-weight: 800; }
+h3 { font-size: 1.05rem; font-weight: 700; }
+p { margin: 0; }
+.soluk { color: var(--muted); }
+.kucuk { font-size: .88rem; }
+.num { font-variant-numeric: tabular-nums; }
+.etiket { font-size: .75rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); }
+button, input, select { font: inherit; color: inherit; }
+button:focus-visible, input:focus-visible, select:focus-visible, a:focus-visible, summary:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.dugme { appearance: none; border: 1px solid var(--line); background: var(--surface); color: var(--fg); border-radius: 10px; padding: 12px 18px; min-height: 48px; font-weight: 700; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
+.dugme:hover { border-color: var(--accent); }
+.dugme.ana { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.dugme.ana:hover { filter: brightness(1.06); }
+.dugme.duz { background: transparent; }
+.dugme:disabled { opacity: .45; cursor: default; }
+.satir { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+
+/* Üst marka */
+.ust { display: flex; align-items: center; gap: 12px; margin-bottom: 22px; }
+.logo { width: 42px; height: 42px; border-radius: 11px; background: var(--mark); color: var(--bg); display: grid; place-items: center; font: 800 17px var(--f-display); flex: none; }
+.logo i { font-style: normal; color: var(--mark-ink); }
+.eve { display: flex; align-items: center; gap: 12px; color: inherit; text-decoration: none; }
+.ust b { display: block; font: 700 1rem var(--f-display); }
+.ust span { font-size: .82rem; color: var(--muted); }
+
+/* Giriş */
+.giris { display: grid; gap: 22px; }
+.giris .ozet { font-size: 1.08rem; max-width: 60ch; }
+.olcu { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.olcu div { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; min-width: 0; }
+.olcu b { display: block; font: 800 1.6rem/1.1 var(--f-display); font-variant-numeric: tabular-nums; }
+.olcu span { font-size: .82rem; color: var(--muted); }
+.alanlar { display: grid; gap: 6px; margin: 0; padding: 0; list-style: none; counter-reset: a; }
+.alanlar li { display: flex; gap: 10px; align-items: baseline; padding: 8px 0; border-bottom: 1px solid var(--line); }
+.alanlar li b { min-width: 0; flex: 1; font-weight: 600; }
+.alanlar li span { color: var(--muted); font-size: .85rem; white-space: nowrap; }
+.form { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 16px; display: grid; gap: 14px; }
+.form .iki { display: grid; grid-template-columns: 1fr 9rem; gap: 12px; }
+.form label { display: grid; gap: 4px; font-size: .85rem; font-weight: 600; color: var(--muted); min-width: 0; }
+.form input, .form select { width: 100%; min-width: 0; min-height: 46px; padding: 8px 12px; border-radius: 10px; border: 1px solid var(--line); background: var(--bg); color: var(--fg); }
+.gizlilik { font-size: .82rem; color: var(--muted); }
+.hata { color: var(--bad); font-weight: 600; font-size: .82rem; }
+.form input[aria-invalid="true"] { border-color: var(--bad); }
+.devam { background: var(--accent-soft); border-radius: 12px; padding: 12px 14px; display: grid; gap: 10px; }
+
+/* Soru ekranı */
+.cubuk { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--bg); padding-block: 8px 10px; display: grid; gap: 8px; }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--bg); }
+.cubuk .bas { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
+.cubuk .bas b { font: 700 .95rem var(--f-display); min-width: 0; }
+.sure { font: 700 .95rem var(--f-display); font-variant-numeric: tabular-nums; color: var(--muted); white-space: nowrap; }
+.optik { display: grid; grid-template-columns: repeat(25, minmax(0, 1fr)); gap: 3px; }
+.optik button { appearance: none; border: 1.5px solid var(--line); background: var(--surface); border-radius: 999px; aspect-ratio: 1; padding: 0; font-size: .6rem; font-weight: 700; color: var(--muted); cursor: pointer; min-width: 0; display: grid; place-items: center; font-variant-numeric: tabular-nums; }
+.optik button.dolu { background: var(--fg); border-color: var(--fg); color: var(--bg); }
+.optik button.bos { border-style: dashed; border-color: var(--warn); color: var(--warn); }
+.optik button.simdi { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent); }
+.optik button.ayrac { margin-left: 4px; }
+@media (max-width: 520px) { .optik { grid-template-columns: repeat(13, minmax(0, 1fr)); } .optik button { font-size: .66rem; } .optik button.ayrac { margin-left: 0; } }
+.kart { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 18px; display: grid; gap: 14px; margin-top: 6px; }
+.kart .ust2 { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
+.rozet { font-size: .74rem; font-weight: 700; padding: 3px 10px; border-radius: 999px; background: var(--surface2); color: var(--muted); }
+.rozet.zor { background: var(--warn-soft); color: var(--warn); }
+.metin { display: grid; gap: 12px; font-size: 1.04rem; min-width: 0; }
+.islem { background: var(--surface2); border-radius: 10px; padding: 14px; text-align: center; font: 700 1.3rem var(--f-display); font-variant-numeric: tabular-nums; overflow-x: auto; }
+.kesir { display: inline-flex; flex-direction: column; align-items: center; vertical-align: middle; line-height: 1.05; margin: 0 .12em; font-variant-numeric: tabular-nums; }
+.kesir > span:first-child { border-bottom: 1.5px solid currentColor; padding: 0 .2em .05em; }
+.kesir > span:last-child { padding: .05em .2em 0; }
+.tablo { overflow-x: auto; }
+.tablo table { border-collapse: collapse; width: 100%; font-size: .95rem; font-variant-numeric: tabular-nums; }
+.tablo th, .tablo td { border: 1px solid var(--line); padding: 7px 10px; text-align: center; }
+.tablo th { background: var(--surface2); font-weight: 700; }
+.zaman { display: flex; align-items: center; gap: 8px; font-weight: 600; font-variant-numeric: tabular-nums; font-size: .92rem; }
+.zaman i { flex: 1; height: 3px; background: var(--accent); border-radius: 3px; position: relative; }
+.zaman i::after { content: ""; position: absolute; right: -2px; top: -4px; border: 5.5px solid transparent; border-left: 8px solid var(--accent); border-right: 0; }
+.sekil { display: block; width: 100%; max-width: 380px; height: auto; margin: 0 auto; }
+.sekil text { fill: var(--fg); font: 14px var(--f-body); }
+.sira { margin: 0 auto; border: 1px solid var(--line); border-radius: 10px; padding: 8px 18px; display: grid; gap: 4px; min-width: 10rem; font-variant-numeric: tabular-nums; }
+.madde { margin: 0; padding-left: 1.2em; display: grid; gap: 4px; }
+.secenekler { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+@media (max-width: 460px) { .secenekler { grid-template-columns: 1fr; } }
+.secenek { appearance: none; text-align: left; border: 1.5px solid var(--line); background: var(--bg); border-radius: 12px; padding: 12px 14px; min-height: 54px; cursor: pointer; display: flex; align-items: center; gap: 12px; font-size: 1.02rem; color: var(--fg); }
+.secenek:hover { border-color: var(--accent); }
+.secenek .harf { width: 30px; height: 30px; border-radius: 999px; border: 1.5px solid var(--muted); display: grid; place-items: center; font-weight: 700; font-size: .9rem; flex: none; }
+.secenek[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); }
+.secenek[aria-pressed="true"] .harf { background: var(--fg); border-color: var(--fg); color: var(--bg); }
+.alt { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin-top: 14px; }
+.alt .satir { flex: 1 1 auto; justify-content: flex-end; }
+.bosbirak { appearance: none; border: 0; background: none; color: var(--muted); font-weight: 600; cursor: pointer; padding: 8px 0; text-decoration: underline; text-underline-offset: 3px; }
+.bosbirak[aria-pressed="true"] { color: var(--warn); }
+.onay { margin-top: 14px; background: var(--warn-soft); color: var(--fg); border: 1px solid var(--warn); border-radius: 12px; padding: 14px; display: grid; gap: 10px; }
+
+/* Sonuç */
+.sonuc { display: grid; gap: 22px; }
+.skor { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+@media (max-width: 520px) { .skor { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.skor div { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; min-width: 0; }
+.skor small { display: block; font-size: .76rem; font-weight: 700; color: var(--muted); letter-spacing: .04em; text-transform: uppercase; }
+.skor b { display: block; font: 800 1.7rem/1.15 var(--f-display); font-variant-numeric: tabular-nums; }
+.skor .vurgu { background: var(--fg); border-color: var(--fg); color: var(--bg); }
+.skor .vurgu small { color: inherit; opacity: .75; }
+.yorum { font-size: 1.06rem; max-width: 62ch; }
+.alan { display: grid; gap: 6px; padding: 12px 0; border-bottom: 1px solid var(--line); }
+.alan .bas { display: flex; justify-content: space-between; gap: 10px; align-items: baseline; }
+.alan .bas b { min-width: 0; font-weight: 700; }
+.alan .bas span { font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.serit { height: 12px; border-radius: 999px; background: var(--surface2); overflow: hidden; }
+.serit i { display: block; height: 100%; border-radius: 999px; background: var(--accent); }
+.alan.zayif .serit i { background: var(--bad); }
+.alan.zayif .bas span { color: var(--bad); }
+.alan p { font-size: .9rem; color: var(--muted); }
+.durum { font-size: .72rem; font-weight: 700; padding: 2px 8px; border-radius: 999px; margin-left: 6px; vertical-align: 2px; }
+.durum.iyi { background: var(--good-soft); color: var(--good); }
+.durum.oncelik { background: var(--bad-soft); color: var(--bad); }
+.beceri { display: flex; flex-wrap: wrap; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.beceri li { background: var(--surface); border: 1px solid var(--line); border-radius: 999px; padding: 5px 12px; font-size: .88rem; }
+.cagri { background: var(--fg); color: var(--bg); border-radius: 16px; padding: 18px; display: grid; gap: 12px; }
+.cagri p { max-width: 60ch; }
+.cagri .dugme.ana { background: var(--mark-ink); border-color: var(--mark-ink); color: var(--fg); }
+.cagri .dugme.duz { color: var(--bg); border-color: currentColor; }
+.cagri .numara { font-size: .88rem; opacity: .8; }
+.cagri textarea { width: 100%; min-height: 96px; border-radius: 10px; border: 0; padding: 10px 12px; font: .9rem/1.45 var(--f-body); background: var(--bg); color: var(--fg); resize: vertical; }
+.inceleme { display: grid; gap: 8px; }
+.inceleme details { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 10px 14px; }
+.inceleme summary { cursor: pointer; display: flex; gap: 10px; align-items: center; list-style: none; font-weight: 600; }
+.inceleme summary::-webkit-details-marker { display: none; }
+.inceleme summary .ns { font-variant-numeric: tabular-nums; min-width: 2.2em; color: var(--muted); }
+.inceleme summary .ne { flex: 1; min-width: 0; }
+.inceleme summary .ok { color: var(--muted); font-size: .85rem; }
+.isaret { font-size: .78rem; font-weight: 700; padding: 2px 9px; border-radius: 999px; white-space: nowrap; }
+.isaret.d { background: var(--good-soft); color: var(--good); }
+.isaret.y { background: var(--bad-soft); color: var(--bad); }
+.isaret.b { background: var(--warn-soft); color: var(--warn); }
+.icerik { display: grid; gap: 12px; padding-top: 12px; }
+.cozum { background: var(--surface2); border-radius: 10px; padding: 12px 14px; display: grid; gap: 4px; }
+.cozum b { color: var(--good); }
+.bildirim { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(18px + env(safe-area-inset-bottom, 0px)); background: var(--fg); color: var(--bg); padding: 10px 16px; border-radius: 10px; font-weight: 600; font-size: .92rem; max-width: calc(100% - 32px); z-index: 20; }
+@media (prefers-reduced-motion: no-preference) { .serit i { transition: width .6s ease-out; } }
+</style>
+</head>
+<body>
+<div class="kap">
+  <header class="ust"><a class="eve" href="../" aria-label="Emre Hoca ana sayfa">
+    <div class="logo" aria-hidden="true">E<i>H</i></div>
+    <div><b>Emre Hoca</b><span>LGS Matematik</span></div></a>
+  </header>
+
+  <!-- 1. Giriş -->
+  <section id="giris" class="giris" aria-labelledby="g-baslik">
+    <div style="display:grid;gap:10px">
+      <span class="etiket">Ücretsiz tanılama testi</span>
+      <h1 id="g-baslik">LGS Matematik Check-Up</h1>
+      <p class="ozet">Kaç net yaptığını değil, <b>neden puan kaybettiğini</b> gösteren 25 soruluk test. Sonunda 5 beceri alanında nerede güçlü, nerede eksik olduğunu görürsün.</p>
+    </div>
+    <div class="olcu">
+      <div><b>25</b><span>soru</span></div>
+      <div><b>50</b><span>dakika önerilen</span></div>
+      <div><b>5</b><span>beceri alanı</span></div>
+    </div>
+    <ol class="alanlar" id="alanListe"></ol>
+    <div id="devam" class="devam" hidden>
+      <p><b>Yarım kalan bir testin var.</b> <span id="devamBilgi"></span></p>
+      <div class="satir"><button class="dugme ana" type="button" id="devamEt">Kaldığın yerden devam et</button><button class="dugme duz" type="button" id="sifirla">Baştan başla</button></div>
+    </div>
+    <form class="form" id="basForm" novalidate>
+      <div class="iki">
+        <label for="ad">Adın <span>(isteğe bağlı)</span><input id="ad" autocomplete="given-name" maxlength="20" placeholder="Örn. Elif" aria-describedby="adHata"><span class="hata" id="adHata" hidden></span></label>
+        <label for="sinif">Sınıfın<select id="sinif"><option>8. sınıf</option><option>7. sınıf</option><option>6. sınıf</option></select></label>
+      </div>
+      <button class="dugme ana" type="submit">Teste başla</button>
+      <p class="gizlilik">Cevapların yalnızca bu cihazda tutulur, hiçbir yere gönderilmez. Kâğıt ve kalem hazırla; hesap makinesi kullanma.</p>
+    </form>
+  </section>
+
+  <!-- 2. Sorular -->
+  <section id="test" hidden aria-label="Test">
+    <div class="cubuk">
+      <div class="bas"><b id="bolumAd"></b><span class="sure" id="sure" aria-label="Geçen süre">00:00</span></div>
+      <nav class="optik" id="optik" aria-label="Sorular"></nav>
+    </div>
+    <article class="kart" id="kart" aria-live="polite"></article>
+    <div class="alt">
+      <button class="bosbirak" type="button" id="bosBirak" aria-pressed="false">Boş bırak</button>
+      <div class="satir">
+        <button class="dugme duz" type="button" id="geri">Önceki</button>
+        <button class="dugme ana" type="button" id="ileri">Sonraki</button>
+      </div>
+    </div>
+    <div class="satir" style="margin-top:12px;justify-content:center"><button class="dugme duz" type="button" id="bitirAc">Testi bitir</button></div>
+    <div class="onay" id="onay" hidden role="alert">
+      <p id="onayMetin"></p>
+      <div class="satir"><button class="dugme ana" type="button" id="bitir">Bitir ve sonucu gör</button><button class="dugme duz" type="button" id="vazgec">Teste dön</button></div>
+    </div>
+  </section>
+
+  <!-- 3. Sonuç -->
+  <section id="sonuc" class="sonuc" hidden aria-labelledby="s-baslik"></section>
+</div>
+<div class="bildirim" id="bildirim" hidden role="status"></div>
+
+<script>
+(function () {
+"use strict";
+/* ---- Ayarlar: WhatsApp numarasını buraya yaz (ülke koduyla, boşluksuz). Boş kalırsa mesaj kopyalanır. ---- */
+const WHATSAPP = "905412797961";
+const NUMARA_GORUNEN = "0541 279 79 61";
+
+/* ---- İsim süzgeci: yalnızca gerçek görünen isimler; küfür, hakaret ve anlamsız yazı geçmez ---- */
+const SADELESTIR = s => s.toLocaleLowerCase("tr-TR").replace(/ç/g, "c").replace(/ğ/g, "g").replace(/ı/g, "i").replace(/ö/g, "o").replace(/ş/g, "s").replace(/ü/g, "u").replace(/[âà]/g, "a").replace(/[îì]/g, "i").replace(/[ûù]/g, "u").replace(/(.)\1+/g, "$1");
+// Kelimenin içinde geçmesi yeterli olanlar (isimlerde rastlanmayan uzun kökler)
+const YASAK_KOK = ["orospu", "pezevenk", "yavsak", "serefsiz", "gerizekal", "kahpe", "yarak", "yarag", "siktir", "sikerim", "sikim", "sikis", "amcik", "amina", "aminako", "ananiz", "anani", "ibne", "gavat", "kavat", "pust", "dalyarak", "tasak", "sokarim", "kodum", "hassiktir", "gotveren", "gotlek", "salak", "aptal", "embesil", "dangalak", "haysiyetsiz", "kopek", "esek", "domuz", "hayvan", "manyak", "zirdeli", "fuck", "shit", "bitch", "sex", "seks", "porn", "admin", "test"];
+// Yalnızca tek başına kelime olarak yasak olanlar (isim içinde geçebilen kısa kökler)
+const YASAK_KELIME = ["mal", "aq", "amk", "oc", "got", "pic", "sik", "am", "lan", "ulan", "bok", "yarra", "dingil", "angut", "ezik", "keko", "hiyar", "abuk", "sabuk", "deneme", "asdf", "qwe", "xxx", "abc"];
+function adKontrol(ham) {
+  const s = ham.replace(/\s+/g, " ").trim();
+  if (!s) return { ok: true, ad: "" };
+  const hata = "Lütfen gerçek adını yaz ya da bu kutuyu boş bırak.";
+  if (s.length > 20 || !/^[a-zA-ZçğıöşüÇĞİÖŞÜâîûÂÎÛ]+( [a-zA-ZçğıöşüÇĞİÖŞÜâîûÂÎÛ]+)?$/.test(s)) return { ok: false, hata: "Adında yalnızca harf olabilir (en fazla iki kelime, 20 harf)." };
+  const kelimeler = s.split(" ");
+  for (const w of kelimeler) {
+    const l = w.toLocaleLowerCase("tr-TR");
+    if (w.length < 2) return { ok: false, hata };
+    if (/(.)\1\1/.test(l)) return { ok: false, hata };                       // aaa, kkk
+    if (!/[aeıioöuüâîû]/.test(l)) return { ok: false, hata };                 // sesli harf yok
+    if (/[^aeıioöuüâîû]{4,}/.test(l)) return { ok: false, hata };             // 4+ ünsüz yan yana
+  }
+  const sade = kelimeler.map(SADELESTIR), bitisik = sade.join("");
+  if (sade.some(w => YASAK_KELIME.includes(w)) || YASAK_KOK.some(k => bitisik.includes(k))) return { ok: false, hata: "Bu isim kullanılamaz. Gerçek adını yaz ya da boş bırak." };
+  const duzgun = kelimeler.map(w => w.charAt(0).toLocaleUpperCase("tr-TR") + w.slice(1).toLocaleLowerCase("tr-TR")).join(" ");
+  return { ok: true, ad: duzgun };
+}
+
+const k = (a, b) => '<span class="kesir"><span>' + a + '</span><span>' + b + '</span></span>';
+const tablo = (bas, satirlar) => '<div class="tablo"><table><thead><tr>' + bas.map(h => '<th scope="col">' + h + '</th>').join('') + '</tr></thead><tbody>' + satirlar.map(r => '<tr>' + r.map(c => '<td>' + c + '</td>').join('') + '</tr>').join('') + '</tbody></table></div>';
+
+const BOLUMLER = [
+  { ad: "Temel Matematik Altyapısı", kisa: "Temel altyapı", bas: 1, son: 5, oneri: "Kesir, oran ve yüzde sağlam değilse 8. sınıf konuları üstüne kurulamaz. Önce bu temeli kapatmak gerekir." },
+  { ad: "8. Sınıf Hazırbulunuşluğu", kisa: "Hazırbulunuşluk", bas: 6, son: 10, oneri: "EBOB-EKOK, bölen sayısı ve üslü ifadeler LGS'nin ilk ünitelerinin temeli. Buradaki eksik, denemelerde ilk soruları götürür." },
+  { ad: "Muhakeme ve Problem Çözme", kisa: "Muhakeme", bas: 11, son: 16, oneri: "Konuyu biliyor ama soruyu denkleme ya da orana çeviremiyorsan puan burada kaçar. Çözüm adım adım model kurma çalışması." },
+  { ad: "Yeni Nesil Diagnostik", kisa: "Yeni nesil", bas: 17, son: 22, oneri: "Tablo okuma, koşul eleme ve uzun metinden doğru veriyi seçme. LGS'de en çok net bu soru tipinde kaybedilir." },
+  { ad: "Hız, Dikkat ve Hata Yönetimi", kisa: "Hız ve dikkat", bas: 23, son: 25, oneri: "Pratik işlem ve \"kesinlikle doğru\" gibi ifadeleri doğru okumak. Bilinen sorudaki dikkat hatası da bir net demektir." }
+];
+
+const SORULAR = [
+  { m: '<div class="islem">' + k(3,4) + ' − ' + k(5,12) + '</div><p>işleminin sonucu kaçtır?</p>', s: [k(5,12), k(1,3), k(1,4), k(1,6)], d: "B", b: "Kesir işlemleri", z: 1, c: "Paydaları 12'de eşitleriz: 3/4 = 9/12. Ardından 9/12 − 5/12 = 4/12 = 1/3." },
+  { m: '<p>Bir sınıftaki erkek öğrencilerin kız öğrencilere oranı <b>3 : 5</b>\'tir. Sınıfta toplam 32 öğrenci vardır.</p><p>Kız öğrenci sayısı kaçtır?</p>', s: ["12", "16", "18", "20"], d: "D", b: "Oran", z: 1, c: "Toplam oran birimi 3 + 5 = 8. 32 ÷ 8 = 4 öğrenci bir birime karşılık gelir. Kızlar 5 birim: 5 × 4 = 20." },
+  { m: '<p>480 TL\'lik bir ürüne önce <b>%15 indirim</b>, ardından indirimli fiyat üzerinden <b>%10 zam</b> uygulanıyor.</p><p>Son fiyat kaç TL\'dir?</p>', s: ["448,8", "456", "440", "468"], d: "A", b: "Yüzde ve ardışık değişim", z: 2, c: "İndirimli fiyat 480 × 0,85 = 408 TL. Zamdan sonra 408 × 1,10 = 448,8 TL. Yüzdeler doğrudan birbirinden çıkarılmaz." },
+  { m: '<div class="islem">3(x − 2) + 5 = 2x + 11</div><p>olduğuna göre x kaçtır?</p>', s: ["8", "10", "12", "14"], d: "C", b: "Cebir ve denklem", z: 2, c: "3x − 6 + 5 = 2x + 11 → 3x − 1 = 2x + 11 → x = 12." },
+  { m: '<p>12 cm × 8 cm boyutlarındaki dikdörtgen kartonun bir köşesinden 4 cm × 4 cm\'lik kare kesiliyor.</p>' +
+      '<svg class="sekil" viewBox="0 0 380 200" role="img" aria-label="12 cm uzunluğunda, 8 cm genişliğinde dikdörtgen; sağ üst köşesinden 4 cm kenarlı kare kesiliyor"><rect x="70" y="20" width="240" height="160" rx="3" fill="var(--surface2)" stroke="var(--fg)" stroke-width="3"/><rect x="230" y="20" width="80" height="80" fill="var(--surface)" stroke="var(--bad)" stroke-width="3" stroke-dasharray="9 6"/><text x="270" y="66" text-anchor="middle">4 × 4</text><text x="190" y="198" text-anchor="middle">12 cm</text><text x="52" y="105" text-anchor="middle" transform="rotate(-90 52 105)">8 cm</text></svg>' +
+      '<p>Kalan şeklin çevresi kaç santimetredir?</p>', s: ["36", "40", "44", "48"], d: "B", b: "Geometrik muhakeme", z: 3, c: "Başlangıç çevresi 2(12 + 8) = 40 cm. Köşeden kare kesilince dışarıdan 4 + 4 cm gider, ama aynı uzunlukta iki yeni iç kenar oluşur. Çevre değişmez: 40 cm." },
+  { m: '<p>84 ve 126 sayılarının EBOB\'u kaçtır?</p>', s: ["21", "28", "42", "63"], d: "C", b: "EBOB", z: 2, c: "84 = 2² · 3 · 7 ve 126 = 2 · 3² · 7. Ortak asal çarpanların küçük kuvvetleri: 2 · 3 · 7 = 42." },
+  { m: '<p>Bir duraktan A otobüsü 18 dakikada, B otobüsü 24 dakikada bir geçmektedir. Saat 09.00\'da birlikte geçen otobüsler ilk kez tekrar saat kaçta birlikte geçer?</p>', s: ["10.12", "10.06", "10.24", "09.54"], d: "A", b: "EKOK problemi", z: 2, c: "EKOK(18, 24) = 72 dakika. 09.00'dan 72 dakika sonrası 10.12." },
+  { m: '<div class="islem">N = 2³ · 3² · 5</div><p>sayısının pozitif bölen sayısı kaçtır?</p>', s: ["18", "20", "30", "24"], d: "D", b: "Asal çarpanlar ve bölen sayısı", z: 3, c: "Üslere 1 ekleyip çarparız: (3 + 1)(2 + 1)(1 + 1) = 4 · 3 · 2 = 24." },
+  { m: '<div class="islem">' + k('2⁵ · 4³', '8²') + '</div><p>işleminin sonucu kaçtır?</p>', s: ["16", "32", "64", "8"], d: "B", b: "Üslü ifadeler", z: 2, c: "4³ = (2²)³ = 2⁶ ve 8² = (2³)² = 2⁶. Böylece 2⁵ · 2⁶ ÷ 2⁶ = 2⁵ = 32." },
+  { m: '<div class="islem">' + k('3⁴ · 9²', '27²') + '</div><p>işleminin sonucu kaçtır?</p>', s: ["3", "27", "9", "6"], d: "C", b: "Üslü ifadelerde taban dönüşümü", z: 3, c: "9² = 3⁴ ve 27² = 3⁶. Sonuç 3⁴⁺⁴⁻⁶ = 3² = 9." },
+  { m: '<p>Aşağıdaki tabloda aynı ilişki kullanılmıştır.</p>' + tablo(["Giriş", "Çıkış"], [["2", "7"], ["5", "16"], ["8", "25"], ["12", "?"]]) + '<p>"?" yerine kaç yazılmalıdır?</p>', s: ["34", "36", "39", "37"], d: "D", b: "Örüntü ve ilişki bulma", z: 2, c: "Kural 3x + 1: 2 → 7, 5 → 16, 8 → 25. Bu yüzden 12 → 3 · 12 + 1 = 37." },
+  { m: '<p>72 cm ve 96 cm uzunluğundaki iki kurdele, hiç artmayacak şekilde <b>eşit ve mümkün olan en uzun</b> parçalara ayrılıyor.</p><p>Toplam kaç parça oluşur?</p>', s: ["7", "8", "6", "5"], d: "A", b: "EBOB'u problemde kullanma", z: 3, c: "En uzun eşit parça EBOB(72, 96) = 24 cm. 72 ÷ 24 = 3 ve 96 ÷ 24 = 4 parça; toplam 7." },
+  { m: '<p>Bir sayının %20 fazlasından 24 çıkarıldığında başlangıçtaki sayı elde ediliyor.</p><p>Bu sayı kaçtır?</p>', s: ["100", "144", "120", "110"], d: "C", b: "Yüzde ile denklem kurma", z: 3, c: "1,2x − 24 = x → 0,2x = 24 → x = 120." },
+  { m: '<p>A sayısı B sayısının ' + k(3,5) + '\'ine, B sayısı ise C sayısının ' + k(4,7) + '\'sine eşittir.</p><p>A = 24 ise C kaçtır?</p>', s: ["56", "70", "64", "60"], d: "B", b: "Çok aşamalı oran", z: 3, c: "24 = (3/5)B → B = 40. Ardından 40 = (4/7)C → C = 70." },
+  { m: '<p>Bir üçgenin iç açıları 2 : 3 : 4 oranındadır.</p><p>En büyük açı kaç derecedir?</p>', s: ["60°", "90°", "70°", "80°"], d: "D", b: "Geometri ve oran", z: 2, c: "Oran toplamı 9. 180 ÷ 9 = 20°. En büyük açı 4 · 20 = 80°." },
+  { m: '<p>1200 TL\'lik bir ürüne önce %25 indirim uygulanıyor. Daha sonra kasada 80 TL kupon indirimi yapılıyor.</p><p>Son fiyat kaç TL olur?</p>', s: ["820", "840", "900", "800"], d: "A", b: "Metindeki işlem sırasını belirleme", z: 2, c: "1200 × 0,75 = 900 TL. Kupondan sonra 900 − 80 = 820 TL." },
+  { m: '<p>Bir dijital panoda üç ışığın yanıp sönme aralıkları aşağıdaki gibidir:</p>' + tablo(["Işık", "Yanma aralığı"], [["A", "18 saniye"], ["B", "24 saniye"], ["C", "30 saniye"]]) + '<div class="zaman"><span>10.00.00</span><i aria-hidden="true"></i><span>10.06.00</span></div><p>Üç ışık saat 10.00.00\'da birlikte yanmıştır. Başlangıç anı hariç, bu 6 dakikalık sürede A ve B ışıklarının birlikte yanıp C ışığının yanmadığı kaç an vardır?</p>', s: ["2", "3", "4", "5"], d: "C", b: "EKOK ve koşul eleme", z: 4, c: "A ve B, EKOK(18, 24) = 72 saniyede bir birlikte yanar: 360 saniyede 72, 144, 216, 288 ve 360. saniyelerde, 5 kez. Üçü birlikte EKOK(18, 24, 30) = 360. saniyede yanar. C'nin yanmadığı anlar 5 − 1 = 4." },
+  { m: '<p>Üç internet mağazasının aynı ürün için kampanyaları aşağıdaki gibidir:</p>' + tablo(["Mağaza", "Etiket", "Kampanya"], [["A", "600 TL", "%25 indirim + indirimli fiyat 450 TL veya üzeriyse 30 TL kupon"], ["B", "540 TL", "%15 indirim"], ["C", "640 TL", "%30 indirim + 40 TL kargo"]]) + '<p>Ürünün en pahalı olduğu mağaza ile en ucuz olduğu mağaza arasındaki fiyat farkı kaç TL\'dir?</p>', s: ["58", "68", "78", "88"], d: "B", b: "Tablo okuma ve koşullu bilgi", z: 4, c: "A: 600 × 0,75 = 450, kupon uygulanır → 420 TL. B: 540 × 0,85 = 459 TL. C: 640 × 0,70 = 448, kargoyla 488 TL. Fark 488 − 420 = 68 TL." },
+  { m: '<p>180 cm × 252 cm boyutlarındaki bir pano, kesme yapılmadan <b>mümkün olan en büyük eş karelere</b> ayrılıyor.</p><svg class="sekil" id="izgara" viewBox="0 0 252 180" role="img" aria-label="7 sütun ve 5 satırlık kare ızgara; kenardaki kareler koyu, içteki kareler açık renkli" style="max-width:300px"></svg><p>Sadece panonun kenarlarına temas etmeyen kareler beyaz renkle gösterilecektir. Kaç beyaz kare vardır?</p>', s: ["10", "12", "18", "15"], d: "D", b: "EBOB ile geometrik modelleme", z: 4, c: "En büyük kare kenarı EBOB(180, 252) = 36 cm. Pano 5 × 7 kareye ayrılır. Kenara değmeyen iç bölge (5 − 2) × (7 − 2) = 3 × 5 = 15 kare." },
+  { m: '<p>Bir öğrencinin tabletinde kullanabileceği internet paketleri:</p>' + tablo(["Paket", "Dahil", "Aylık", "Aşım"], [["A", "8 GB", "150 TL", "1 GB başına 20 TL"], ["B", "12 GB", "210 TL", "1 GB başına 10 TL"], ["C", "16 GB", "260 TL", "Aşım yok"]]) + '<p>Öğrenci bir ayda tam 14 GB kullanmıştır. En pahalı seçenek ile en ucuz seçenek arasındaki fark kaç TL\'dir?</p>', s: ["40", "30", "50", "60"], d: "A", b: "Tarife tablosu yorumlama", z: 4, c: "A: 6 GB aşım → 150 + 6 · 20 = 270 TL. B: 2 GB aşım → 210 + 2 · 10 = 230 TL. C: 260 TL. En pahalı 270, en ucuz 230; fark 40 TL." },
+  { m: '<p>Beş öğrenci bir yarışmada 1\'den 5\'e sıralanmıştır: Ece, Mert, Can, Ada, Bora.</p><div class="sira" aria-label="Sıralama: 1 ile 4 arası boş, 5. Bora"><span>1. ______</span><span>2. ______</span><span>3. ______</span><span>4. ______</span><span>5. Bora</span></div><ul class="madde"><li>Mert, Can\'ın hemen önündedir.</li><li>Ada, Can\'ın hemen arkasındadır.</li><li>Ece, Mert\'ten önce gelmiştir.</li></ul><p>Buna göre üçüncü olan kimdir?</p>', s: ["Mert", "Can", "Ada", "Ece"], d: "B", b: "Mantıksal çıkarım", z: 4, c: "Mert-Can-Ada ardışık bir bloktur. Bora 5. olduğundan blok 2-3-4'e yerleşir, Ece 1. olur. Üçüncü Can." },
+  { m: '<p>Bir elektrik şirketinin ücretlendirmesi:</p>' + tablo(["Kullanım", "Ücret"], [["İlk 100 birim", "Birim başına 1,50 TL"], ["100 birimin üzeri", "Her ek birim başına 2 TL"], ["Sabit ücret", "30 TL"]]) + '<p>Bir kullanıcının faturası 260 TL gelmiştir ve kullanıcı 100 birimden fazla elektrik tüketmiştir. Kaç birim tüketmiştir?</p>', s: ["120", "130", "140", "150"], d: "C", b: "Tarife ve cebirsel modelleme", z: 4, c: "İlk 100 birim 150 TL, sabit ücretle 180 TL. Kalan 80 TL ek kullanım: 80 ÷ 2 = 40 birim. Toplam 140 birim." },
+  { m: '<div class="islem">125 × 32</div><p>işleminin sonucu kaçtır?</p>', s: ["3750", "4250", "3600", "4000"], d: "D", b: "Pratik işlem stratejisi", z: 2, c: "32 = 8 × 4. 125 × 8 = 1000 ve 1000 × 4 = 4000." },
+  { m: '<p>Bir öğrencinin dört matematik denemesindeki doğru sayıları:</p>' + tablo(["Deneme", "Doğru"], [["1", "15"], ["2", "18"], ["3", "12"], ["4", "?"]]) + '<p>Dört denemenin doğru ortalaması 16 ise dördüncü denemede kaç doğru yapmıştır?</p>', s: ["19", "17", "18", "20"], d: "A", b: "Veri okuma ve ortalama", z: 2, c: "Toplam doğru 16 × 4 = 64. İlk üç deneme 15 + 18 + 12 = 45. Dördüncü deneme 64 − 45 = 19." },
+  { m: '<p>Dört öğrenci için şu bilgiler verilmiştir:</p><ul class="madde"><li>Deniz, Ayşe\'den önce gelmiştir.</li><li>Ayşe, Burak\'tan önce gelmiştir.</li><li>Burak, Cem\'den önce gelmiştir.</li></ul><p>Buna göre aşağıdakilerden hangisi <b>kesinlikle</b> doğrudur?</p>', s: ["Cem ikinci olmuştur.", "Ayşe birinci olmuştur.", "Deniz, Burak'tan önce gelmiştir.", "Burak, Deniz'den önce gelmiştir."], d: "C", b: "Mantıksal sıralama ve dikkat", z: 2, c: "İlişkiler Deniz, Ayşe, Burak, Cem sırasını zorunlu kılar. Bu yüzden Deniz, Burak'tan kesinlikle önce gelir." }
+];
+const HARF = ["A", "B", "C", "D"];
+const N = SORULAR.length;
+const bolumOf = i => BOLUMLER.findIndex(b => i + 1 >= b.bas && i + 1 <= b.son);
+
+/* ---- Durum ---- */
+const ANAHTAR = "emrehoca-checkup-v1";
+const yeniDurum = () => ({ ad: "", sinif: "8. sınıf", cevap: Array(N).fill(null), i: 0, bas: 0, gecen: 0, bitti: false });
+let D = yeniDurum();
+const kaydet = () => { try { localStorage.setItem(ANAHTAR, JSON.stringify(D)); } catch (e) {} };
+const oku = () => { try { const v = JSON.parse(localStorage.getItem(ANAHTAR) || "null"); if (v && Array.isArray(v.cevap) && v.cevap.length === N) return v; } catch (e) {} return null; };
+const sil = () => { try { localStorage.removeItem(ANAHTAR); } catch (e) {} };
+
+const $ = id => document.getElementById(id);
+const esc = s => String(s == null ? "" : s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const sayi = (n, b) => Number(n).toLocaleString("tr-TR", { maximumFractionDigits: b == null ? 2 : b, minimumFractionDigits: 0 });
+let bzaman;
+const bildir = t => { const b = $("bildirim"); b.textContent = t; b.hidden = false; clearTimeout(bzaman); bzaman = setTimeout(() => { b.hidden = true; }, 2800); };
+const goster = id => { ["giris", "test", "sonuc"].forEach(x => { $(x).hidden = x !== id; }); window.scrollTo(0, 0); };
+
+/* ---- Giriş ---- */
+$("alanListe").innerHTML = BOLUMLER.map(b => '<li><b>' + b.ad + '</b><span>' + (b.son - b.bas + 1) + ' soru</span></li>').join("");
+const eski = oku();
+if (eski && !eski.bitti && eski.cevap.some(c => c !== null)) {
+  $("devam").hidden = false;
+  $("devamBilgi").textContent = eski.cevap.filter(c => c !== null).length + " / " + N + " soru işaretli.";
+}
+$("devamEt").addEventListener("click", () => { D = eski; D.bas = Date.now(); teste(); });
+$("sifirla").addEventListener("click", () => { sil(); $("devam").hidden = true; bildir("Eski test silindi"); });
+$("basForm").addEventListener("submit", e => {
+  e.preventDefault();
+  const sonuc = adKontrol($("ad").value);
+  if (!sonuc.ok) {
+    $("adHata").textContent = sonuc.hata; $("adHata").hidden = false;
+    $("ad").setAttribute("aria-invalid", "true"); $("ad").focus();
+    return;
+  }
+  $("adHata").hidden = true; $("ad").removeAttribute("aria-invalid");
+  D = yeniDurum();
+  D.ad = sonuc.ad;
+  D.sinif = $("sinif").value;
+  D.bas = Date.now();
+  kaydet();
+  teste();
+});
+
+/* ---- Test ---- */
+let saat = null;
+const gecenSn = () => Math.floor(D.gecen + (D.bas ? (Date.now() - D.bas) / 1000 : 0));
+const sureYaz = s => String(Math.floor(s / 60)).padStart(2, "0") + ":" + String(s % 60).padStart(2, "0");
+function teste() {
+  goster("test");
+  $("optik").innerHTML = SORULAR.map((_, i) => '<button type="button" data-git="' + i + '"' + (BOLUMLER.some(b => b.bas === i + 1 && i > 0) ? ' class="ayrac"' : '') + ' aria-label="' + (i + 1) + '. soru">' + (i + 1) + '</button>').join("");
+  clearInterval(saat);
+  saat = setInterval(() => { $("sure").textContent = sureYaz(gecenSn()); }, 1000);
+  ciz();
+}
+function optikGuncelle() {
+  $("optik").querySelectorAll("button").forEach((b, i) => {
+    const c = D.cevap[i];
+    b.classList.toggle("dolu", !!c && c !== "-");
+    b.classList.toggle("bos", c === "-");
+    b.classList.toggle("simdi", i === D.i);
+    if (i === D.i) b.setAttribute("aria-current", "step"); else b.removeAttribute("aria-current");
+  });
+}
+function ciz() {
+  const q = SORULAR[D.i], bo = BOLUMLER[bolumOf(D.i)], zor = D.i >= 16 && D.i <= 21;
+  $("bolumAd").textContent = (bolumOf(D.i) + 1) + ". bölüm · " + bo.ad;
+  $("sure").textContent = sureYaz(gecenSn());
+  $("kart").innerHTML =
+    '<div class="ust2"><h2>' + (D.i + 1) + '. Soru <span class="soluk kucuk num" style="font-family:var(--f-body);font-weight:500">/ ' + N + '</span></h2><span class="rozet' + (zor ? ' zor' : '') + '">' + (zor ? 'Yeni nesil' : 'Check-Up') + '</span></div>' +
+    '<div class="metin">' + q.m + '</div>' +
+    '<div class="secenekler" role="group" aria-label="Şıklar">' + q.s.map((s, j) => '<button type="button" class="secenek" data-sec="' + HARF[j] + '" aria-pressed="' + (D.cevap[D.i] === HARF[j]) + '"><span class="harf">' + HARF[j] + '</span><span>' + s + '</span></button>').join("") + '</div>';
+  if (D.i === 18) izgaraCiz($("izgara"));
+  $("bosBirak").setAttribute("aria-pressed", String(D.cevap[D.i] === "-"));
+  $("bosBirak").textContent = D.cevap[D.i] === "-" ? "Boş bırakıldı" : "Boş bırak";
+  $("geri").disabled = D.i === 0;
+  $("ileri").textContent = D.i === N - 1 ? "Testi bitir" : "Sonraki";
+  $("onay").hidden = true;
+  optikGuncelle();
+}
+function izgaraCiz(svg) {
+  if (!svg) return;
+  let h = "";
+  for (let r = 0; r < 5; r++) for (let c = 0; c < 7; c++) {
+    const kenar = r === 0 || r === 4 || c === 0 || c === 6;
+    h += '<rect x="' + (c * 36 + 1) + '" y="' + (r * 36 + 1) + '" width="34" height="34" fill="' + (kenar ? 'var(--accent)' : 'var(--surface)') + '" fill-opacity="' + (kenar ? '.55' : '1') + '" stroke="var(--line)"/>';
+  }
+  svg.innerHTML = h;
+}
+function git(i) { D.i = Math.max(0, Math.min(N - 1, i)); kaydet(); ciz(); $("kart").scrollIntoView({ block: "nearest" }); }
+$("kart").addEventListener("click", e => {
+  const b = e.target.closest("[data-sec]");
+  if (!b) return;
+  D.cevap[D.i] = D.cevap[D.i] === b.dataset.sec ? null : b.dataset.sec;
+  kaydet(); ciz();
+});
+$("optik").addEventListener("click", e => { const b = e.target.closest("[data-git]"); if (b) git(+b.dataset.git); });
+$("bosBirak").addEventListener("click", () => { D.cevap[D.i] = D.cevap[D.i] === "-" ? null : "-"; kaydet(); ciz(); });
+$("geri").addEventListener("click", () => git(D.i - 1));
+$("ileri").addEventListener("click", () => { if (D.i === N - 1) onayAc(); else git(D.i + 1); });
+$("bitirAc").addEventListener("click", onayAc);
+$("vazgec").addEventListener("click", () => { $("onay").hidden = true; });
+$("bitir").addEventListener("click", bitir);
+function onayAc() {
+  const bos = D.cevap.filter(c => c === null || c === "-").length;
+  $("onayMetin").textContent = bos ? bos + " soru boş. Boş sorular yanlış sayılmaz ama net getirmez. Bitirmek istiyor musun?" : "Bütün soruları işaretledin. Sonucunu görmeye hazır mısın?";
+  $("onay").hidden = false;
+  $("bitir").focus();
+}
+document.addEventListener("keydown", e => {
+  if ($("test").hidden || e.target.matches("input, textarea, select") || e.ctrlKey || e.metaKey || e.altKey) return;
+  const t = e.key.toUpperCase();
+  if (HARF.includes(t)) { D.cevap[D.i] = D.cevap[D.i] === t ? null : t; kaydet(); ciz(); }
+  else if (e.key === "ArrowRight") git(D.i + 1);
+  else if (e.key === "ArrowLeft") git(D.i - 1);
+});
+
+/* ---- Sonuç ---- */
+function bitir() {
+  D.gecen = gecenSn(); D.bas = 0; D.bitti = true;
+  clearInterval(saat);
+  kaydet();
+  sonucCiz();
+}
+function hesapla() {
+  let dg = 0, yn = 0, bs = 0;
+  const alan = BOLUMLER.map(() => ({ d: 0, t: 0 }));
+  const zayifBeceri = [];
+  SORULAR.forEach((q, i) => {
+    const c = D.cevap[i], a = alan[bolumOf(i)];
+    a.t++;
+    if (c === q.d) { dg++; a.d++; }
+    else { if (c === null || c === "-") bs++; else yn++; zayifBeceri.push(q.b); }
+  });
+  return { dg, yn, bs, net: Math.max(0, dg - yn / 3), alan, zayifBeceri: [...new Set(zayifBeceri)] };
+}
+function sonucCiz() {
+  const r = hesapla();
+  const oranlar = r.alan.map(a => a.d / a.t);
+  const enDusuk = oranlar.indexOf(Math.min(...oranlar));
+  const enYuksek = oranlar.indexOf(Math.max(...oranlar));
+  const ad = D.ad ? esc(D.ad) : "";
+  const genel = r.dg >= 21 ? "Matematik altyapın güçlü. Hedef artık hatasız ve hızlı çözmek; puanı küçük dikkat hataları belirleyecek."
+    : r.dg >= 15 ? "Temelin büyük ölçüde yerinde, ama bazı alanlarda düzenli puan kaybediyorsun. Doğru alana odaklanırsan net hızlı yükselir."
+    : r.dg >= 9 ? "Birkaç temel alanda eksik var ve bu eksikler yeni konuları da zorlaştırıyor. Önce temeli kapatmak en hızlı yol."
+    : "Şu an temelde ciddi boşluklar var. Bu kötü bir haber değil: nereden başlayacağımız artık belli.";
+  const oncelikler = oranlar.map((o, i) => ({ o, i })).filter(x => x.o < 0.6).sort((a, b) => a.o - b.o);
+  const mesaj = "Merhaba Emre Hoca, " + (D.ad ? D.ad + " olarak " : "") + "LGS Matematik Check-Up'ı çözdüm (" + D.sinif + "). Sonuç: " + r.dg + "/" + N + " doğru, " + sayi(r.net) + " net. En zayıf alanım: " + BOLUMLER[enDusuk].kisa + " (" + r.alan[enDusuk].d + "/" + r.alan[enDusuk].t + "). Kişisel yol haritası için görüşmek istiyorum.";
+  const waUrl = WHATSAPP ? "https://wa.me/" + WHATSAPP + "?text=" + encodeURIComponent(mesaj) : "";
+  $("sonuc").innerHTML =
+    '<div style="display:grid;gap:8px"><span class="etiket">Check-Up sonucun · ' + esc(D.sinif) + '</span><h1 id="s-baslik">' + (ad ? ad + ", sonucun hazır" : "Sonucun hazır") + '</h1><p class="yorum">' + genel + '</p></div>' +
+    '<div class="skor"><div class="vurgu"><small>Net</small><b>' + sayi(r.net) + '</b></div><div><small>Doğru</small><b>' + r.dg + '</b></div><div><small>Yanlış</small><b>' + r.yn + '</b></div><div><small>Boş</small><b>' + r.bs + '</b></div></div>' +
+    '<p class="soluk kucuk">LGS usulü: 3 yanlış 1 doğruyu götürür. Süre: ' + sureYaz(D.gecen) + ' (önerilen 50:00).</p>' +
+    '<div><h2>Beceri alanların</h2>' + BOLUMLER.map((b, i) => {
+      const a = r.alan[i], o = oranlar[i], zayif = o < 0.6;
+      return '<div class="alan' + (zayif ? ' zayif' : '') + '"><div class="bas"><b>' + b.ad + (i === enDusuk && zayif ? '<span class="durum oncelik">Öncelik</span>' : '') + (i === enYuksek && o >= 0.8 ? '<span class="durum iyi">En güçlü</span>' : '') + '</b><span>' + a.d + ' / ' + a.t + '</span></div>' +
+        '<div class="serit" role="img" aria-label="' + b.ad + ': ' + a.t + ' sorudan ' + a.d + ' doğru"><i style="width:' + Math.max(3, o * 100).toFixed(0) + '%"></i></div>' +
+        (zayif ? '<p>' + b.oneri + '</p>' : '') + '</div>';
+    }).join("") + '</div>' +
+    (r.zayifBeceri.length ? '<div style="display:grid;gap:10px"><h2>Çalışman gereken beceriler</h2><ul class="beceri">' + r.zayifBeceri.map(s => '<li>' + esc(s) + '</li>').join("") + '</ul></div>' : '<p class="yorum"><b>Hiç yanlışın yok.</b> Tebrikler; sıradaki adım süreli denemelerle hızını korumak.</p>') +
+    '<div class="cagri"><h2>Kişisel yol haritanı birlikte çıkaralım</h2><p>' + (oncelikler.length ? 'Sonuçlarına göre önceliğin <b>' + oncelikler.slice(0, 2).map(x => BOLUMLER[x.i].kisa.toLocaleLowerCase("tr-TR")).join(" ve ") + '</b>. ' : '') + 'Bu sonucu Emre Hoca\'ya gönder; 10 dakikalık ücretsiz bir görüşmede hangi konudan, nasıl başlaman gerektiğini birlikte konuşalım.</p>' +
+      '<div class="satir">' + (waUrl ? '<a class="dugme ana" href="' + waUrl + '" target="_blank" rel="noopener">WhatsApp\'tan gönder</a>' : '') + '<button class="dugme ' + (waUrl ? 'duz' : 'ana') + '" type="button" id="kopyala">Mesajı kopyala</button></div>' +
+      '<label class="kucuk" for="mesaj" style="display:grid;gap:6px">Gönderilecek mesaj<textarea id="mesaj" readonly>' + esc(mesaj) + '</textarea></label>' +
+      (NUMARA_GORUNEN ? '<p class="numara">WhatsApp: <b>' + esc(NUMARA_GORUNEN) + '</b></p>' : '<p class="numara">WhatsApp numarası yakında eklenecek. Şimdilik mesajı kopyalayıp Emre Hoca\'ya iletebilirsin.</p>') + '</div>' +
+    '<div style="display:grid;gap:10px"><h2>Soru soru inceleme</h2><p class="soluk kucuk">Bir soruya dokun: senin cevabın, doğru cevap ve çözümü açılır.</p><div class="inceleme">' + SORULAR.map((q, i) => {
+      const c = D.cevap[i], dogru = c === q.d, bos = c === null || c === "-";
+      const isr = dogru ? '<span class="isaret d">Doğru</span>' : bos ? '<span class="isaret b">Boş</span>' : '<span class="isaret y">Yanlış</span>';
+      return '<details' + (!dogru && !bos ? '' : '') + '><summary><span class="ns">' + (i + 1) + '.</span><span class="ne">' + esc(q.b) + '</span>' + isr + '</summary><div class="icerik"><div class="metin">' + q.m.replace(' id="izgara"', ' data-izgara="1"') + '</div>' +
+        '<p><b>Senin cevabın:</b> ' + (bos ? 'Boş' : c + ') ' + q.s[HARF.indexOf(c)]) + ' · <b>Doğru cevap:</b> ' + q.d + ') ' + q.s[HARF.indexOf(q.d)] + '</p>' +
+        '<div class="cozum"><b>Çözüm</b><p>' + esc(q.c) + '</p></div></div></details>';
+    }).join("") + '</div></div>' +
+    '<div class="satir" style="justify-content:center"><button class="dugme duz" type="button" id="yeniden">Testi yeniden çöz</button></div>';
+  $("sonuc").querySelectorAll('[data-izgara]').forEach(izgaraCiz);
+  goster("sonuc");
+  $("kopyala").addEventListener("click", async () => {
+    try { await navigator.clipboard.writeText(mesaj); bildir("Mesaj kopyalandı"); }
+    catch (e) { const t = $("mesaj"); t.focus(); t.select(); bildir("Mesajı seçtim, kopyala de"); }
+  });
+  let emin = false;
+  $("yeniden").addEventListener("click", e => {
+    if (!emin) { emin = true; e.currentTarget.textContent = "Sonuç silinecek. Emin misin? Tekrar bas"; return; }
+    sil(); D = yeniDurum(); $("devam").hidden = true; $("ad").value = ""; goster("giris");
+  });
+}
+
+/* Biten bir test varsa doğrudan sonucu göster */
+if (eski && eski.bitti) { D = eski; sonucCiz(); }
+})();
+</script>
+</body>
+</html>

@@ -38,6 +38,7 @@ Site herkese açıktır; bu dosya da sitede görünür. Bu yüzden buraya şifre
 | **Haftanın meydan okuması** (8. sınıf) | Her hafta 5 zor soru, soru başına 3 dk (`veri/meydan-N.js`, test kodu `meydan-N`). 1. hafta 18 Ekim 2026'da açıldı (`ayarlar.js` → `MEYDAN_BASLANGIC`); her pazar yeni hafta açılır, başlamamış haftalar listelenmez. Ana sayfadaki "Senin için"de kart; sonuçlar normal test gibi panele gelir. **Hazır olan: 4 hafta (8 Kasım–14 Kasım'a kadar).** |
 | **Senin için** (ana sayfalar) | LGS geri sayımı (yalnızca 8. sınıf), bugün tekrar edilecek soru sayısı ve en zayıf 2 konu için öneri (özet, kart, test, yanlışlarım bağlantıları) |
 | **Öğretmen paneli** | `panel.html`; şifreyle açılır; ana sayfanın altındaki küçük bağlantıdan girilir |
+| **Matematik Check-Up** | `check-up/index.html`: tek başına çalışan 25 soruluk ücretsiz tanılama testi (Emre Hoca'nın Check-Up kitapçığı, cevaplar kitapçıkla karşılaştırıldı). 5 beceri alanında sonuç, LGS neti, soru soru çözüm. Sonuç hiçbir yere gönderilmez; öğrenci isterse WhatsApp'tan Emre Hoca'ya hazır mesajla iletir (numara sayfanın başındaki `WHATSAPP` sabitinde). İsim kutusunda küfür, hakaret ve anlamsız yazı süzgeci var (`adKontrol`). Kayıt: localStorage `emrehoca-checkup-v1`. Ana sayfada Deneme bölümünde kutusu var |
 | **7. sınıf** (ayrı giriş: `7-sinif/index.html`) | Tam Sayılar ve Rasyonel Sayılar: tanı testi (`yedi-tanima`, 12 soru · 30 dk, yalnızca tanıma düzeyi) ve görselli 3 karma test (`yedi-test-1..3`, 12'şer soru · 30 dk); online ve yazdırılabilir |
 
 - **7. ve 8. sınıf birbirinden ayrı:**
