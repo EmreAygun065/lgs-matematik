@@ -9,13 +9,16 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600..800&display=swap">
 <link rel="stylesheet" href="cozum-kartlari/ortak/stil.css?v=20261016b">
-<link rel="stylesheet" href="cozum-kartlari/ortak/giris.css?v=20261019a">
+<link rel="stylesheet" href="cozum-kartlari/ortak/giris.css?v=20261026a">
 </head>
 <body>
 <div class="sayfa">
   <div class="ust-cubuk">
     <span class="marka">Emre Hoca</span>
-    <button class="theme-btn" id="themeBtn" title="Açık / koyu tema">◐ Tema</button>
+    <div class="ust-sag">
+      <a class="cu-ust" href="check-up/">Ücretsiz Check-Up</a>
+      <button class="theme-btn" id="themeBtn" title="Açık / koyu tema">◐ Tema</button>
+    </div>
   </div>
 
   <section class="defter" aria-labelledby="baslik">
@@ -33,6 +36,26 @@
         <span class="ilerleme" data-ilerleme="deneme-1,deneme-2,deneme-3,deneme-4,deneme-5,deneme-6" data-birim="deneme"></span></a>
     </nav>
     <p class="not">İlerlemen yalnızca bu cihazda tutulur. Başka bir cihazda çözdüğün testler burada görünmez.</p>
+  </section>
+
+  <section class="checkup" aria-labelledby="cu-baslik">
+    <div class="cu-sol">
+      <span class="cu-etiket">Ücretsiz · 25 soru · yaklaşık 50 dakika</span>
+      <h2 id="cu-baslik" class="baslik-font">Matematikte nerede puan kaybediyorsun?</h2>
+      <p class="cu-aciklama">LGS Matematik Check-Up, kaç net yaptığını değil <b>neden net kaybettiğini</b> gösterir. Testin sonunda 5 beceri alanındaki durumunu ve her sorunun çözümünü görürsün.</p>
+      <div class="cu-dugmeler">
+        <a class="cu-dugme" href="check-up/">Check-Up'ı ücretsiz çöz</a>
+        <span>Üyelik yok, sonuç hemen ekranda.</span>
+      </div>
+    </div>
+    <div class="cu-ornek" role="img" aria-label="Örnek sonuç raporu: Temel altyapı 5 üzerinden 5, Hazırbulunuşluk 5 üzerinden 4, Muhakeme 6 üzerinden 4, Yeni nesil 6 üzerinden 2 (öncelik), Hız ve dikkat 3 üzerinden 3">
+      <small>Örnek sonuç raporu</small>
+      <div class="cu-satir"><span>Temel altyapı</span><b>5/5</b><i style="--o:100%"></i></div>
+      <div class="cu-satir"><span>Hazırbulunuşluk</span><b>4/5</b><i style="--o:80%"></i></div>
+      <div class="cu-satir"><span>Muhakeme</span><b>4/6</b><i style="--o:67%"></i></div>
+      <div class="cu-satir zayif"><span>Yeni nesil <em>Öncelik</em></span><b>2/6</b><i style="--o:33%"></i></div>
+      <div class="cu-satir"><span>Hız ve dikkat</span><b>3/3</b><i style="--o:100%"></i></div>
+    </div>
   </section>
 
   <section class="senin" id="seninIcin" data-seviye="8" data-kok="cozum-kartlari/" aria-labelledby="senin-baslik" hidden>
@@ -64,11 +87,6 @@
         <h3>Yanlışlarım ve Boşlarım</h3>
         <p class="aciklama">Test ve denemelerde yanlış yaptığın ve boş bıraktığın sorular burada toplanır.</p>
         <ul><li><a href="cozum-kartlari/yanlislarim.html"><span>📒 Yanlışlarımı tekrar çöz</span></a></li></ul>
-      </div>
-      <div class="sutun">
-        <h3>Matematik Check-Up</h3>
-        <p class="aciklama">25 soruluk ücretsiz tanılama testi. 5 beceri alanında nerede güçlü, nerede eksik olduğunu gösterir.</p>
-        <ul><li><a href="check-up/"><span>🩺 Check-Up'ı çöz</span><em>25</em></a></li></ul>
       </div>
     </div>
   </section>
